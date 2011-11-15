@@ -25,14 +25,14 @@ opts.parse!(ARGV.dup)
 config_file ||= ::File.expand_path("../../config/acm.yml", __FILE__)
 config = YAML.load_file(config_file)
 
-CollabSpaces::Config.configure(config)
+ACM::Config.configure(config)
 
 require "acm_controller"
 
 thin_server = Thin::Server.new("0.0.0.0", config["port"], :signals => false) do
   use Rack::CommonLogger
   map "/" do
-    run CollabSpaces::Controller::RackController.new
+    run ACM::Controller::RackController.new
   end
 end
 

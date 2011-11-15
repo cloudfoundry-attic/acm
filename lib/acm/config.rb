@@ -2,10 +2,10 @@ require "monitor"
 require "logger"
 require "securerandom"
 
-require "collab_spaces/thread_formatter"
+require "acm/thread_formatter"
 
 
-module CollabSpaces
+module ACM
 
   class Config
 
@@ -17,7 +17,6 @@ module CollabSpaces
         :db,
         :name,
         :revision,
-        :uaa,
         :basic_auth
       ]
 
@@ -58,18 +57,10 @@ module CollabSpaces
         @db.sql_log_level = :debug
         Sequel::Model.plugin :validation_helpers
 
-        create_default_org_and_project()
-
         @lock = Monitor.new
 
         puts "Configuration complete"
-        @logger.debug("Collab Spaces running")
-
-        #@show_exceptions = config["sinatra"]["show_exceptions"]
-        #@raise_errors = config["sinatra"]["raise_errors"]
-        #@dump_errors = config["sinatra"]["dump_errors"]
-
-        @uaa = { :host => "localhost", :port => 8080, :context => "/cloudfoundry-identity-uaa", :user => "app", :password => "appclientsecret" }
+        @logger.debug("ACM running")
 
         @basic_auth = { :user => config["basic_auth"]["user"], :password => config["basic_auth"]["password"]}
 
@@ -89,7 +80,7 @@ module CollabSpaces
             opts[:database] = ':memory:' if blank_object?(opts[:database])
             db = ::SQLite3::Database.new(opts[:database])
             db.busy_handler do |retries|
-              CollabSpaces::Config.logger.debug "SQLITE BUSY, retry ##{retries}"
+              ACM::Config.logger.debug "SQLITE BUSY, retry ##{retries}"
               sleep(0.1)
               retries < 20
             end
@@ -104,43 +95,6 @@ module CollabSpaces
             db
           end
         end
-      end
-
-      def create_default_org_and_project()
-
-        @logger.debug("Is default org available?")
-        ds = @db[:resources]
-        all_org = ds.filter(:name => :all.to_s, :type => :organization.to_s).all()
-        if(all_org.nil? || all_org.size() == 0)
-          @logger.debug("Creating default org")
-          @db[:resources].insert(:id => -1,
-                                 :name => "all",
-                                 :owner_id => -1,
-                                 :type => "organization",
-                                 :description => "Root cloudfoundry org",
-                                 :immutable_id => SecureRandom.uuid,
-                                 :created_at => Time.now,
-                                 :last_updated_at => Time.now)
-          @db[:resources].insert(:id => -2,
-                                 :name => "all",
-                                 :owner_id => -1,
-                                 :type => "project",
-                                 :description => "Project for the root cloudfoundry org",
-                                 :immutable_id => SecureRandom.uuid,
-                                 :created_at => Time.now,
-                                 :last_updated_at => Time.now)
-          @db[:resources].insert(:id => -3,
-                                 :name => "organization",
-                                 :owner_id => -1,
-                                 :type => "resource_type",
-                                 :description => "Organization resource type for the root cloudfoundry org",
-                                 :immutable_id => SecureRandom.uuid,
-                                 :created_at => Time.now,
-                                 :last_updated_at => Time.now)
-        else
-          @logger.debug("Yes")
-        end
-
       end
 
     end
