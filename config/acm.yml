@@ -1,0 +1,14 @@
+---
+name: Collab Spaces
+port: 9090
+logging:
+  level: DEBUG
+  file: /tmp/acm.log
+dir: /tmp/acm_dir
+db:
+  database: "sqlite://acm.db"
+  max_connections: 32
+  pool_timeout: 10
+basic_auth:
+  user: acm_user
+  password: acm_password1234

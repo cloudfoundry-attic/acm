@@ -1,0 +1,45 @@
+#!/usr/bin/env ruby
+#
+ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../../Gemfile", __FILE__)
+
+require "rubygems"
+require "bundler/setup"
+
+$:.unshift(File.expand_path("../../lib", __FILE__))
+$:.unshift(File.expand_path("../../lib/acm", __FILE__))
+$:.unshift(File.expand_path("../../lib/acm/models", __FILE__))
+
+require "config"
+require "thin"
+
+config_file = nil
+
+opts = OptionParser.new do |opts|
+  opts.on("-c", "--config [ARG]", "Configuration File") do |opt|
+    config_file = opt
+  end
+end
+
+opts.parse!(ARGV.dup)
+
+config_file ||= ::File.expand_path("../../config/acm.yml", __FILE__)
+config = YAML.load_file(config_file)
+
+CollabSpaces::Config.configure(config)
+
+require "acm_controller"
+
+thin_server = Thin::Server.new("0.0.0.0", config["port"], :signals => false) do
+  use Rack::CommonLogger
+  map "/" do
+    run CollabSpaces::Controller::RackController.new
+  end
+end
+
+["TERM", "INT", "QUIT"].each do |signal|
+  trap(signal) do
+    thin_server.stop!
+  end
+end
+
+thin_server.start!
