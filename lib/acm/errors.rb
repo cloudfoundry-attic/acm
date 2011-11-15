@@ -1,5 +1,5 @@
 
-module CollabSpaces
+module ACM
 
   OK                    = 200
   CREATED               = 201
@@ -12,7 +12,7 @@ module CollabSpaces
 
   INTERNAL_SERVER_ERROR = 500
 
-  class CollabSpacesError < StandardError
+  class ACMError < StandardError
     attr_reader :response_code
     attr_reader :error_code
 
@@ -25,7 +25,7 @@ module CollabSpaces
   end
 
   [
-   ["ResourceNotFound",        NOT_FOUND,   1000, "Resource %s not found"],
+   ["ObjectNotFound",        NOT_FOUND,   1000, "Object %s not found"],
    ["InvalidRequest",          BAD_REQUEST, 1001, "Invalid request: \"%s\""],
    ["Unauthorized",            UNAUTHORIZED, 1002, "Unauthorized"],
 
@@ -34,13 +34,13 @@ module CollabSpaces
   ].each do |e|
     class_name, response_code, error_code, format = e
 
-    klass = Class.new CollabSpacesError do
+    klass = Class.new ACMError do
       define_method :initialize do |*args|
         super(response_code, error_code, format, *args)
       end
     end
 
-    CollabSpaces.const_set(class_name, klass)
+    ACM.const_set(class_name, klass)
   end
 
 end
