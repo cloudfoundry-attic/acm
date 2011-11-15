@@ -13,11 +13,7 @@ module ACM
       def initialize
         super
         @logger = Config.logger
-        @logger.debug("ApiController is up")
-      end
-
-      use Rack::Auth::Basic, "Restricted Area" do |username, password|
-        [username, password] == [Config.basic_auth[:user], Config.basic_auth[:password]]
+        @logger.debug("ACM ApiController is up")
       end
 
       ###################  /token_info  ###################
