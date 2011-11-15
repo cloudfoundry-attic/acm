@@ -3,7 +3,7 @@ name: Collab Spaces
 port: 9090
 logging:
   level: DEBUG
-  file: /tmp/acm.log
+  file: ../log/acm.log
 dir: /tmp/acm_dir
 db:
   database: "sqlite://acm.db"
