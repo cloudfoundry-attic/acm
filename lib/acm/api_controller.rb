@@ -1,5 +1,6 @@
 require 'acm/errors'
 require 'acm_controller'
+require 'acm/routes/route_objects'
 require 'sinatra/base'
 require 'json'
 require 'net/http'
@@ -15,8 +16,6 @@ module ACM
         @logger = Config.logger
         @logger.debug("ACM ApiController is up")
       end
-
-      load 'routes/route_objects.rb'
 
       configure do
         set(:show_exceptions, false)
