@@ -3,7 +3,7 @@ Sequel.migration do
     create_table :objects do
       primary_key   :id
       string         :immutable_id, :null => false, :unique => true
-      foreign_key   :object_type_id, :object_types
+      foreign_key   :permission_set_id, :permission_sets
       string         :name
       text          :metadata_json
 
@@ -12,7 +12,7 @@ Sequel.migration do
 
     end
 
-    create_table :object_types do
+    create_table :permission_sets do
       primary_key   :id
       string          :name, :null => false, :unique => true
 
@@ -21,15 +21,21 @@ Sequel.migration do
 
     end
 
+    create_table :object_permission_set_map do
+      primary_key   :id
+      foreign_key   :object_id, :objects
+      foreign_key   :permission_set_id, :permission_sets
+    end
+
     create_table :permissions do
       primary_key   :id
-      foreign_key   :object_type_id, :object_types
+      foreign_key   :permission_set_id, :permission_sets
       string          :name, :null => false
 
       time          :created_at, :null => false
       time          :last_updated_at, :null => false
 
-      unique        ([:object_type_id, :name])
+      unique        ([:permission_set_id, :name])
 
     end
 
@@ -72,7 +78,7 @@ Sequel.migration do
     drop_table    :access_control_entities
     drop_table    :permissions
     drop_table    :objects
-    drop_table    :object_types
+    drop_table    :permission_sets
 
   end
 end
