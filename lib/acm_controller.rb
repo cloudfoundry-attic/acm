@@ -16,22 +16,22 @@ module ACM
       def initialize
         super
         @logger = Config.logger
+        api_controller = ApiController.new
+
+        @logger.debug("Created ApiController")
+
+        @app = Rack::Auth::Basic.new(api_controller) do |username, password|
+          [username, password] == [Config.basic_auth[:user], Config.basic_auth[:password]]
+        end
+        @app.realm = "ACM"
+
       end
 
       def call(env)
 
         @logger.debug("Call with parameters #{env.inspect}")
 
-        api_controller = ApiController.new
-
-        @logger.debug("Created ApiController")
-
-        app = Rack::Auth::Basic.new(api_controller) do |user, password|
-          api_controller.authenticate(user, password)
-        end
-        app.realm = "ACM"
-
-        status, headers, body = app.call(env)
+        status, headers, body = @app.call(env)
         headers["Date"] = Time.now.rfc822 # As thin doesn't inject date
 
         [ status, headers, body ]
