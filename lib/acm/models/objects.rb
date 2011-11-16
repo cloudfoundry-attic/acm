@@ -1,4 +1,5 @@
 require 'acm/models/acm_common_model'
+require 'acm/models/permission_set'
 
 require 'sequel'
 require 'json'
@@ -15,7 +16,6 @@ module ACM::Models
     def before_create
       super
       set_immutable_id
-
     end
 
     def set_immutable_id
@@ -25,7 +25,15 @@ module ACM::Models
 
     def to_json
       {
-        "name" => self.name
+        :name => self.name,
+        :type => self.permission_sets.nil? || self.permission_sets.size == 0 ? nil : self.permission_sets[0].name,
+        :id => self.immutable_id,
+        :additional_info => self.additional_info,
+        :meta => {
+          :created => self.created_at,
+          :updated => self.last_updated_at,
+          :schema => latest_schema
+        }
       }.to_json()
     end
   end

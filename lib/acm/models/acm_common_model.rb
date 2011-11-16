@@ -22,5 +22,9 @@ module ACM::Models
       self.last_updated_at = Time.now()
     end
 
+    def latest_schema
+      "urn:acm:schemas:1.0"
+    end
+
   end
 end

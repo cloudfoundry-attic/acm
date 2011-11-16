@@ -6,11 +6,11 @@ module ACM
 
     class ObjectService < ACMService
 
-      def create_object(opts)
+      def create_object(opts = nil)
 
         o = ACM::Models::Objects.new(
-          :name => opts[:name],
-          :additional_info => opts[:additional_info]
+          :name => !opts.nil? ? opts[:name] : nil,
+          :additional_info => !opts.nil? ? opts[:additional_info] : nil
         )
 
         begin

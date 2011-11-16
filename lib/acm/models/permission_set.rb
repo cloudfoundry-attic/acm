@@ -1,7 +1,7 @@
 require 'sequel'
 
 module ACM::Models
-  class PermissionSets < Sequel::Model(:permission_sets)
+  class PermissionSet < Sequel::Model(:permission_sets)
 
     many_to_many :objects,
                  :left_key => :permission_set_id, :right_key => :object_id,
