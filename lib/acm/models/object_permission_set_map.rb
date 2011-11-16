@@ -1,5 +1,9 @@
 require 'sequel'
 
-class ObjectPermissionSetMap < Sequel::Model(:object_permission_set_map)
+module ACM::Models
+  class ObjectPermissionSetMap < Sequel::Model(:object_permission_set_map)
 
+    many_to_one :permission_set, :class => :PermissionSets
+
+  end
 end

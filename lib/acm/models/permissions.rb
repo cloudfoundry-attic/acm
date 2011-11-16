@@ -1,5 +1,9 @@
 require 'sequel'
 
-class Permissions < Sequel::Model(:permissions)
+module ACM::Models
+  class Permissions < Sequel::Model(:permissions)
 
+    many_to_one :permission_set, :class => :PermissionSets
+
+  end
 end

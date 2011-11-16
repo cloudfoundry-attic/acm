@@ -5,7 +5,7 @@ Sequel.migration do
       string         :immutable_id, :null => false, :unique => true
       foreign_key   :permission_set_id, :permission_sets
       string         :name
-      text          :metadata_json
+      text          :additional_info
 
       time          :created_at, :null => false
       time          :last_updated_at, :null => false
