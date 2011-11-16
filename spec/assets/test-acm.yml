@@ -1,0 +1,12 @@
+---
+name: ACM
+port: 9090
+logging:
+  level: DEBUG
+  file: ../log/acm-test.log
+dir: /tmp/acm_dir
+db:
+  database: "sqlite://acm.db"
+  max_connections: 32
+  pool_timeout: 10
+

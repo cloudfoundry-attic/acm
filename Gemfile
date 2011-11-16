@@ -1,7 +1,6 @@
+
 source :rubygems
 
-gem "bcrypt-ruby"
-gem "httpclient"
 gem "rack-test"         # needed for console
 gem "rake"
 gem "sequel"
@@ -21,9 +20,7 @@ end
 
 group :test do
   gem "autotest", :platforms => :ruby_19
-  gem "ci_reporter"
   gem "machinist"
-  gem "minitar"
   gem "rspec"
   gem "ruby-debug", :platforms => :ruby_18
   gem "ruby-debug19", :platforms => :ruby_19
