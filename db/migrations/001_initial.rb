@@ -76,6 +76,7 @@ Sequel.migration do
     drop_table    :members
     drop_table    :groups
     drop_table    :access_control_entities
+    drop_table    :object_permission_set_map
     drop_table    :permissions
     drop_table    :objects
     drop_table    :permission_sets
