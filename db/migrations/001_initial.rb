@@ -51,11 +51,12 @@ Sequel.migration do
       unique        ([:object_id, :group_id, :permission_id])
     end
 
-    create_table :groups do
+    create_table :subjects do
       primary_key   :id
       string         :immutable_id, :null => false, :unique => true
-      foreign_key   :object_id, :objects
-      string         :name
+      string         :type, :null => false
+      foreign_key   :object_id, :objects, :null => true
+      text          :additional_info
 
       time          :created_at, :null => false
       time          :last_updated_at, :null => false
@@ -63,8 +64,8 @@ Sequel.migration do
 
     create_table :members do
       primary_key   :id
-      foreign_key   :group_id, :groups
-      integer         :user_id
+      foreign_key   :group_id, :subjects
+      foreign_key   :user_id, :subjects
 
       time          :created_at, :null => false
       time          :last_updated_at, :null => false
@@ -74,7 +75,7 @@ Sequel.migration do
 
   down do
     drop_table    :members
-    drop_table    :groups
+    drop_table    :subjects
     drop_table    :access_control_entities
     drop_table    :object_permission_set_map
     drop_table    :permissions

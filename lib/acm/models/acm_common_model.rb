@@ -18,7 +18,7 @@ module ACM::Models
 
     def before_update
       super
-      @logger.debug("self.last_updated_at #{self.inspect}")
+      @logger.debug("self.last_updated_at #{self.last_updated_at.inspect}")
       self.last_updated_at = Time.now()
     end
 

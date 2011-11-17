@@ -1,42 +1,36 @@
-module ACM; module Controller; end; end
-
 require "acm/config"
 require "acm/api_controller"
 
 require "sequel"
 require "yajl"
 
-module ACM
+module ACM::Controller
 
-  module Controller
+  class RackController
+    PUBLIC_URLS = ["/info"]
 
-    class RackController
-      PUBLIC_URLS = ["/info"]
+    def initialize
+      super
+      @logger = Config.logger
+      api_controller = ApiController.new
 
-      def initialize
-        super
-        @logger = Config.logger
-        api_controller = ApiController.new
+      @logger.debug("Created ApiController")
 
-        @logger.debug("Created ApiController")
-
-        @app = Rack::Auth::Basic.new(api_controller) do |username, password|
-          [username, password] == [Config.basic_auth[:user], Config.basic_auth[:password]]
-        end
-        @app.realm = "ACM"
-
+      @app = Rack::Auth::Basic.new(api_controller) do |username, password|
+        [username, password] == [Config.basic_auth[:user], Config.basic_auth[:password]]
       end
+      @app.realm = "ACM"
 
-      def call(env)
+    end
 
-        @logger.debug("Call with parameters #{env.inspect}")
+    def call(env)
 
-        status, headers, body = @app.call(env)
-        headers["Date"] = Time.now.rfc822 # As thin doesn't inject date
+      @logger.debug("Call with parameters #{env.inspect}")
 
-        [ status, headers, body ]
-      end
+      status, headers, body = @app.call(env)
+      headers["Date"] = Time.now.rfc822 # As thin doesn't inject date
 
+      [ status, headers, body ]
     end
 
   end

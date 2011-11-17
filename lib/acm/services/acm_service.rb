@@ -1,14 +1,10 @@
 
-module ACM
+module ACM::Services
 
-  module Services
+  class ACMService
 
-    class ACMService
-
-      def initialize
-        @logger = Config.logger
-      end
-
+    def initialize
+      @logger = ACM::Config.logger
     end
 
   end
