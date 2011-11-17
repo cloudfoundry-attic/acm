@@ -67,8 +67,20 @@ describe ACM::Services::ObjectService do
       obj_id = object[:id]
       obj_id.should_not be_nil
 
+      user_json = @user_service = ACM::Services::UserService.new().create_user()
 
+      user = Yajl::Parser.parse(user_json, :symbolize_keys => true)
 
+      user_id = user[:id]
+      user_id.should_not be_nil
+
+      new_object_json = @object_service.add_permission(obj_id, :read_appspace, user_id)
+
+      new_object = Yajl::Parser.parse(new_object_json, :symbolize_keys => true)
+
+      new_object[:id].should_be eql(obj_id)
+
+      (new_object[:acl][:read_appspace].include? user_id).should be_true
     end
 
   end
