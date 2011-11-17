@@ -8,6 +8,7 @@ module ACM::Services
     def create_user(opts = nil)
 
       s = ACM::Models::Subjects.new(
+        :immutable_id => (!opts.nil? && !opts[:id].nil?) ? opts[:id] : SecureRandom.uuid(),
         :type => :user.to_s,
         :additional_info => !opts.nil? ? opts[:additional_info] : nil
       )

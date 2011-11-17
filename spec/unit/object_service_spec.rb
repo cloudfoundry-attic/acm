@@ -68,7 +68,7 @@ describe ACM::Services::ObjectService do
       obj_id.should_not be_nil
 
 
-      #@object_service.add_permission(obj_id, "read_app")
+
     end
 
   end

@@ -21,7 +21,9 @@ module ACM::Models
     end
 
     def set_immutable_id
-      self.immutable_id = SecureRandom.uuid
+      if(self.immutable_id.nil?)
+        self.immutable_id = SecureRandom.uuid()
+      end
       @logger.debug("Immutable id for subject #{self.type} is #{self.immutable_id}")
     end
 
