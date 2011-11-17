@@ -43,12 +43,12 @@ Sequel.migration do
       primary_key   :id
       foreign_key   :object_id, :objects
       foreign_key   :permission_id, :permissions
-      foreign_key   :group_id, :groups
+      foreign_key   :subject_id, :subjects
 
       time          :created_at, :null => false
       time          :last_updated_at, :null => false
 
-      unique        ([:object_id, :group_id, :permission_id])
+      unique        ([:object_id, :subject_id, :permission_id])
     end
 
     create_table :subjects do
