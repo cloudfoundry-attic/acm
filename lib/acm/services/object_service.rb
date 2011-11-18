@@ -57,6 +57,18 @@ module ACM::Services
 
     end
 
+    def read_object(obj_id)
+
+      object = ACM::Models::Objects.filter(:immutable_id => obj_id).first()
+
+      if(object.nil?)
+        @logger.error("Could not find object with id #{obj_id.inspect}")
+        raise ACM::ObjectNotFound.new("#{obj_id.inspect}")
+      end
+
+      object.to_json()
+    end
+
     def add_permission(obj_id, permission, user_id)
       @logger.debug("adding permissions")
 

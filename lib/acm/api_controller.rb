@@ -1,6 +1,6 @@
 require 'acm/errors'
 require 'acm_controller'
-require 'acm/routes/route_objects'
+require 'acm/routes/object_controller'
 require 'sinatra/base'
 require 'json'
 require 'net/http'
@@ -11,7 +11,7 @@ module ACM::Controller
 
     def initialize
       super
-      @logger = Config.logger
+      @logger = ACM::Config.logger
       @logger.debug("ACM ApiController is up")
     end
 

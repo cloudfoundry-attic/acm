@@ -75,6 +75,7 @@ Rspec.configure do |rspec_config|
     FileUtils.mkdir_p(acm_dir)
     ACM::Config.logger = logger
     ACM::Config.db = db
+    ACM::Config.basic_auth = { :user => :admin.to_s, :password => :password.to_s }
 
   end
 

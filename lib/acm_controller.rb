@@ -11,13 +11,13 @@ module ACM::Controller
 
     def initialize
       super
-      @logger = Config.logger
+      @logger = ACM::Config.logger
       api_controller = ApiController.new
 
       @logger.debug("Created ApiController")
 
       @app = Rack::Auth::Basic.new(api_controller) do |username, password|
-        [username, password] == [Config.basic_auth[:user], Config.basic_auth[:password]]
+        [username, password] == [ACM::Config.basic_auth[:user], ACM::Config.basic_auth[:password]]
       end
       @app.realm = "ACM"
 

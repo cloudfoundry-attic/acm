@@ -59,11 +59,10 @@ module ACM
 
         @lock = Monitor.new
 
+        @basic_auth = {:user => config["basic_auth"]["user"], :password => config["basic_auth"]["password"]}
+
         puts "Configuration complete"
         @logger.debug("ACM running")
-
-        @basic_auth = { :user => config["basic_auth"]["user"], :password => config["basic_auth"]["password"]}
-
       end
 
       def logger=(logger)
