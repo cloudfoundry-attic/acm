@@ -68,7 +68,9 @@ module ACM::Services
       requested_permission = ACM::Models::Permissions.join(:permission_sets, :id => :permission_set_id)
                                                     .join(:object_permission_set_map, :permission_set_id => :id)
                                                     .filter(:object_permission_set_map__object_id => object.id)
-                                                    .filter(:permissions__name => permission.to_s).first()
+                                                    .filter(:permissions__name => permission.to_s)
+                                                    .select(:permissions__id, :permissions__name)
+                                                    .first()
       @logger.debug("requested permission #{requested_permission.inspect}")
 
       #find the subject
