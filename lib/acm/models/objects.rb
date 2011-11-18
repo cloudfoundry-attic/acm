@@ -34,16 +34,19 @@ module ACM::Models
         :id => self.immutable_id,
         :additional_info => self.additional_info,
       }
+
       output_object[:acls] = {}
       access_control_entries.each { |access_control_entry|
-        @logger.debug("Access control entry for object #{self.id} #{access_control_entry.inspect}")
-        subject_array = []
-        access_control_entry.subjects.each { |subject|
-          subject_array.insert(0, subject.immutable_id)
-        }
-        @logger.debug("SubjectArray for acl id #{access_control_entry.id} is #{subject_array.inspect}")
-        if(subject_array.size > 0)
-          output_object[:acls][access_control_entry.permission.name] = subject_array
+        @logger.debug("Access Control entry #{access_control_entry.inspect}")
+        perimission_name = access_control_entry.permission.name
+        @logger.debug("Permission name #{perimission_name.inspect}")
+        subjects = access_control_entry.subjects
+        @logger.debug("Subjects #{subjects.inspect}")
+        subject_list = []
+        subjects.each{|subject| subject_list.insert(0, subject.immutable_id)}
+
+        if(subject_list.size() > 0)
+          output_object[:acls][perimission_name] = subject_list
         end
       }
 

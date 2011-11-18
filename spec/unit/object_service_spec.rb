@@ -83,32 +83,58 @@ describe ACM::Services::ObjectService do
 
   describe "adding permissions to an object" do
 
-    it "should update the object entity with a new acl" do
+    before(:each) do
       o_json = @object_service.create_object(:name => "www_staging",
                                             :additional_info => {:description => :staging_app_space}.to_json(),
                                             :permission_sets => [:app_space])
 
       object = Yajl::Parser.parse(o_json, :symbolize_keys => true)
 
-      obj_id = object[:id]
-      obj_id.should_not be_nil
+      @obj_id = object[:id]
+      @obj_id.should_not be_nil
 
       user_json = @user_service = ACM::Services::UserService.new().create_user()
 
       user = Yajl::Parser.parse(user_json, :symbolize_keys => true)
 
-      user_id = user[:id]
-      user_id.should_not be_nil
+      @user_id = user[:id]
+      @user_id.should_not be_nil
 
-      new_object_json = @object_service.add_permission(obj_id, :read_appspace, user_id)
+    end
+
+    it "should update the object entity with a new acl" do
+      new_object_json = @object_service.add_permission(@obj_id, :read_appspace, @user_id)
 
       @logger.debug("Returned object is #{new_object_json.inspect}")
 
       new_object = Yajl::Parser.parse(new_object_json, :symbolize_keys => true)
 
-      new_object[:id].should eql(obj_id)
+      new_object[:id].should eql(@obj_id)
 
-      (new_object[:acls][:read_appspace].include? user_id).should be_true
+      (new_object[:acls][:read_appspace].include? @user_id).should be_true
+    end
+
+    it "should update the object entity with multiple acls " do
+      new_object_json = @object_service.add_permission(@obj_id, :read_appspace, @user_id)
+
+      @logger.debug("Returned object is #{new_object_json.inspect}")
+
+      user2_json = @user_service = ACM::Services::UserService.new().create_user()
+
+      user2 = Yajl::Parser.parse(user2_json, :symbolize_keys => true)
+
+      new_object2_json = @object_service.add_permission(@obj_id, :read_appspace, user2[:id])
+
+      @logger.debug("Returned object is #{new_object2_json.inspect}")
+
+      new_object = Yajl::Parser.parse(new_object_json, :symbolize_keys => true)
+      new_object2 = Yajl::Parser.parse(new_object2_json, :symbolize_keys => true)
+
+      new_object[:id].should eql(@obj_id)
+      new_object2[:id].should eql(@obj_id)
+
+      (new_object[:acls][:read_appspace].include? @user_id).should be_true
+      (new_object2[:acls][:read_appspace].include? user2[:id]).should be_true
     end
 
   end

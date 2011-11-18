@@ -58,29 +58,39 @@ module ACM::Services
     end
 
     def add_permission(obj_id, permission, user_id)
+      @logger.debug("adding permissions")
 
       #Find the object
       object = ACM::Models::Objects.filter(:immutable_id => obj_id.to_s).first()
+      @logger.debug("requested object #{object.inspect}")
 
       #Find the requested permission only if it belongs to a permission set that is related to that object
       requested_permission = ACM::Models::Permissions.join(:permission_sets, :id => :permission_set_id)
                                                     .join(:object_permission_set_map, :permission_set_id => :id)
                                                     .filter(:object_permission_set_map__object_id => object.id)
                                                     .filter(:permissions__name => permission.to_s).first()
-
       @logger.debug("requested permission #{requested_permission.inspect}")
 
       #find the subject
       subject = ACM::Models::Subjects.filter(:immutable_id => user_id.to_s).first()
+      @logger.debug("requested subject #{requested_permission.inspect}")
 
       ACM::Config.db.transaction do
-        new_access_control_entry = object.add_access_control_entry(:object_id => object.id,
-                                                             :permission_id => requested_permission.id)
-        new_access_control_entry.add_subject(subject)
-        @logger.debug("AccessControlEntry #{new_access_control_entry.inspect}")
-      end
+        object_aces = object.access_control_entries.select{|ace| ace.permission_id == requested_permission.id}
+        ace = nil
+        if(object_aces.size() == 0)
+          ace = object.add_access_control_entry(:object_id => object.id,
+                                               :permission_id => requested_permission.id)
+          @logger.debug("new ace #{ace.inspect}")
+        else
+          ace = object_aces[0]
+          @logger.debug("found ace #{ace.inspect}")
+        end
 
-      @logger.debug("Modified object #{object.inspect}")
+        ace.add_subject(subject)
+
+        @logger.debug("subjects for ace #{ace.id} are #{ACM::Models::AceSubjectMap.filter(:access_control_entry_id => ace.id).count().inspect}")
+      end
 
       object.to_json
     end
