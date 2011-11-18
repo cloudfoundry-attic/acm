@@ -108,7 +108,7 @@ describe ACM::Services::ObjectService do
 
       new_object[:id].should eql(obj_id)
 
-      (new_object[:acl][:read_appspace].include? user_id).should be_true
+      (new_object[:acls][:read_appspace].include? user_id).should be_true
     end
 
   end

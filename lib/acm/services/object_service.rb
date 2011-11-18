@@ -1,6 +1,7 @@
 require 'acm/services/acm_service'
 require 'acm/models/objects'
 require 'acm/models/permission_sets'
+require 'acm/models/ace_subject_map'
 
 module ACM::Services
 
@@ -58,8 +59,10 @@ module ACM::Services
 
     def add_permission(obj_id, permission, user_id)
 
+      #Find the object
       object = ACM::Models::Objects.filter(:immutable_id => obj_id.to_s).first()
 
+      #Find the requested permission only if it belongs to a permission set that is related to that object
       requested_permission = ACM::Models::Permissions.join(:permission_sets, :id => :permission_set_id)
                                                     .join(:object_permission_set_map, :permission_set_id => :id)
                                                     .filter(:object_permission_set_map__object_id => object.id)
@@ -67,11 +70,16 @@ module ACM::Services
 
       @logger.debug("requested permission #{requested_permission.inspect}")
 
+      #find the subject
       subject = ACM::Models::Subjects.filter(:immutable_id => user_id.to_s).first()
 
-      new_access_control_entry = object.add_access_control_entry(:object => object, :permission_id => requested_permission.id, :subject_id => subject.id)
+      ACM::Config.db.transaction do
+        new_access_control_entry = object.add_access_control_entry(:object_id => object.id,
+                                                             :permission_id => requested_permission.id)
+        new_access_control_entry.add_subject(subject)
+        @logger.debug("AccessControlEntry #{new_access_control_entry.inspect}")
+      end
 
-      @logger.debug("AccessControlEntry #{new_access_control_entry.inspect}")
       @logger.debug("Modified object #{object.inspect}")
 
       object.to_json

@@ -42,12 +42,11 @@ Sequel.migration do
       primary_key   :id
       foreign_key   :object_id, :objects
       foreign_key   :permission_id, :permissions
-      foreign_key   :subject_id, :subjects
 
       time          :created_at, :null => false
       time          :last_updated_at, :null => false
 
-      unique        ([:object_id, :subject_id, :permission_id])
+      unique        ([:object_id, :permission_id])
     end
 
     create_table :ace_subject_map do
@@ -61,7 +60,6 @@ Sequel.migration do
       string         :immutable_id, :null => false, :unique => true
       string         :type, :null => false
       foreign_key   :object_id, :objects, :null => true
-      foreign_key   :access_control_entry_id, :access_control_entries
       text          :additional_info
 
       time          :created_at, :null => false

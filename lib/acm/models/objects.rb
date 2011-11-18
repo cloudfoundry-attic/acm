@@ -33,11 +33,6 @@ module ACM::Models
         :type => self.permission_sets.nil? || self.permission_sets.size == 0 ? nil : self.permission_sets[0].name,
         :id => self.immutable_id,
         :additional_info => self.additional_info,
-        :meta => {
-          :created => self.created_at,
-          :updated => self.last_updated_at,
-          :schema => latest_schema
-        }
       }
       output_object[:acls] = {}
       access_control_entries.each { |access_control_entry|
@@ -53,6 +48,14 @@ module ACM::Models
       }
 
       @logger.debug("ACL hash for object #{self.id} is #{output_object[:acls].inspect}")
+
+      output_object.update(
+        :meta => {
+          :created => self.created_at,
+          :updated => self.last_updated_at,
+          :schema => latest_schema
+        }
+      )
 
       output_object.to_json()
     end
