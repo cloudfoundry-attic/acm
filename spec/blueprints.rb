@@ -3,16 +3,16 @@ require 'acm/models/objects'
 Sham.define do
   name          { |index| "name-#{index}" }
   immutable_id  { SecureRandom.uuid }
+  random_number { rand(1000) }
 
 end
 
 module ACM::Models
 
-  Objects.blueprint do
-    name            { Sham.name }
-    type            { "app_space" }
-    immutable_id    { Sham.immutable_id }
-    additional_info   { "{\"authentication_endpoint\":\"http://localhost:8080/cloudfoundry-identity-uaa\"}" }
+  PermissionSets.blueprint do
+    id            { Sham.random_number }
+    name          { "app_space_permission_set" }
+
   end
 
 end

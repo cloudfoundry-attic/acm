@@ -2,13 +2,25 @@ require File.expand_path("../../spec_helper", __FILE__)
 
 require 'acm/services/object_service'
 require 'acm/services/user_service'
+require 'acm/models/permissions'
+require 'acm/models/permission_sets'
 require 'json'
 
 describe ACM::Services::ObjectService do
 
   before(:each) do
+    #Fix the schema
+    ps1 = ACM::Models::PermissionSets.new(:name => :app_space.to_s)
+    ps1.save
+    ps2 = ACM::Models::PermissionSets.new(:name => :director.to_s)
+    ps2.save
+    ACM::Models::Permissions.new(:permission_set_id => ps1.id, :name => :read_appspace.to_s).save
+    ACM::Models::Permissions.new(:permission_set_id => ps1.id, :name => :write_appspace.to_s).save
+    ACM::Models::Permissions.new(:permission_set_id => ps1.id, :name => :delete_appspace.to_s).save
+
     @object_service = ACM::Services::ObjectService.new()
     @user_service = ACM::Services::UserService.new()
+    @logger = ACM::Config.logger
   end
 
   describe "creating an object" do
@@ -54,13 +66,27 @@ describe ACM::Services::ObjectService do
 
     end
 
+    it "will create an object and associate it with a set of permission types" do
+
+      o_json = @object_service.create_object(:permission_sets => [:app_space])
+
+      object = Yajl::Parser.parse(o_json, :symbolize_keys => true)
+
+      object[:id].should_not be_nil
+      object[:type].should_not be_nil
+      object[:meta][:created].should_not be_nil
+      object[:meta][:updated].should_not be_nil
+
+    end
+
   end
 
   describe "adding permissions to an object" do
 
     it "add permissions to an object" do
       o_json = @object_service.create_object(:name => "www_staging",
-                                            :additional_info => {:description => :staging_app_space}.to_json())
+                                            :additional_info => {:description => :staging_app_space}.to_json(),
+                                            :permission_sets => [:app_space])
 
       object = Yajl::Parser.parse(o_json, :symbolize_keys => true)
 
@@ -76,9 +102,11 @@ describe ACM::Services::ObjectService do
 
       new_object_json = @object_service.add_permission(obj_id, :read_appspace, user_id)
 
+      @logger.debug("Returned object is #{new_object_json.inspect}")
+
       new_object = Yajl::Parser.parse(new_object_json, :symbolize_keys => true)
 
-      new_object[:id].should_be eql(obj_id)
+      new_object[:id].should eql(obj_id)
 
       (new_object[:acl][:read_appspace].include? user_id).should be_true
     end

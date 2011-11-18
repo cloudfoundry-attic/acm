@@ -1,5 +1,6 @@
 require 'acm/models/acm_common_model'
 require 'sequel'
+require 'json'
 
 module ACM::Models
   class Subjects < Sequel::Model(:subjects)
@@ -10,8 +11,8 @@ module ACM::Models
       validates_includes [:user.to_s, :group.to_s], :type, :message => 'is not valid'
     end
 
-    one_to_one  :object, :class_name => :Objects
-    many_to_one :members, :class_name => :Members
+    one_to_one  :object, :class => "ACM::Models::Objects"
+    many_to_one :members, :class => "ACM::Models::Members"
 
     include ACM::Models::Common
 

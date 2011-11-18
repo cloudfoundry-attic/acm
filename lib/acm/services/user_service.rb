@@ -5,12 +5,12 @@ module ACM::Services
 
   class UserService < ACMService
 
-    def create_user(opts = nil)
+    def create_user(opts = {})
 
       s = ACM::Models::Subjects.new(
-        :immutable_id => (!opts.nil? && !opts[:id].nil?) ? opts[:id] : SecureRandom.uuid(),
+        :immutable_id => !opts[:id].nil? ? opts[:id] : SecureRandom.uuid(),
         :type => :user.to_s,
-        :additional_info => !opts.nil? ? opts[:additional_info] : nil
+        :additional_info => !opts[:additional_info].nil? ? opts[:additional_info] : nil
       )
 
       begin
