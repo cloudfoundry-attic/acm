@@ -83,7 +83,7 @@ describe ACM::Services::ObjectService do
 
   describe "adding permissions to an object" do
 
-    it "add permissions to an object" do
+    it "should update the object entity with a new acl" do
       o_json = @object_service.create_object(:name => "www_staging",
                                             :additional_info => {:description => :staging_app_space}.to_json(),
                                             :permission_sets => [:app_space])
