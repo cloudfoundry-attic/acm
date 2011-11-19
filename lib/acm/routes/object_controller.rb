@@ -6,11 +6,6 @@ module ACM
 
     class ApiController < Sinatra::Base
 
-      def initialize
-        super
-        @object_service = ACM::Services::ObjectService.new()
-      end
-
       get '/objects/:object_id' do
         content_type 'application/json', :charset => 'utf-8'
         @logger.debug("GET request for /objects/#{params[:object_id]}")
@@ -34,7 +29,17 @@ module ACM
         end
         @logger.debug("decoded value is #{request_json.inspect}")
 
+        #parse the request
+        name = request_json[:name.to_s]
+        permission_sets = request_json[:type.to_s]
+        additional_info = request_json[:additionalInfo.to_s]
 
+        object_json = @object_service.create_object(:name => name,
+                                                  :additional_info => additional_info,
+                                                  :permission_sets => permission_sets)
+
+        @logger.debug("Response is #{object_json.inspect}")
+        object_json
       end
 
     end

@@ -28,11 +28,15 @@ module ACM::Models
     end
 
     def to_json
+      #Get the names out of the permission sets
+      object_types = (self.permission_sets.nil? || self.permission_sets.size == 0) ?
+                          nil :
+                          self.permission_sets.map{|permission_set| permission_set.name}
       output_object = {
         :name => self.name,
-        :type => self.permission_sets.nil? || self.permission_sets.size == 0 ? nil : self.permission_sets[0].name,
+        :type => object_types,
         :id => self.immutable_id,
-        :additional_info => self.additional_info,
+        :additionalInfo => self.additional_info,
       }
 
       output_object[:acls] = {}

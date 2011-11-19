@@ -25,7 +25,7 @@ describe ACM::Services::ObjectService do
 
   describe "creating an object" do
 
-    it "will create an object with a valid id" do
+    it "should create an object with a valid id" do
 
       o_json = @object_service.create_object(:name => "www_staging")
 
@@ -39,7 +39,7 @@ describe ACM::Services::ObjectService do
 
     end
 
-    it "will create an object with a valid id even without a name" do
+    it "should create an object with a valid id even without a name" do
 
       o_json = @object_service.create_object()
 
@@ -52,7 +52,7 @@ describe ACM::Services::ObjectService do
 
     end
 
-    it "will create an object with a valid id with additional info" do
+    it "should create an object with a valid id with additional info" do
 
       o_json = @object_service.create_object(:additional_info => {:description => :staging_app_space}.to_json())
 
@@ -62,11 +62,11 @@ describe ACM::Services::ObjectService do
       object[:type].should be_nil
       object[:meta][:created].should_not be_nil
       object[:meta][:updated].should_not be_nil
-      object[:additional_info].should eql({:description => :staging_app_space}.to_json())
+      object[:additionalInfo].should eql({:description => :staging_app_space}.to_json())
 
     end
 
-    it "will create an object and associate it with a set of permission types" do
+    it "should create an object and associate it with a set of permission types" do
 
       o_json = @object_service.create_object(:permission_sets => [:app_space])
 
@@ -78,6 +78,8 @@ describe ACM::Services::ObjectService do
       object[:meta][:updated].should_not be_nil
 
     end
+
+    it "should create an object with multiple types"
 
   end
 

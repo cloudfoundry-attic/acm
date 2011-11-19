@@ -13,6 +13,8 @@ module ACM::Controller
       super
       @logger = ACM::Config.logger
       @logger.debug("ACM ApiController is up")
+
+      @object_service = ACM::Services::ObjectService.new()
     end
 
     configure do
@@ -26,7 +28,7 @@ module ACM::Controller
 
       @logger.debug("Reached error handler")
       exception = request.env["sinatra.error"]
-      if exception.kind_of?(ACMError)
+      if exception.kind_of?(ACM::ACMError)
         @logger.debug("Request failed with response code: #{exception.response_code} error code: " +
                          "#{exception.error_code} error: #{exception.message}")
         status(exception.response_code)

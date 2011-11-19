@@ -24,8 +24,13 @@ describe ACM::Controller::RackController do
     it "allows correct credentials" do
       basic_authorize "admin", "password"
       get "/"
-      last_response.status.should eql(404)
       @logger.debug("Auth response #{last_response.inspect}")
+      last_response.status.should eql(404)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      body[:code].should eql(1000)
+      body[:description].should eql("The resource was not found")
     end
 
     it "should not allow incorrect credentials" do

@@ -8,6 +8,7 @@ module ACM::Services
   class ObjectService < ACMService
 
     def create_object(opts = {})
+      @logger.debug("create object parameters #{opts}")
 
       permission_sets = !opts[:permission_sets].nil? ? opts[:permission_sets] : nil
       name = !opts[:name].nil? ? opts[:name] : nil
@@ -53,8 +54,9 @@ module ACM::Services
 
       end
 
-      o.to_json
+      @logger.debug("Object created is #{o.inspect}")
 
+      o.to_json
     end
 
     def read_object(obj_id)
