@@ -38,12 +38,12 @@ module ACM
         name = request_json[:name.to_s]
         permission_sets = request_json[:type.to_s]
         additional_info = request_json[:additionalInfo.to_s]
-        acls = request_json[:acls.to_s]
+        acls = request_json[:acl.to_s]
 
         object_json = @object_service.create_object(:name => name,
                                                   :additional_info => additional_info,
                                                   :permission_sets => permission_sets,
-                                                  :acls => acls)
+                                                  :acl => acls)
 
         @logger.debug("Response is #{object_json.inspect}")
         object_json

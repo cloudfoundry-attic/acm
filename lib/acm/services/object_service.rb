@@ -13,7 +13,7 @@ module ACM::Services
       permission_sets = get_option(opts, :permission_sets)
       name = get_option(opts, :name)
       additional_info = get_option(opts, :additional_info)
-      acls = get_option(opts, :acls)
+      acls = get_option(opts, :acl)
 
       o = ACM::Models::Objects.new(
         :name => name,

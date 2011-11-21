@@ -145,7 +145,7 @@ describe ACM::Controller::RackController do
         :name => "www_staging",
         :type => ["app_space"],
         :additionalInfo => "{component => cloud_controller}",
-        :acls => {
+        :acl => {
           :read_appspace => [@user1[:id], @user2[:id], @user3[:id], @user4[:id]],
           :write_appspace => [@user2[:id], @user3[:id]],
           :delete_appspace => [@user4[:id]]
@@ -160,17 +160,17 @@ describe ACM::Controller::RackController do
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
 
-      body[:acls].should_not be_nil
-      sorted_acls = body[:acls].keys().sort()
+      body[:acl].should_not be_nil
+      sorted_acls = body[:acl].keys().sort()
       sorted_acls.should eql([:read_appspace, :write_appspace, :delete_appspace].sort())
 
-      sorted_users = body[:acls][:read_appspace].sort()
+      sorted_users = body[:acl][:read_appspace].sort()
       sorted_users.should eql([@user1[:id], @user2[:id], @user3[:id], @user4[:id]].sort())
 
-      sorted_users = body[:acls][:write_appspace].sort()
+      sorted_users = body[:acl][:write_appspace].sort()
       sorted_users.should eql([@user2[:id], @user3[:id]].sort())
 
-      sorted_users = body[:acls][:delete_appspace].sort()
+      sorted_users = body[:acl][:delete_appspace].sort()
       sorted_users.should eql([@user4[:id]].sort())
 
       body[:name].to_s.should eql(object_data[:name].to_s)
@@ -188,7 +188,7 @@ describe ACM::Controller::RackController do
       object_data = {
         :name => "www_staging",
         :additionalInfo => "{component => cloud_controller}",
-        :acls => {
+        :acl => {
           :read_appspace => [@user1[:id], @user2[:id], @user3[:id], @user4[:id]],
           :write_appspace => [@user2[:id], @user3[:id]],
           :delete_appspace => [@user4[:id]]
@@ -215,7 +215,7 @@ describe ACM::Controller::RackController do
         :name => "www_staging",
         :type => ["app_space"],
         :additionalInfo => "{component => cloud_controller}",
-        :acls => {
+        :acl => {
           :read_appspace => [@user1[:id], @user2[:id], @user3[:id], @user4[:id]],
           :write_appspace => [@user2[:id], @user3[:id]],
           :update_appspace => [@user4[:id]]

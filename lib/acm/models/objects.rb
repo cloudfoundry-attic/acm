@@ -39,7 +39,7 @@ module ACM::Models
         :additionalInfo => self.additional_info,
       }
 
-      output_object[:acls] = {}
+      output_object[:acl] = {}
       access_control_entries.each { |access_control_entry|
         @logger.debug("Access Control entry #{access_control_entry.inspect}")
         perimission_name = access_control_entry.permission.name
@@ -50,11 +50,11 @@ module ACM::Models
         subjects.each{|subject| subject_list.insert(0, subject.immutable_id)}
 
         if(subject_list.size() > 0)
-          output_object[:acls][perimission_name] = subject_list
+          output_object[:acl][perimission_name] = subject_list
         end
       }
 
-      @logger.debug("ACL hash for object #{self.id} is #{output_object[:acls].inspect}")
+      @logger.debug("ACL hash for object #{self.id} is #{output_object[:acl].inspect}")
 
       output_object.update(
         :meta => {
