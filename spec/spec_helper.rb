@@ -77,10 +77,13 @@ Rspec.configure do |rspec_config|
     ACM::Config.db = db
     ACM::Config.basic_auth = { :user => :admin.to_s, :password => :password.to_s }
 
+    logger.debug("Start test #{example.example.metadata[:full_description]}")
+
   end
 
-  rspec_config.after(:each) do
+  rspec_config.after(:each) do |example|
     FileUtils.rm_rf(acm_dir)
+    logger.debug("End test #{example.example.metadata[:full_description]}")
   end
 
   rspec_config.after(:all) do

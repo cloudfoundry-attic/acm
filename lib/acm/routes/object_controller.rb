@@ -25,18 +25,25 @@ module ACM
           request_json = Yajl::Parser.new.parse(request.body)
         rescue => e
           @logger.error("Invalid request #{e.message}")
-          raise ACM::InvalidRequest.new(e.message)
+          raise ACM::InvalidRequest.new("Invalid character in json request")
         end
-        @logger.debug("decoded value is #{request_json.inspect}")
+        @logger.debug("request is #{request_json.inspect}")
+
+        if(request_json.nil?)
+          @logger.error("Invalid request")
+          raise ACM::InvalidRequest.new("Request is empty")
+        end
 
         #parse the request
         name = request_json[:name.to_s]
         permission_sets = request_json[:type.to_s]
         additional_info = request_json[:additionalInfo.to_s]
+        acls = request_json[:acls.to_s]
 
         object_json = @object_service.create_object(:name => name,
                                                   :additional_info => additional_info,
-                                                  :permission_sets => permission_sets)
+                                                  :permission_sets => permission_sets,
+                                                  :acls => acls)
 
         @logger.debug("Response is #{object_json.inspect}")
         object_json

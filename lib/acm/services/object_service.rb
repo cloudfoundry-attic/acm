@@ -10,9 +10,10 @@ module ACM::Services
     def create_object(opts = {})
       @logger.debug("create object parameters #{opts}")
 
-      permission_sets = !opts[:permission_sets].nil? ? opts[:permission_sets] : nil
-      name = !opts[:name].nil? ? opts[:name] : nil
-      additional_info = !opts[:additional_info].nil? ? opts[:additional_info] : nil
+      permission_sets = get_option(opts, :permission_sets)
+      name = get_option(opts, :name)
+      additional_info = get_option(opts, :additional_info)
+      acls = get_option(opts, :acls)
 
       o = ACM::Models::Objects.new(
         :name => name,
@@ -42,14 +43,34 @@ module ACM::Services
               o.add_permission_set(permission_set_entity)
             }
 
-            @logger.debug("permission_set_string_values for object #{o.inspect} are #{permission_set_string_values.inspect}")
+            @logger.debug("permission_set_string_values for object #{o.id} are #{permission_set_string_values.inspect}")
+
+          end
+
+          @logger.debug("Acls requested are #{acls.inspect}")
+          if(!acls.nil?)
+            #ACLs are a list of hashes
+            acls.each { |permission, user_id_set|
+              user_id_set.each { |user_id|
+                begin
+                  add_permission(o.immutable_id, permission, user_id)
+                rescue => e
+                  @logger.error("Failed to add permission #{permission.inspect} on object #{o.immutable_id} for user #{user_id}")
+                  raise ACM::InvalidRequest.new("Failed to add permission #{permission} on object #{o.immutable_id} for user #{user_id}")
+                end
+              }
+            }
 
           end
 
         rescue => e
-          @logger.info("Failed to create an object #{e}")
+          @logger.error("Failed to create an object #{e}")
           @logger.debug("Failed to create an object #{e.backtrace.inspect}")
-          raise ACM::SystemInternalError.new(e)
+          if (e.kind_of?(ACM::ACMError))
+            raise e
+          else
+            raise ACM::SystemInternalError.new(e)
+          end
         end
 
       end
@@ -57,6 +78,10 @@ module ACM::Services
       @logger.debug("Object created is #{o.inspect}")
 
       o.to_json
+    end
+
+    def get_option(map, key)
+      map[key].nil? ? nil : map[key]
     end
 
     def read_object(obj_id)
@@ -72,7 +97,7 @@ module ACM::Services
     end
 
     def add_permission(obj_id, permission, user_id)
-      @logger.debug("adding permissions")
+      @logger.debug("adding permission #{permission} on object #{obj_id} and user #{user_id}")
 
       #Find the object
       object = ACM::Models::Objects.filter(:immutable_id => obj_id.to_s).first()

@@ -95,7 +95,7 @@ describe ACM::Services::ObjectService do
       @obj_id = object[:id]
       @obj_id.should_not be_nil
 
-      user_json = @user_service = ACM::Services::UserService.new().create_user()
+      user_json = ACM::Services::UserService.new().create_user()
 
       user = Yajl::Parser.parse(user_json, :symbolize_keys => true)
 
