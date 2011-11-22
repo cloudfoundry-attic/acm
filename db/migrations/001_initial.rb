@@ -14,6 +14,7 @@ Sequel.migration do
     create_table :permission_sets do
       primary_key   :id
       string          :name, :null => false, :unique => true
+      text          :additional_info
 
       time          :created_at, :null => false
       time          :last_updated_at, :null => false

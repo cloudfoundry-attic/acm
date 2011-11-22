@@ -126,6 +126,7 @@ module ACM::Services
     end
 
     def read_object(obj_id)
+      @logger.debug("read_object parameters #{obj_id.inspect}")
       object = ACM::Models::Objects.filter(:immutable_id => obj_id).first()
 
       if(object.nil?)
@@ -139,6 +140,7 @@ module ACM::Services
     end
 
     def delete_object(obj_id)
+      @logger.debug("delete_object parameters #{obj_id.inspect}")
       object = ACM::Models::Objects.filter(:immutable_id => obj_id).first()
 
       if(object.nil?)
