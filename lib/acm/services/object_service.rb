@@ -138,7 +138,11 @@ module ACM::Services
 
       #find the subject
       subject = ACM::Models::Subjects.filter(:immutable_id => user_id.to_s).first()
-      @logger.debug("requested subject #{requested_permission.inspect}")
+      @logger.debug("requested subject #{subject.inspect}")
+      if(subject.nil?)
+        @logger.error("Could not find subject #{user_id.to_s}")
+        raise ACM::InvalidRequest.new("Could not find subject #{user_id.to_s}")
+      end
 
       ACM::Config.db.transaction do
         object_aces = object.access_control_entries.select{|ace| ace.permission_id == requested_permission.id}

@@ -96,11 +96,18 @@ describe ACM::Services::ObjectService do
       @obj_id.should_not be_nil
 
       user_json = ACM::Services::UserService.new().create_user()
-
       user = Yajl::Parser.parse(user_json, :symbolize_keys => true)
-
       @user_id = user[:id]
       @user_id.should_not be_nil
+
+      @user1 = SecureRandom.uuid
+      @user_service.create_user(:id => @user1)
+      @user2 = SecureRandom.uuid
+      @user_service.create_user(:id => @user2)
+      @user3 = SecureRandom.uuid
+      @user_service.create_user(:id => @user3)
+      @user4 = SecureRandom.uuid
+      @user_service.create_user(:id => @user4)
 
     end
 
@@ -114,12 +121,10 @@ describe ACM::Services::ObjectService do
     end
 
     it "should correctly update the object with multiple acls " do
-      new_object_json = @object_service.add_permission(@obj_id, :read_appspace, @user_id)
+      new_object_json = @object_service.add_permission(@obj_id, :read_appspace, @user1)
       @logger.debug("Returned object is #{new_object_json.inspect}")
 
-      user2_json = @user_service = ACM::Services::UserService.new().create_user()
-      user2 = Yajl::Parser.parse(user2_json, :symbolize_keys => true)
-      new_object2_json = @object_service.add_permission(@obj_id, :read_appspace, user2[:id])
+      new_object2_json = @object_service.add_permission(@obj_id, :read_appspace, @user2)
       @logger.debug("Returned object is #{new_object2_json.inspect}")
 
       new_object = Yajl::Parser.parse(new_object_json, :symbolize_keys => true)
@@ -128,17 +133,15 @@ describe ACM::Services::ObjectService do
       new_object[:id].should eql(@obj_id)
       new_object2[:id].should eql(@obj_id)
 
-      (new_object[:acl][:read_appspace].include? "u:#{@user_id}").should be_true
-      (new_object2[:acl][:read_appspace].include? "u:#{user2[:id]}").should be_true
+      (new_object[:acl][:read_appspace].include? "u:#{@user1}").should be_true
+      (new_object2[:acl][:read_appspace].include? "u:#{@user2}").should be_true
     end
 
     it "should correctly update the object acls with multiple permissions" do
-      new_object_json = @object_service.add_permission(@obj_id, :read_appspace, @user_id)
+      new_object_json = @object_service.add_permission(@obj_id, :read_appspace, @user1)
       @logger.debug("Returned object is #{new_object_json.inspect}")
 
-      user2_json = @user_service = ACM::Services::UserService.new().create_user()
-      user2 = Yajl::Parser.parse(user2_json, :symbolize_keys => true)
-      new_object2_json = @object_service.add_permission(@obj_id, :write_appspace, user2[:id])
+      new_object2_json = @object_service.add_permission(@obj_id, :write_appspace, @user2)
       @logger.debug("Returned object is #{new_object2_json.inspect}")
 
       new_object = Yajl::Parser.parse(new_object_json, :symbolize_keys => true)
@@ -147,27 +150,21 @@ describe ACM::Services::ObjectService do
       new_object[:id].should eql(@obj_id)
       new_object2[:id].should eql(@obj_id)
 
-      (new_object[:acl][:read_appspace].include? "u:#{@user_id}").should be_true
-      (new_object2[:acl][:write_appspace].include? "u:#{user2[:id]}").should be_true
+      (new_object[:acl][:read_appspace].include? "u:#{@user1}").should be_true
+      (new_object2[:acl][:write_appspace].include? "u:#{@user2}").should be_true
     end
 
     it "should correctly update the object acls that have multiple permissions with multiple permissions" do
-      new_object_json = @object_service.add_permission(@obj_id, :read_appspace, @user_id)
+      new_object_json = @object_service.add_permission(@obj_id, :read_appspace, @user1)
       @logger.debug("Returned object is #{new_object_json.inspect}")
 
-      user2_json = @user_service = ACM::Services::UserService.new().create_user()
-      user2 = Yajl::Parser.parse(user2_json, :symbolize_keys => true)
-      new_object2_json = @object_service.add_permission(@obj_id, :read_appspace, user2[:id])
+      new_object2_json = @object_service.add_permission(@obj_id, :read_appspace, @user2)
       @logger.debug("Returned object is #{new_object2_json.inspect}")
 
-      user3_json = @user_service = ACM::Services::UserService.new().create_user()
-      user3 = Yajl::Parser.parse(user3_json, :symbolize_keys => true)
-      new_object3_json = @object_service.add_permission(@obj_id, :write_appspace, user3[:id])
+      new_object3_json = @object_service.add_permission(@obj_id, :write_appspace, @user3)
       @logger.debug("Returned object is #{new_object3_json.inspect}")
 
-      user4_json = @user_service = ACM::Services::UserService.new().create_user()
-      user4 = Yajl::Parser.parse(user4_json, :symbolize_keys => true)
-      new_object4_json = @object_service.add_permission(@obj_id, :write_appspace, user4[:id])
+      new_object4_json = @object_service.add_permission(@obj_id, :write_appspace, @user4)
       @logger.debug("Returned object is #{new_object4_json.inspect}")
 
       new_object = Yajl::Parser.parse(new_object_json, :symbolize_keys => true)
@@ -180,10 +177,10 @@ describe ACM::Services::ObjectService do
       new_object3[:id].should eql(@obj_id)
       new_object4[:id].should eql(@obj_id)
 
-      (new_object[:acl][:read_appspace].include? "u:#{@user_id}").should be_true
-      (new_object2[:acl][:read_appspace].include? "u:#{user2[:id]}").should be_true
-      (new_object3[:acl][:write_appspace].include? "u:#{user3[:id]}").should be_true
-      (new_object4[:acl][:write_appspace].include? "u:#{user4[:id]}").should be_true
+      (new_object[:acl][:read_appspace].include? "u:#{@user1}").should be_true
+      (new_object2[:acl][:read_appspace].include? "u:#{@user2}").should be_true
+      (new_object3[:acl][:write_appspace].include? "u:#{@user3}").should be_true
+      (new_object4[:acl][:write_appspace].include? "u:#{@user4}").should be_true
     end
 
   end
