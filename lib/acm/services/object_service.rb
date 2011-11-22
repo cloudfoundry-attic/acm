@@ -101,6 +101,11 @@ module ACM::Services
                                                     .first()
       @logger.debug("requested permission #{requested_permission.inspect}")
 
+      if(requested_permission.nil?)
+        @logger.error("Failed to add permission #{permission} on object #{obj_id} for user #{user_id}")
+        raise ACM::InvalidRequest.new("Failed to add permission #{permission} on object #{obj_id} for user #{user_id}")
+      end
+
       #find the subject
       subject = ACM::Models::Subjects.filter(:immutable_id => user_id.to_s).first()
       @logger.debug("requested subject #{requested_permission.inspect}")
