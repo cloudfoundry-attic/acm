@@ -1,6 +1,7 @@
 require 'acm/errors'
 require 'acm_controller'
 require 'acm/routes/object_controller'
+require 'acm/services/object_service'
 require 'sinatra/base'
 require 'json'
 require 'net/http'
