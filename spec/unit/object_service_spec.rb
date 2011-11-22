@@ -110,7 +110,7 @@ describe ACM::Services::ObjectService do
       new_object = Yajl::Parser.parse(new_object_json, :symbolize_keys => true)
 
       new_object[:id].should eql(@obj_id)
-      (new_object[:acl][:read_appspace].include? @user_id).should be_true
+      (new_object[:acl][:read_appspace].include? "u:#{@user_id}").should be_true
     end
 
     it "should correctly update the object with multiple acls " do
@@ -128,8 +128,8 @@ describe ACM::Services::ObjectService do
       new_object[:id].should eql(@obj_id)
       new_object2[:id].should eql(@obj_id)
 
-      (new_object[:acl][:read_appspace].include? @user_id).should be_true
-      (new_object2[:acl][:read_appspace].include? user2[:id]).should be_true
+      (new_object[:acl][:read_appspace].include? "u:#{@user_id}").should be_true
+      (new_object2[:acl][:read_appspace].include? "u:#{user2[:id]}").should be_true
     end
 
     it "should correctly update the object acls with multiple permissions" do
@@ -147,8 +147,8 @@ describe ACM::Services::ObjectService do
       new_object[:id].should eql(@obj_id)
       new_object2[:id].should eql(@obj_id)
 
-      (new_object[:acl][:read_appspace].include? @user_id).should be_true
-      (new_object2[:acl][:write_appspace].include? user2[:id]).should be_true
+      (new_object[:acl][:read_appspace].include? "u:#{@user_id}").should be_true
+      (new_object2[:acl][:write_appspace].include? "u:#{user2[:id]}").should be_true
     end
 
     it "should correctly update the object acls that have multiple permissions with multiple permissions" do
@@ -180,10 +180,10 @@ describe ACM::Services::ObjectService do
       new_object3[:id].should eql(@obj_id)
       new_object4[:id].should eql(@obj_id)
 
-      (new_object[:acl][:read_appspace].include? @user_id).should be_true
-      (new_object2[:acl][:read_appspace].include? user2[:id]).should be_true
-      (new_object3[:acl][:write_appspace].include? user3[:id]).should be_true
-      (new_object4[:acl][:write_appspace].include? user4[:id]).should be_true
+      (new_object[:acl][:read_appspace].include? "u:#{@user_id}").should be_true
+      (new_object2[:acl][:read_appspace].include? "u:#{user2[:id]}").should be_true
+      (new_object3[:acl][:write_appspace].include? "u:#{user3[:id]}").should be_true
+      (new_object4[:acl][:write_appspace].include? "u:#{user4[:id]}").should be_true
     end
 
   end

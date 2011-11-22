@@ -19,6 +19,7 @@ module ACM::Controller
       @logger.debug("ACM ApiController is up")
 
       @object_service = ACM::Services::ObjectService.new()
+      @user_service = ACM::Services::UserService.new()
       @permission_set_service = ACM::Services::PermissionSetService.new()
     end
 

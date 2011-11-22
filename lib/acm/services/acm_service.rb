@@ -5,6 +5,7 @@ module ACM::Services
 
     def initialize
       @logger = ACM::Config.logger
+
     end
 
   end

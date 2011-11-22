@@ -48,7 +48,13 @@ module ACM::Models
         subjects = access_control_entry.subjects
         @logger.debug("Subjects #{subjects.inspect}")
         subject_list = []
-        subjects.each{|subject| subject_list.insert(0, subject.immutable_id)}
+        subjects.each{|subject|
+          if(subject.type.to_sym == :user)
+            subject_list.insert(0, "u:#{subject.immutable_id}")
+          else
+            subject_list.insert(0, "g:#{subject.immutable_id}")
+          end
+        }
 
         if(subject_list.size() > 0)
           output_object[:acl][perimission_name] = subject_list

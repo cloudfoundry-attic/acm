@@ -62,16 +62,10 @@ describe ACM::Controller::RackController do
       ACM::Models::Permissions.new(:permission_set_id => ps1.id, :name => :write_appspace.to_s).save
       ACM::Models::Permissions.new(:permission_set_id => ps1.id, :name => :delete_appspace.to_s).save
 
-      @user_service = ACM::Services::UserService.new()
-      #Create a set of users
-      user1_json = ACM::Services::UserService.new().create_user()
-      @user1 = Yajl::Parser.parse(user1_json, :symbolize_keys => true)
-      user2_json = ACM::Services::UserService.new().create_user()
-      @user2 = Yajl::Parser.parse(user2_json, :symbolize_keys => true)
-      user3_json = ACM::Services::UserService.new().create_user()
-      @user3 = Yajl::Parser.parse(user3_json, :symbolize_keys => true)
-      user4_json = ACM::Services::UserService.new().create_user()
-      @user4 = Yajl::Parser.parse(user4_json, :symbolize_keys => true)
+      @user1 = SecureRandom.uuid
+      @user2 = SecureRandom.uuid
+      @user3 = SecureRandom.uuid
+      @user4 = SecureRandom.uuid
 
       @logger = ACM::Config.logger
     end
@@ -146,9 +140,9 @@ describe ACM::Controller::RackController do
         :permission_sets => ["app_space"],
         :additionalInfo => "{component => cloud_controller}",
         :acl => {
-          :read_appspace => [@user1[:id], @user2[:id], @user3[:id], @user4[:id]],
-          :write_appspace => [@user2[:id], @user3[:id]],
-          :delete_appspace => [@user4[:id]]
+          :read_appspace => ["u:#{@user1}", "u:#{@user2}", "u:#{@user3}", "u:#{@user4}"],
+          :write_appspace => ["u:#{@user2}", "u:#{@user3}"],
+          :delete_appspace => ["u:#{@user4}"]
          }
       }
 
@@ -165,13 +159,13 @@ describe ACM::Controller::RackController do
       sorted_acls.should eql([:read_appspace, :write_appspace, :delete_appspace].sort())
 
       sorted_users = body[:acl][:read_appspace].sort()
-      sorted_users.should eql([@user1[:id], @user2[:id], @user3[:id], @user4[:id]].sort())
+      sorted_users.should eql(["u:#{@user1}", "u:#{@user2}", "u:#{@user3}", "u:#{@user4}"].sort())
 
       sorted_users = body[:acl][:write_appspace].sort()
-      sorted_users.should eql([@user2[:id], @user3[:id]].sort())
+      sorted_users.should eql(["u:#{@user2}", "u:#{@user3}"].sort())
 
       sorted_users = body[:acl][:delete_appspace].sort()
-      sorted_users.should eql([@user4[:id]].sort())
+      sorted_users.should eql(["u:#{@user4}"].sort())
 
       body[:name].to_s.should eql(object_data[:name].to_s)
       body[:permission_sets].should eql(object_data[:permission_sets])
@@ -189,9 +183,9 @@ describe ACM::Controller::RackController do
         :name => "www_staging",
         :additionalInfo => "{component => cloud_controller}",
         :acl => {
-          :read_appspace => [@user1[:id], @user2[:id], @user3[:id], @user4[:id]],
-          :write_appspace => [@user2[:id], @user3[:id]],
-          :delete_appspace => [@user4[:id]]
+          :read_appspace => ["u:#{@user1}", "u:#{@user2}", "u:#{@user3}", "u:#{@user4}"],
+          :write_appspace => ["u:#{@user2}", "u:#{@user3}"],
+          :delete_appspace => ["u:#{@user4}"]
          }
       }
 
@@ -216,9 +210,9 @@ describe ACM::Controller::RackController do
         :permission_sets => ["app_space"],
         :additionalInfo => "{component => cloud_controller}",
         :acl => {
-          :read_appspace => [@user1[:id], @user2[:id], @user3[:id], @user4[:id]],
-          :write_appspace => [@user2[:id], @user3[:id]],
-          :update_appspace => [@user4[:id]]
+          :read_appspace => ["u:#{@user1}", "u:#{@user2}", "u:#{@user3}", "u:#{@user4}"],
+          :write_appspace => ["u:#{@user2}", "u:#{@user3}"],
+          :update_appspace => ["u:#{@user4}"]
          }
       }
 
@@ -239,25 +233,19 @@ describe ACM::Controller::RackController do
   describe "when fetching an object" do
 
     before(:each) do
-      #Fix the schema
-      ps1 = ACM::Models::PermissionSets.new(:name => :app_space.to_s)
-      ps1.save
-      ps2 = ACM::Models::PermissionSets.new(:name => :director.to_s)
-      ps2.save
-      ACM::Models::Permissions.new(:permission_set_id => ps1.id, :name => :read_appspace.to_s).save
-      ACM::Models::Permissions.new(:permission_set_id => ps1.id, :name => :write_appspace.to_s).save
-      ACM::Models::Permissions.new(:permission_set_id => ps1.id, :name => :delete_appspace.to_s).save
+      @permission_set_service = ACM::Services::PermissionSetService.new()
 
-      @user_service = ACM::Services::UserService.new()
-      #Create a set of users
-      user1_json = ACM::Services::UserService.new().create_user()
-      @user1 = Yajl::Parser.parse(user1_json, :symbolize_keys => true)
-      user2_json = ACM::Services::UserService.new().create_user()
-      @user2 = Yajl::Parser.parse(user2_json, :symbolize_keys => true)
-      user3_json = ACM::Services::UserService.new().create_user()
-      @user3 = Yajl::Parser.parse(user3_json, :symbolize_keys => true)
-      user4_json = ACM::Services::UserService.new().create_user()
-      @user4 = Yajl::Parser.parse(user4_json, :symbolize_keys => true)
+      @permission_set_service.create_permission_set(:name => :app_space,
+                                                    :permissions => [:read_appspace, :write_appspace, :delete_appspace],
+                                                    :additional_info => "this is the permission set for the app space")
+
+      @permission_set_service.create_permission_set(:name => :director)
+
+
+      @user1 = SecureRandom.uuid
+      @user2 = SecureRandom.uuid
+      @user3 = SecureRandom.uuid
+      @user4 = SecureRandom.uuid
 
       @logger = ACM::Config.logger
     end
@@ -270,9 +258,9 @@ describe ACM::Controller::RackController do
         :permission_sets => ["app_space"],
         :additionalInfo => "{component => cloud_controller}",
         :acl => {
-          :read_appspace => [@user1[:id], @user2[:id], @user3[:id], @user4[:id]],
-          :write_appspace => [@user2[:id], @user3[:id]],
-          :delete_appspace => [@user4[:id]]
+          :read_appspace => ["u:#{@user1}", "u:#{@user2}", "u:#{@user3}", "u:#{@user4}"],
+          :write_appspace => ["u:#{@user2}", "u:#{@user3}"],
+          :delete_appspace => ["u:#{@user4}"]
          }
       }
 
@@ -331,24 +319,19 @@ describe ACM::Controller::RackController do
 
     before(:each) do
       #Fix the schema
-      ps1 = ACM::Models::PermissionSets.new(:name => :app_space.to_s)
-      ps1.save
-      ps2 = ACM::Models::PermissionSets.new(:name => :director.to_s)
-      ps2.save
-      ACM::Models::Permissions.new(:permission_set_id => ps1.id, :name => :read_appspace.to_s).save
-      ACM::Models::Permissions.new(:permission_set_id => ps1.id, :name => :write_appspace.to_s).save
-      ACM::Models::Permissions.new(:permission_set_id => ps1.id, :name => :delete_appspace.to_s).save
+      @permission_set_service = ACM::Services::PermissionSetService.new()
 
-      @user_service = ACM::Services::UserService.new()
-      #Create a set of users
-      user1_json = ACM::Services::UserService.new().create_user()
-      @user1 = Yajl::Parser.parse(user1_json, :symbolize_keys => true)
-      user2_json = ACM::Services::UserService.new().create_user()
-      @user2 = Yajl::Parser.parse(user2_json, :symbolize_keys => true)
-      user3_json = ACM::Services::UserService.new().create_user()
-      @user3 = Yajl::Parser.parse(user3_json, :symbolize_keys => true)
-      user4_json = ACM::Services::UserService.new().create_user()
-      @user4 = Yajl::Parser.parse(user4_json, :symbolize_keys => true)
+      @permission_set_service.create_permission_set(:name => :app_space,
+                                                    :permissions => [:read_appspace, :write_appspace, :delete_appspace],
+                                                    :additional_info => "this is the permission set for the app space")
+
+      @permission_set_service.create_permission_set(:name => :director)
+
+
+      @user1 = SecureRandom.uuid
+      @user2 = SecureRandom.uuid
+      @user3 = SecureRandom.uuid
+      @user4 = SecureRandom.uuid
 
       @logger = ACM::Config.logger
     end
@@ -361,9 +344,9 @@ describe ACM::Controller::RackController do
         :permission_sets => ["app_space"],
         :additionalInfo => "{component => cloud_controller}",
         :acl => {
-          :read_appspace => [@user1[:id], @user2[:id], @user3[:id], @user4[:id]],
-          :write_appspace => [@user2[:id], @user3[:id]],
-          :delete_appspace => [@user4[:id]]
+          :read_appspace => ["u:#{@user1}", "u:#{@user2}", "u:#{@user3}", "u:#{@user4}"],
+          :write_appspace => ["u:#{@user2}", "u:#{@user3}"],
+          :delete_appspace => ["u:#{@user4}"]
          }
       }
 
@@ -397,9 +380,9 @@ describe ACM::Controller::RackController do
         :permission_sets => ["app_space"],
         :additionalInfo => "{component => cloud_controller}",
         :acl => {
-          :read_appspace => [@user1[:id], @user2[:id], @user3[:id], @user4[:id]],
-          :write_appspace => [@user2[:id], @user3[:id]],
-          :delete_appspace => [@user4[:id]]
+          :read_appspace => ["u:#{@user1}", "u:#{@user2}", "u:#{@user3}", "u:#{@user4}"],
+          :write_appspace => ["u:#{@user2}", "u:#{@user3}"],
+          :delete_appspace => ["u:#{@user4}"]
          }
       }
 
@@ -416,13 +399,13 @@ describe ACM::Controller::RackController do
       sorted_acls.should eql([:read_appspace, :write_appspace, :delete_appspace].sort())
 
       sorted_users = body[:acl][:read_appspace].sort()
-      sorted_users.should eql([@user1[:id], @user2[:id], @user3[:id], @user4[:id]].sort())
+      sorted_users.should eql(["u:#{@user1}", "u:#{@user2}", "u:#{@user3}", "u:#{@user4}"].sort())
 
       sorted_users = body[:acl][:write_appspace].sort()
-      sorted_users.should eql([@user2[:id], @user3[:id]].sort())
+      sorted_users.should eql(["u:#{@user2}", "u:#{@user3}"].sort())
 
       sorted_users = body[:acl][:delete_appspace].sort()
-      sorted_users.should eql([@user4[:id]].sort())
+      sorted_users.should eql(["u:#{@user4}"].sort())
 
       body[:name].to_s.should eql(object_data[:name].to_s)
       body[:permission_sets].should eql(object_data[:permission_sets])

@@ -21,8 +21,22 @@ module ACM::Services
         raise ACM::SystemInternalError.new()
       end
 
-      s.to_json
+      s.to_json()
 
+    end
+
+    def find_user(user_id)
+      @logger.debug("find_user parameters #{user_id.inspect}")
+      user = ACM::Models::Subjects.filter(:immutable_id => user_id).first()
+
+      if(user.nil?)
+        @logger.error("Could not find user with id #{user_id.inspect}")
+        raise ACM::ObjectNotFound.new("#{user_id.inspect}")
+      else
+        @logger.debug("Found user #{user.inspect}")
+      end
+
+      user.to_json()
     end
 
   end

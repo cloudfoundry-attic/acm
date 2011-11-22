@@ -7,6 +7,12 @@ module ACM::Services
 
   class ObjectService < ACMService
 
+    def initialize
+      super
+
+      @user_service = ACM::Services::UserService.new()
+    end
+
     def create_object(opts = {})
       @logger.debug("create object parameters #{opts}")
 
@@ -51,15 +57,39 @@ module ACM::Services
           if(!acls.nil?)
             #ACLs are a list of hashes
             acls.each { |permission, user_id_set|
-              user_id_set.each { |user_id|
-                begin
-                  #TODO: icky code. should allow a set of permissions to be accepted... later
-                  add_permission(o.immutable_id, permission, user_id)
-                rescue => e
-                  @logger.error("Failed to add permission #{permission.inspect} on object #{o.immutable_id} for user #{user_id}")
-                  raise ACM::InvalidRequest.new("Failed to add permission #{permission} on object #{o.immutable_id} for user #{user_id}")
-                end
-              }
+              if(user_id_set.kind_of?(Array))
+                user_id_set.each { |user_id|
+                  begin
+                    user = nil
+                    if(user_id.index("u:") == 0)
+                      #search for the user. if the user does not exist create it
+                      user_id = user_id.sub(/(u:)/, '')
+                      user_json = nil
+                      begin
+                        user_json = @user_service.find_user(user_id)
+                      rescue => e
+                        if(e.kind_of?(ACM::ObjectNotFound))
+                          @logger.debug("Could not find user #{user_id}. Creating the user")
+                          user_json = @user_service.create_user(:id => user_id)
+                        else
+                          @logger.error("Internal error #{e.message}")
+                          raise ACM::SystemInternalError.new()
+                        end
+                      end
+
+                      user = Yajl::Parser.parse(user_json, :symbolize_keys => true)
+                    end
+                    #TODO: icky code. should allow a set of permissions to be accepted... later
+                    add_permission(o.immutable_id, permission, user[:id])
+                  rescue => e
+                    @logger.error("Failed to add permission #{permission.inspect} on object #{o.immutable_id} for user #{user_id}")
+                    raise ACM::InvalidRequest.new("Failed to add permission #{permission} on object #{o.immutable_id} for user #{user_id}")
+                  end
+                }
+              else
+                @logger.error("Failed to add permission #{permission.inspect} on object #{o.immutable_id}. User id must be an array")
+                raise ACM::InvalidRequest.new("Failed to add permission #{permission} on object #{o.immutable_id}. User id must be an array")
+              end
             }
 
           end
