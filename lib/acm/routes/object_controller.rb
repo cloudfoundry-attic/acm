@@ -10,10 +10,17 @@ module ACM
         content_type 'application/json', :charset => 'utf-8'
         @logger.debug("GET request for /objects/#{params[:object_id]}")
 
-        reponse = @object_service.read_object(params[:object_id])
-        @log.debug("Response is #{reponse.inspect}")
+        response = @object_service.read_object(params[:object_id])
+        @logger.debug("Response is #{response.inspect}")
 
         response
+      end
+
+      delete '/objects/:object_id' do
+        content_type 'application/json', :charset => 'utf-8'
+        @logger.debug("DELETE request for /objects/#{params[:object_id]}")
+
+        @object_service.delete_object(params[:object_id])
       end
 
       post '/objects' do

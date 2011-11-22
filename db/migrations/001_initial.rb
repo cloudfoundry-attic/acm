@@ -59,7 +59,7 @@ Sequel.migration do
       primary_key   :id
       string         :immutable_id, :null => false, :unique => true
       string         :type, :null => false
-      foreign_key   :object_id, :objects, :null => true
+      foreign_key   :object_id, :objects
       text          :additional_info
 
       time          :created_at, :null => false

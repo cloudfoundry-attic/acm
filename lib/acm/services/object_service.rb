@@ -53,6 +53,7 @@ module ACM::Services
             acls.each { |permission, user_id_set|
               user_id_set.each { |user_id|
                 begin
+                  #TODO: icky code. should allow a set of permissions to be accepted... later
                   add_permission(o.immutable_id, permission, user_id)
                 rescue => e
                   @logger.error("Failed to add permission #{permission.inspect} on object #{o.immutable_id} for user #{user_id}")
@@ -82,18 +83,6 @@ module ACM::Services
 
     def get_option(map, key)
       map[key].nil? ? nil : map[key]
-    end
-
-    def read_object(obj_id)
-
-      object = ACM::Models::Objects.filter(:immutable_id => obj_id).first()
-
-      if(object.nil?)
-        @logger.error("Could not find object with id #{obj_id.inspect}")
-        raise ACM::ObjectNotFound.new("#{obj_id.inspect}")
-      end
-
-      object.to_json()
     end
 
     def add_permission(obj_id, permission, user_id)
@@ -134,6 +123,43 @@ module ACM::Services
       end
 
       object.to_json
+    end
+
+    def read_object(obj_id)
+      object = ACM::Models::Objects.filter(:immutable_id => obj_id).first()
+
+      if(object.nil?)
+        @logger.error("Could not find object with id #{obj_id.inspect}")
+        raise ACM::ObjectNotFound.new("#{obj_id.inspect}")
+      else
+        @logger.debug("Found object #{object.inspect}")
+      end
+
+      object.to_json()
+    end
+
+    def delete_object(obj_id)
+      object = ACM::Models::Objects.filter(:immutable_id => obj_id).first()
+
+      if(object.nil?)
+        @logger.error("Could not find object with id #{obj_id.inspect}")
+        raise ACM::ObjectNotFound.new("#{obj_id.inspect}")
+      else
+        @logger.debug("Found object #{object.inspect}")
+      end
+
+      object.remove_all_permission_sets
+
+      aces = object.access_control_entries
+      object.remove_all_access_control_entries
+
+      aces.each{ |ace|
+        ace.remove_all_subjects
+        ace.delete
+      }
+      object.delete
+
+      nil
     end
 
   end

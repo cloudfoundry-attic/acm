@@ -10,7 +10,7 @@ describe ACM::Controller::RackController do
     @app ||= ACM::Controller::RackController.new
   end
 
-  describe "on an invalid request for object creation" do
+  describe "when sending an invalid request for object creation" do
 
     it "should respond with an error on an incorrectly formatted request" do
       @logger = ACM::Config.logger
@@ -50,7 +50,7 @@ describe ACM::Controller::RackController do
   end
 
 
-  describe "object creation" do
+  describe "when requesting a new object" do
 
     before(:each) do
       #Fix the schema
@@ -232,6 +232,234 @@ describe ACM::Controller::RackController do
 
       body[:code].should eql(1001)
       body[:description].should include("Invalid request")
+    end
+
+  end
+
+  describe "when fetching an object" do
+
+    before(:each) do
+      #Fix the schema
+      ps1 = ACM::Models::PermissionSets.new(:name => :app_space.to_s)
+      ps1.save
+      ps2 = ACM::Models::PermissionSets.new(:name => :director.to_s)
+      ps2.save
+      ACM::Models::Permissions.new(:permission_set_id => ps1.id, :name => :read_appspace.to_s).save
+      ACM::Models::Permissions.new(:permission_set_id => ps1.id, :name => :write_appspace.to_s).save
+      ACM::Models::Permissions.new(:permission_set_id => ps1.id, :name => :delete_appspace.to_s).save
+
+      @user_service = ACM::Services::UserService.new()
+      #Create a set of users
+      user1_json = ACM::Services::UserService.new().create_user()
+      @user1 = Yajl::Parser.parse(user1_json, :symbolize_keys => true)
+      user2_json = ACM::Services::UserService.new().create_user()
+      @user2 = Yajl::Parser.parse(user2_json, :symbolize_keys => true)
+      user3_json = ACM::Services::UserService.new().create_user()
+      @user3 = Yajl::Parser.parse(user3_json, :symbolize_keys => true)
+      user4_json = ACM::Services::UserService.new().create_user()
+      @user4 = Yajl::Parser.parse(user4_json, :symbolize_keys => true)
+
+      @logger = ACM::Config.logger
+    end
+
+    it "should return the object that's requested" do
+      basic_authorize "admin", "password"
+
+      object_data = {
+        :name => "www_staging",
+        :type => ["app_space"],
+        :additionalInfo => "{component => cloud_controller}",
+        :acl => {
+          :read_appspace => [@user1[:id], @user2[:id], @user3[:id], @user4[:id]],
+          :write_appspace => [@user2[:id], @user3[:id]],
+          :delete_appspace => [@user4[:id]]
+         }
+      }
+
+      post "/objects", {}, { "CONTENT_TYPE" => "application/json", :input => object_data.to_json() }
+      @logger.debug("post /objects last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      original_object = last_response.body
+
+      get "/objects/#{body[:id]}", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("get /objects/#{body[:id]} last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      fetched_object = last_response.body
+
+      original_object.should eql(fetched_object)
+
+    end
+
+    it "should return an error when the object does not exist" do
+      basic_authorize "admin", "password"
+
+      get "/objects/1234", {}, { "CONTENT_TYPE" => "application/json" }
+      last_response.status.should eql(404)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+
+      body[:code].should eql(1000)
+      body[:description].should include("not found")
+    end
+
+    it "should return an error on an invalid request" do
+      basic_authorize "admin", "password"
+
+      get "/objects/", {}, { "CONTENT_TYPE" => "application/json" }
+      last_response.status.should eql(404)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+
+      body[:code].should eql(1000)
+      body[:description].should include("not found")
+    end
+
+  end
+
+  describe "when deleting an object" do
+
+    before(:each) do
+      #Fix the schema
+      ps1 = ACM::Models::PermissionSets.new(:name => :app_space.to_s)
+      ps1.save
+      ps2 = ACM::Models::PermissionSets.new(:name => :director.to_s)
+      ps2.save
+      ACM::Models::Permissions.new(:permission_set_id => ps1.id, :name => :read_appspace.to_s).save
+      ACM::Models::Permissions.new(:permission_set_id => ps1.id, :name => :write_appspace.to_s).save
+      ACM::Models::Permissions.new(:permission_set_id => ps1.id, :name => :delete_appspace.to_s).save
+
+      @user_service = ACM::Services::UserService.new()
+      #Create a set of users
+      user1_json = ACM::Services::UserService.new().create_user()
+      @user1 = Yajl::Parser.parse(user1_json, :symbolize_keys => true)
+      user2_json = ACM::Services::UserService.new().create_user()
+      @user2 = Yajl::Parser.parse(user2_json, :symbolize_keys => true)
+      user3_json = ACM::Services::UserService.new().create_user()
+      @user3 = Yajl::Parser.parse(user3_json, :symbolize_keys => true)
+      user4_json = ACM::Services::UserService.new().create_user()
+      @user4 = Yajl::Parser.parse(user4_json, :symbolize_keys => true)
+
+      @logger = ACM::Config.logger
+    end
+
+    it "should delete the object that's requested" do
+      basic_authorize "admin", "password"
+
+      object_data = {
+        :name => "www_staging",
+        :type => ["app_space"],
+        :additionalInfo => "{component => cloud_controller}",
+        :acl => {
+          :read_appspace => [@user1[:id], @user2[:id], @user3[:id], @user4[:id]],
+          :write_appspace => [@user2[:id], @user3[:id]],
+          :delete_appspace => [@user4[:id]]
+         }
+      }
+
+      post "/objects", {}, { "CONTENT_TYPE" => "application/json", :input => object_data.to_json() }
+      @logger.debug("post /objects last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+
+      delete "/objects/#{body[:id]}", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("delete /objects/#{body[:id]} last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
+      last_response.original_headers["Content-Length"].should eql("0")
+
+      get "/objects/#{body[:id]}", {}, { "CONTENT_TYPE" => "application/json" }
+      last_response.status.should eql(404)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+
+      body[:code].should eql(1000)
+      body[:description].should include("not found")
+
+      #Should not mess up any other tables. should be able to still create objects
+      object_data = {
+        :name => "www_staging",
+        :type => ["app_space"],
+        :additionalInfo => "{component => cloud_controller}",
+        :acl => {
+          :read_appspace => [@user1[:id], @user2[:id], @user3[:id], @user4[:id]],
+          :write_appspace => [@user2[:id], @user3[:id]],
+          :delete_appspace => [@user4[:id]]
+         }
+      }
+
+      post "/objects", {}, { "CONTENT_TYPE" => "application/json", :input => object_data.to_json() }
+      @logger.debug("post /objects last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+
+      body[:acl].should_not be_nil
+      sorted_acls = body[:acl].keys().sort()
+      sorted_acls.should eql([:read_appspace, :write_appspace, :delete_appspace].sort())
+
+      sorted_users = body[:acl][:read_appspace].sort()
+      sorted_users.should eql([@user1[:id], @user2[:id], @user3[:id], @user4[:id]].sort())
+
+      sorted_users = body[:acl][:write_appspace].sort()
+      sorted_users.should eql([@user2[:id], @user3[:id]].sort())
+
+      sorted_users = body[:acl][:delete_appspace].sort()
+      sorted_users.should eql([@user4[:id]].sort())
+
+      body[:name].to_s.should eql(object_data[:name].to_s)
+      body[:type].should eql(object_data[:type])
+      body[:additionalInfo].should eql(object_data[:additionalInfo])
+      body[:id].should_not be_nil
+      body[:meta][:created].should_not be_nil
+      body[:meta][:updated].should_not be_nil
+      body[:meta][:schema].should eql("urn:acm:schemas:1.0")
+
+    end
+
+    it "should return an error when the object does not exist" do
+      basic_authorize "admin", "password"
+
+      delete "/objects/1234", {}, { "CONTENT_TYPE" => "application/json" }
+      last_response.status.should eql(404)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+
+      body[:code].should eql(1000)
+      body[:description].should include("not found")
+    end
+
+    it "should return an error on an invalid request" do
+      basic_authorize "admin", "password"
+
+      delete "/objects/", {}, { "CONTENT_TYPE" => "application/json" }
+      last_response.status.should eql(404)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+
+      body[:code].should eql(1000)
+      body[:description].should include("not found")
     end
 
   end

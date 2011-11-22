@@ -51,7 +51,7 @@ module ACM::Controller
       status(404)
       error_payload                = Hash.new
       error_payload['code']        = ACM::ObjectNotFound.new("").error_code
-      error_payload['description'] = "The resource was not found"
+      error_payload['description'] = "The object was not found"
       #TODO: Handle meta and uri
       Yajl::Encoder.encode(error_payload)
     end

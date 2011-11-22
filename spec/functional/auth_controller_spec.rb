@@ -30,7 +30,7 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       body[:code].should eql(1000)
-      body[:description].should eql("The resource was not found")
+      body[:description].should eql("The object was not found")
     end
 
     it "should not allow incorrect credentials" do

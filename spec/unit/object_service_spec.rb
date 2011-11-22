@@ -188,4 +188,54 @@ describe ACM::Services::ObjectService do
 
   end
 
+  describe "getting an object" do
+
+    it "should correctly fetch an object requested" do
+
+      o_json = @object_service.create_object(:name => "www_staging")
+
+      created_object = Yajl::Parser.parse(o_json, :symbolize_keys => true)
+
+      read_object_json = @object_service.read_object(created_object[:id])
+
+      read_object = Yajl::Parser.parse(read_object_json, :symbolize_keys => true)
+
+      read_object.should eql(created_object)
+    end
+
+    it "should raise an exception when the object id does not exist" do
+
+      lambda {
+        read_object_json = @object_service.read_object("12345")
+      }.should raise_error(ACM::ACMError)
+
+    end
+
+  end
+
+  describe "deleting an object" do
+
+    it "should delete the object requested" do
+
+      o_json = @object_service.create_object(:name => "www_staging")
+
+      created_object = Yajl::Parser.parse(o_json, :symbolize_keys => true)
+
+      @object_service.delete_object(created_object[:id])
+
+      lambda {
+        read_object_json = @object_service.read_object(created_object[:id])
+      }.should raise_error(ACM::ACMError)
+    end
+
+    it "should raise an exception when the object id does not exist" do
+
+      lambda {
+        read_object_json = @object_service.delete_object("12345")
+      }.should raise_error(ACM::ACMError)
+
+    end
+
+  end
+
 end
