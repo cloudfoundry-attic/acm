@@ -19,12 +19,13 @@ module ACM::Controller
       @logger.debug("ACM ApiController is up")
 
       @object_service = ACM::Services::ObjectService.new()
+      @permission_set_service = ACM::Services::PermissionSetService.new()
     end
 
     configure do
       set(:show_exceptions, false)
       set(:raise_errors, false)
-      set(:dump_errors, true)
+      set(:dump_errors, false)
     end
 
     error do

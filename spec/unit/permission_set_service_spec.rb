@@ -61,4 +61,42 @@ describe ACM::Services::PermissionSetService do
 
   end
 
+  describe "reading a permission set" do
+
+    before(:each) do
+      @permission_set_service = ACM::Services::PermissionSetService.new()
+
+      @logger = ACM::Config.logger
+    end
+
+    it "should return the correct permission set for a valid name" do
+      ps_json = @permission_set_service.create_permission_set(:name => :app_space,
+                                                              :permissions => [:read_appspace, :update_appspace, :delete_appspace],
+                                                              :additional_info => "this is the permission set for the app space"
+      )
+
+      ps = Yajl::Parser.parse(ps_json, :symbolize_keys => true)
+
+      read_ps_json = @permission_set_service.read_permission_set(:app_space)
+      read_ps = Yajl::Parser.parse(read_ps_json, :symbolize_keys => true)
+
+      read_ps.should eql(ps)
+    end
+
+    it "should return an error if it cannot find a permission set" do
+      ps_json = @permission_set_service.create_permission_set(:name => :app_space,
+                                                              :permissions => [:read_appspace, :update_appspace, :delete_appspace],
+                                                              :additional_info => "this is the permission set for the app space"
+      )
+
+      ps = Yajl::Parser.parse(ps_json, :symbolize_keys => true)
+
+      lambda {
+        @permission_set_service.read_permission_set(:bosh_director)
+      }.should raise_error(ACM::ACMError)
+
+    end
+
+  end
+
 end

@@ -47,6 +47,20 @@ module ACM::Services
       map[key].nil? ? nil : map[key]
     end
 
+    def read_permission_set(name)
+      @logger.debug("read_permission_set parameters #{name.inspect}")
+      permission_set = ACM::Models::PermissionSets.filter(:name => name.to_s).first()
+
+      if(permission_set.nil?)
+        @logger.error("Could not find permission set with id #{name.inspect}")
+        raise ACM::ObjectNotFound.new("#{name.inspect}")
+      else
+        @logger.debug("Found permission set #{permission_set.inspect}")
+      end
+
+      permission_set.to_json()
+    end
+
   end
 
 end
