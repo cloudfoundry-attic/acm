@@ -148,16 +148,18 @@ module ACM::Services
         @logger.debug("Found object #{object.inspect}")
       end
 
-      object.remove_all_permission_sets
+      ACM::Config.db.transaction do
+        object.remove_all_permission_sets
 
-      aces = object.access_control_entries
-      object.remove_all_access_control_entries
+        aces = object.access_control_entries
+        object.remove_all_access_control_entries
 
-      aces.each{ |ace|
-        ace.remove_all_subjects
-        ace.delete
-      }
-      object.delete
+        aces.each{ |ace|
+          ace.remove_all_subjects
+          ace.delete
+        }
+        object.delete
+      end
 
       nil
     end

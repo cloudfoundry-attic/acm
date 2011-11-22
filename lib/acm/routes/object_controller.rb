@@ -43,7 +43,7 @@ module ACM
 
         #parse the request
         name = request_json[:name.to_s]
-        permission_sets = request_json[:type.to_s]
+        permission_sets = request_json[:permission_sets.to_s]
         additional_info = request_json[:additionalInfo.to_s]
         acls = request_json[:acl.to_s]
 

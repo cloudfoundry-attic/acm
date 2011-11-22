@@ -81,7 +81,7 @@ describe ACM::Controller::RackController do
 
       object_data = {
         :name => "www_staging",
-        :type => ["app_space"],
+        :permission_sets => ["app_space"],
         :id => "54947df8-0e9e-4471-a2f9-9af509fb5889",
         :additionalInfo => "{component => cloud_controller}",
         :meta => {
@@ -100,7 +100,7 @@ describe ACM::Controller::RackController do
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
 
       body[:name].to_s.should eql(object_data[:name].to_s)
-      body[:type].should eql(object_data[:type])
+      body[:permission_sets].should eql(object_data[:permission_sets])
       body[:additionalInfo].should eql(object_data[:additionalInfo])
       body[:id].should_not be_nil
       body[:id].should_not eql(object_data[:id])
@@ -130,7 +130,7 @@ describe ACM::Controller::RackController do
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
 
       body[:name].to_s.should eql(object_data[:name].to_s)
-      body[:type].should be_nil
+      body[:permission_sets].should be_nil
       body[:additionalInfo].should eql(object_data[:additionalInfo])
       body[:id].should_not be_nil
       body[:meta][:created].should_not be_nil
@@ -143,7 +143,7 @@ describe ACM::Controller::RackController do
 
       object_data = {
         :name => "www_staging",
-        :type => ["app_space"],
+        :permission_sets => ["app_space"],
         :additionalInfo => "{component => cloud_controller}",
         :acl => {
           :read_appspace => [@user1[:id], @user2[:id], @user3[:id], @user4[:id]],
@@ -174,7 +174,7 @@ describe ACM::Controller::RackController do
       sorted_users.should eql([@user4[:id]].sort())
 
       body[:name].to_s.should eql(object_data[:name].to_s)
-      body[:type].should eql(object_data[:type])
+      body[:permission_sets].should eql(object_data[:permission_sets])
       body[:additionalInfo].should eql(object_data[:additionalInfo])
       body[:id].should_not be_nil
       body[:meta][:created].should_not be_nil
@@ -213,7 +213,7 @@ describe ACM::Controller::RackController do
 
       object_data = {
         :name => "www_staging",
-        :type => ["app_space"],
+        :permission_sets => ["app_space"],
         :additionalInfo => "{component => cloud_controller}",
         :acl => {
           :read_appspace => [@user1[:id], @user2[:id], @user3[:id], @user4[:id]],
@@ -267,7 +267,7 @@ describe ACM::Controller::RackController do
 
       object_data = {
         :name => "www_staging",
-        :type => ["app_space"],
+        :permission_sets => ["app_space"],
         :additionalInfo => "{component => cloud_controller}",
         :acl => {
           :read_appspace => [@user1[:id], @user2[:id], @user3[:id], @user4[:id]],
@@ -358,7 +358,7 @@ describe ACM::Controller::RackController do
 
       object_data = {
         :name => "www_staging",
-        :type => ["app_space"],
+        :permission_sets => ["app_space"],
         :additionalInfo => "{component => cloud_controller}",
         :acl => {
           :read_appspace => [@user1[:id], @user2[:id], @user3[:id], @user4[:id]],
@@ -394,7 +394,7 @@ describe ACM::Controller::RackController do
       #Should not mess up any other tables. should be able to still create objects
       object_data = {
         :name => "www_staging",
-        :type => ["app_space"],
+        :permission_sets => ["app_space"],
         :additionalInfo => "{component => cloud_controller}",
         :acl => {
           :read_appspace => [@user1[:id], @user2[:id], @user3[:id], @user4[:id]],
@@ -425,7 +425,7 @@ describe ACM::Controller::RackController do
       sorted_users.should eql([@user4[:id]].sort())
 
       body[:name].to_s.should eql(object_data[:name].to_s)
-      body[:type].should eql(object_data[:type])
+      body[:permission_sets].should eql(object_data[:permission_sets])
       body[:additionalInfo].should eql(object_data[:additionalInfo])
       body[:id].should_not be_nil
       body[:meta][:created].should_not be_nil

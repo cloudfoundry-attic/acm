@@ -34,7 +34,7 @@ module ACM::Models
                           self.permission_sets.map{|permission_set| permission_set.name}
       output_object = {
         :name => self.name,
-        :type => object_types,
+        :permission_sets => object_types,
         :id => self.immutable_id,
         :additionalInfo => self.additional_info,
       }
