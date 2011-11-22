@@ -67,7 +67,7 @@ describe ACM::Services::UserService do
 
       lambda {
         user_json = @user_service.create_user(:id => "abc12345", :additional_info => {:email => "olds@vmware.com"}.to_json())
-      }.should raise_error(ACM::SystemInternalError)
+      }.should raise_error(ACM::InvalidRequest)
 
     end
 

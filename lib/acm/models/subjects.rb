@@ -12,7 +12,7 @@ module ACM::Models
     end
 
     one_to_one  :object, :class => "ACM::Models::Objects"
-    many_to_one :members, :class => "ACM::Models::Members"
+    one_to_many :members, :key => :group_id, :class => "ACM::Models::Members"
     many_to_many :access_control_entries,
                  :left_key => :subject_id, :right_key => :access_control_entry_id,
                  :join_table => :ace_subject_map,
@@ -33,16 +33,36 @@ module ACM::Models
     end
 
     def to_json
-      {
+      @logger.debug("Group Id #{self.id}")
+
+      output_group = {
         :id => self.immutable_id,
         :type => self.type,
-        :additional_info => self.additional_info,
+        :additional_info => self.additional_info
+      }
+
+      if(self.type == :group.to_s)
+        members = self.members
+        output_members = []
+        members.each { |member|
+          @logger.debug("Member #{member.inspect} user #{member.user.inspect}")
+          output_members.insert(0, member.user.immutable_id)
+        }
+        if(output_members.size() > 0)
+          output_group[:members] = output_members
+        end
+      end
+
+      output_group.update(
         :meta => {
           :created => self.created_at,
           :updated => self.last_updated_at,
           :schema => latest_schema
         }
-      }.to_json()
+      )
+
+      @logger.debug("Group #{self.id} is #{output_group.inspect}")
+      output_group.to_json()
     end
 
   end

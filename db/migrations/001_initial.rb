@@ -74,6 +74,8 @@ Sequel.migration do
 
       time          :created_at, :null => false
       time          :last_updated_at, :null => false
+
+      unique        ([:group_id, :user_id])
     end
 
   end
