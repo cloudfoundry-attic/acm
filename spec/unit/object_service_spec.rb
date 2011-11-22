@@ -33,7 +33,7 @@ describe ACM::Services::ObjectService do
 
       object[:name].should eql("www_staging")
       object[:id].should_not be_nil
-      object[:type].should be_nil
+      object[:permission_sets].should be_nil
       object[:meta][:created].should_not be_nil
       object[:meta][:updated].should_not be_nil
 
@@ -46,7 +46,7 @@ describe ACM::Services::ObjectService do
       object = Yajl::Parser.parse(o_json, :symbolize_keys => true)
 
       object[:id].should_not be_nil
-      object[:type].should be_nil
+      object[:permission_sets].should be_nil
       object[:meta][:created].should_not be_nil
       object[:meta][:updated].should_not be_nil
 
@@ -59,7 +59,7 @@ describe ACM::Services::ObjectService do
       object = Yajl::Parser.parse(o_json, :symbolize_keys => true)
 
       object[:id].should_not be_nil
-      object[:type].should be_nil
+      object[:permission_sets].should be_nil
       object[:meta][:created].should_not be_nil
       object[:meta][:updated].should_not be_nil
       object[:additionalInfo].should eql({:description => :staging_app_space}.to_json())
@@ -73,7 +73,7 @@ describe ACM::Services::ObjectService do
       object = Yajl::Parser.parse(o_json, :symbolize_keys => true)
 
       object[:id].should_not be_nil
-      object[:type].should_not be_nil
+      object[:permission_sets].should_not be_nil
       object[:meta][:created].should_not be_nil
       object[:meta][:updated].should_not be_nil
 
