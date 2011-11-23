@@ -67,6 +67,9 @@ describe ACM::Controller::RackController do
       @user3 = SecureRandom.uuid
       @user4 = SecureRandom.uuid
 
+      @user_service = ACM::Services::UserService.new()
+      @group_service = ACM::Services::GroupService.new()
+
       @logger = ACM::Config.logger
     end
 
@@ -133,6 +136,67 @@ describe ACM::Controller::RackController do
     end
 
     it "should assign the requested acls to a new object" do
+      basic_authorize "admin", "password"
+      @user1 = SecureRandom.uuid
+      @user_service.create_user(:id => @user1)
+      @user2 = SecureRandom.uuid
+      @user_service.create_user(:id => @user2)
+      @user3 = SecureRandom.uuid
+      @user4 = SecureRandom.uuid
+      @user5 = SecureRandom.uuid
+      @user6 = SecureRandom.uuid
+
+      @group1 = SecureRandom.uuid
+      @group_service.create_group(:id => @group1, :members => [@user1])
+      @group2 = SecureRandom.uuid
+      @group_service.create_group(:id => @group2)
+      @group3 = SecureRandom.uuid
+      @group_service.create_group(:id => @group3)
+      @group4 = SecureRandom.uuid
+      @group_service.create_group(:id => @group4, :members => [@user4, @user5, @user6])
+
+      object_data = {
+        :name => "www_staging",
+        :additional_info => {:description => :staging_app_space}.to_json(),
+        :permission_sets => [:app_space.to_s],
+        :acl => {
+            :read_appspace => ["g:#{@group1}", "g:#{@group2}", "g:#{@group4}", "u:#{@user1}", "u:#{@user6}"],
+            :write_appspace => ["g:#{@group1}", "g:#{@group3}", "g:#{@group4}"],
+            :delete_appspace => ["u:#{@user2}", "u:#{@user5}", "g:#{@group3}"]
+        }
+      }
+
+      post "/objects", {}, { "CONTENT_TYPE" => "application/json", :input => object_data.to_json() }
+      @logger.debug("post /objects last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+
+      body[:acl].should_not be_nil
+      sorted_acls = body[:acl].keys().sort()
+      sorted_acls.should eql([:read_appspace, :write_appspace, :delete_appspace].sort())
+
+      sorted_users = body[:acl][:read_appspace].sort()
+      sorted_users.should eql(["g:#{@group1}", "g:#{@group2}", "g:#{@group4}", "u:#{@user1}", "u:#{@user6}"].sort())
+
+      sorted_users = body[:acl][:write_appspace].sort()
+      sorted_users.should eql(["g:#{@group1}", "g:#{@group3}", "g:#{@group4}"].sort())
+
+      sorted_users = body[:acl][:delete_appspace].sort()
+      sorted_users.should eql(["u:#{@user2}", "u:#{@user5}", "g:#{@group3}"].sort())
+
+      body[:name].to_s.should eql(object_data[:name].to_s)
+      body[:permission_sets].should eql(object_data[:permission_sets])
+      body[:additionalInfo].should eql(object_data[:additionalInfo])
+      body[:id].should_not be_nil
+      body[:meta][:created].should_not be_nil
+      body[:meta][:updated].should_not be_nil
+      body[:meta][:schema].should eql("urn:acm:schemas:1.0")
+    end
+
+    it "should assign the requested groups to a new object" do
       basic_authorize "admin", "password"
 
       object_data = {
