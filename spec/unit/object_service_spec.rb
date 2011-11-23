@@ -12,6 +12,7 @@ describe ACM::Services::ObjectService do
 
     @object_service = ACM::Services::ObjectService.new()
     @user_service = ACM::Services::UserService.new()
+    @group_service = ACM::Services::GroupService.new()
     @permission_set_service = ACM::Services::PermissionSetService.new()
 
     @permission_set_service.create_permission_set(:name => :app_space,
@@ -80,6 +81,181 @@ describe ACM::Services::ObjectService do
     end
 
     it "should create an object with multiple types"
+
+    it "should not create an object with a permission that's not supported by its permission_set'" do
+      @user1 = SecureRandom.uuid
+      @user_service.create_user(:id => @user1)
+      @user2 = SecureRandom.uuid
+      @user_service.create_user(:id => @user2)
+      @user3 = SecureRandom.uuid
+      @user4 = SecureRandom.uuid
+
+      lambda {
+        o_json = @object_service.create_object(:name => "www_staging",
+                                            :additional_info => {:description => :staging_app_space}.to_json(),
+                                            :permission_sets => [:app_space],
+                                            :acl => {
+                                                :read_appspace => ["u:#{@user1}", "u:#{@user2}", "u:#{@user3}", "u:#{@user4}"],
+                                                :update_appspace => ["u:#{@user1}", "u:#{@user3}", "u:#{@user4}"]
+                                            })
+      }.should raise_error(ACM::InvalidRequest)
+
+
+    end
+
+
+    it "should create an object with multiple users" do
+      @user1 = SecureRandom.uuid
+      @user_service.create_user(:id => @user1)
+      @user2 = SecureRandom.uuid
+      @user_service.create_user(:id => @user2)
+      @user3 = SecureRandom.uuid
+      @user4 = SecureRandom.uuid
+
+      o_json = @object_service.create_object(:name => "www_staging",
+                                            :additional_info => {:description => :staging_app_space}.to_json(),
+                                            :permission_sets => [:app_space],
+                                            :acl => {
+                                                :read_appspace => ["u:#{@user1}", "u:#{@user2}", "u:#{@user3}", "u:#{@user4}"],
+                                                :write_appspace => ["u:#{@user1}", "u:#{@user3}", "u:#{@user4}"]
+                                            })
+      object = Yajl::Parser.parse(o_json, :symbolize_keys => true)
+
+      object[:name].should eql("www_staging")
+
+      object[:acl][:read_appspace].sort().should eql(["u:#{@user1}", "u:#{@user2}", "u:#{@user3}", "u:#{@user4}"].sort())
+      object[:acl][:write_appspace].sort().should eql(["u:#{@user1}", "u:#{@user3}", "u:#{@user4}"].sort())
+
+    end
+
+    it "should create an object with multiple groups" do
+      @group1 = SecureRandom.uuid
+      @group_service.create_group(:id => @group1)
+      @group2 = SecureRandom.uuid
+      @group_service.create_group(:id => @group2)
+      @group3 = SecureRandom.uuid
+      @group_service.create_group(:id => @group3)
+      @group4 = SecureRandom.uuid
+      @group_service.create_group(:id => @group4)
+
+      o_json = @object_service.create_object(:name => "www_staging",
+                                            :additional_info => {:description => :staging_app_space}.to_json(),
+                                            :permission_sets => [:app_space],
+                                            :acl => {
+                                                :read_appspace => ["g:#{@group1}", "g:#{@group2}", "g:#{@group3}", "g:#{@group4}"],
+                                                :write_appspace => ["g:#{@group1}", "g:#{@group3}", "g:#{@group4}"]
+                                            })
+      object = Yajl::Parser.parse(o_json, :symbolize_keys => true)
+
+      object[:name].should eql("www_staging")
+
+      object[:acl][:read_appspace].sort().should eql(["g:#{@group1}", "g:#{@group2}", "g:#{@group3}", "g:#{@group4}"].sort())
+      object[:acl][:write_appspace].sort().should eql(["g:#{@group1}", "g:#{@group3}", "g:#{@group4}"].sort())
+
+    end
+
+    it "should not create an object with groups that do not exist" do
+      @group1 = SecureRandom.uuid
+      @group_service.create_group(:id => @group1)
+      @group2 = SecureRandom.uuid
+      @group_service.create_group(:id => @group2)
+      @group3 = SecureRandom.uuid
+      @group_service.create_group(:id => @group3)
+      @group4 = SecureRandom.uuid
+
+      lambda {
+        o_json = @object_service.create_object(:name => "www_staging",
+                                              :additional_info => {:description => :staging_app_space}.to_json(),
+                                              :permission_sets => [:app_space],
+                                              :acl => {
+                                                  :read_appspace => ["g:#{@group1}", "g:#{@group2}", "g:#{@group3}", "g:#{@group4}"],
+                                                  :write_appspace => ["g:#{@group1}", "g:#{@group3}", "g:#{@group4}"]
+                                              })
+      }.should raise_error(ACM::InvalidRequest)
+
+    end
+
+    it "should create an object with multiple users and groups" do
+      @user1 = SecureRandom.uuid
+      @user_service.create_user(:id => @user1)
+      @user2 = SecureRandom.uuid
+      @user_service.create_user(:id => @user2)
+      @user3 = SecureRandom.uuid
+      @user4 = SecureRandom.uuid
+      @user5 = SecureRandom.uuid
+      @user6 = SecureRandom.uuid
+
+      @group1 = SecureRandom.uuid
+      @group_service.create_group(:id => @group1, :members => [@user1])
+      @group2 = SecureRandom.uuid
+      @group_service.create_group(:id => @group2)
+      @group3 = SecureRandom.uuid
+      @group_service.create_group(:id => @group3)
+      @group4 = SecureRandom.uuid
+      @group_service.create_group(:id => @group4, :members => [@user4, @user5, @user6])
+
+
+      o_json = @object_service.create_object(:name => "www_staging",
+                                            :additional_info => {:description => :staging_app_space}.to_json(),
+                                            :permission_sets => [:app_space],
+                                            :acl => {
+                                                :read_appspace => ["g:#{@group1}", "g:#{@group2}", "g:#{@group4}", "u:#{@user1}", "u:#{@user6}"],
+                                                :write_appspace => ["g:#{@group1}", "g:#{@group3}", "g:#{@group4}"],
+                                                :delete_appspace => ["u:#{@user2}", "u:#{@user5}", "g:#{@group3}"]
+                                            })
+      object = Yajl::Parser.parse(o_json, :symbolize_keys => true)
+
+      object[:name].should eql("www_staging")
+
+      object[:acl][:read_appspace].sort().should eql(["g:#{@group1}", "g:#{@group2}", "g:#{@group4}", "u:#{@user1}", "u:#{@user6}"].sort())
+      object[:acl][:write_appspace].sort().should eql(["g:#{@group1}", "g:#{@group3}", "g:#{@group4}"].sort())
+      object[:acl][:delete_appspace].sort().should eql(["u:#{@user2}", "u:#{@user5}", "g:#{@group3}"].sort())
+
+    end
+
+    it "should error out if users and groups are mixed up" do
+      @user1 = SecureRandom.uuid
+      @user_service.create_user(:id => @user1)
+      @user2 = SecureRandom.uuid
+      @user_service.create_user(:id => @user2)
+      @user3 = SecureRandom.uuid
+      @user4 = SecureRandom.uuid
+      @user5 = SecureRandom.uuid
+      @user6 = SecureRandom.uuid
+
+      @group1 = SecureRandom.uuid
+      @group_service.create_group(:id => @group1, :members => [@user1])
+      @group2 = SecureRandom.uuid
+      @group_service.create_group(:id => @group2)
+      @group3 = SecureRandom.uuid
+      @group_service.create_group(:id => @group3)
+      @group4 = SecureRandom.uuid
+      @group_service.create_group(:id => @group4, :members => [@user4, @user5, @user6])
+
+      lambda {
+        o_json = @object_service.create_object(:name => "www_staging",
+                                              :additional_info => {:description => :staging_app_space}.to_json(),
+                                              :permission_sets => [:app_space],
+                                              :acl => {
+                                                  :read_appspace => ["u:#{@group1}", "g:#{@group2}", "g:#{@group4}", "u:#{@user1}", "u:#{@user6}"],
+                                                  :write_appspace => ["g:#{@group1}", "g:#{@group3}", "g:#{@group4}"],
+                                                  :delete_appspace => ["u:#{@user2}", "u:#{@user5}", "g:#{@group3}"]
+                                              })
+      }.should raise_error(ACM::InvalidRequest)
+
+      lambda {
+        o_json = @object_service.create_object(:name => "www_staging",
+                                              :additional_info => {:description => :staging_app_space}.to_json(),
+                                              :permission_sets => [:app_space],
+                                              :acl => {
+                                                  :read_appspace => ["g:#{@group1}", "g:#{@group2}", "g:#{@group4}", "u:#{@user1}", "u:#{@user6}"],
+                                                  :write_appspace => ["g:#{@group1}", "g:#{@group3}", "g:#{@group4}"],
+                                                  :delete_appspace => ["u:#{@user2}", "g:#{@user5}", "g:#{@group3}"]
+                                              })
+      }.should raise_error(ACM::InvalidRequest)
+
+    end
+
 
   end
 

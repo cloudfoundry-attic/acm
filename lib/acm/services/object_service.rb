@@ -11,6 +11,7 @@ module ACM::Services
       super
 
       @user_service = ACM::Services::UserService.new()
+      @group_service = ACM::Services::GroupService.new()
     end
 
     def create_object(opts = {})
@@ -19,7 +20,7 @@ module ACM::Services
       permission_sets = get_option(opts, :permission_sets)
       name = get_option(opts, :name)
       additional_info = get_option(opts, :additional_info)
-      acls = get_option(opts, :acl)
+      acl = get_option(opts, :acl)
 
       o = ACM::Models::Objects.new(
         :name => name,
@@ -53,14 +54,14 @@ module ACM::Services
 
           end
 
-          @logger.debug("Acls requested are #{acls.inspect}")
-          if(!acls.nil?)
+          @logger.debug("Acls requested are #{acl.inspect}")
+          if(!acl.nil?)
             #ACLs are a list of hashes
-            acls.each { |permission, user_id_set|
+            acl.each { |permission, user_id_set|
               if(user_id_set.kind_of?(Array))
                 user_id_set.each { |user_id|
                   begin
-                    user = nil
+                    subject = nil
                     if(user_id.index("u:") == 0)
                       #search for the user. if the user does not exist create it
                       user_id = user_id.sub(/(u:)/, '')
@@ -77,10 +78,27 @@ module ACM::Services
                         end
                       end
 
-                      user = Yajl::Parser.parse(user_json, :symbolize_keys => true)
+                      subject = Yajl::Parser.parse(user_json, :symbolize_keys => true)
+                    elsif(user_id.index("g:") == 0)
+                      #search for the group. If the group does not exist, error out
+                      group_id = user_id.sub(/(g:)/, '')
+                      group_json = nil
+                      begin
+                        group_json = @group_service.find_group(group_id)
+                      rescue => e
+                        if(e.kind_of?(ACM::ObjectNotFound))
+                          @logger.error("Could not find group #{group_id} #{e.message}")
+                          raise e
+                        else
+                          @logger.error("Internal error #{e.message}")
+                          raise ACM::SystemInternalError.new()
+                        end
+                      end
+
+                      subject = Yajl::Parser.parse(group_json, :symbolize_keys => true)
                     end
                     #TODO: icky code. should allow a set of permissions to be accepted... later
-                    add_permission(o.immutable_id, permission, user[:id])
+                    add_permission(o.immutable_id, permission, subject[:id])
                   rescue => e
                     @logger.error("Failed to add permission #{permission.inspect} on object #{o.immutable_id} for user #{user_id}")
                     raise ACM::InvalidRequest.new("Failed to add permission #{permission} on object #{o.immutable_id} for user #{user_id}")
@@ -118,6 +136,7 @@ module ACM::Services
     def add_permission(obj_id, permission, user_id)
       @logger.debug("adding permission #{permission} on object #{obj_id} and user #{user_id}")
 
+      #TODO: Get this done in a single update query
       #Find the object
       object = ACM::Models::Objects.filter(:immutable_id => obj_id.to_s).first()
       @logger.debug("requested object #{object.inspect}")
