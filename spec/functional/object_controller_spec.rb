@@ -53,14 +53,13 @@ describe ACM::Controller::RackController do
   describe "when requesting a new object" do
 
     before(:each) do
-      #Fix the schema
-      ps1 = ACM::Models::PermissionSets.new(:name => :app_space.to_s)
-      ps1.save
-      ps2 = ACM::Models::PermissionSets.new(:name => :director.to_s)
-      ps2.save
-      ACM::Models::Permissions.new(:permission_set_id => ps1.id, :name => :read_appspace.to_s).save
-      ACM::Models::Permissions.new(:permission_set_id => ps1.id, :name => :write_appspace.to_s).save
-      ACM::Models::Permissions.new(:permission_set_id => ps1.id, :name => :delete_appspace.to_s).save
+      @permission_set_service = ACM::Services::PermissionSetService.new()
+
+      @permission_set_service.create_permission_set(:name => :app_space,
+                                                    :permissions => [:read_appspace, :write_appspace, :delete_appspace],
+                                                    :additional_info => "this is the permission set for the app space")
+
+      @permission_set_service.create_permission_set(:name => :director)
 
       @user1 = SecureRandom.uuid
       @user2 = SecureRandom.uuid
