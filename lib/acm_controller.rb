@@ -25,7 +25,10 @@ module ACM::Controller
 
     def call(env)
 
-      @logger.debug("Received call with parameters #{env.inspect}")
+      @logger.debug("Received call with for \
+                    #{env["rack.url_scheme"]} \
+                    from #{env["REMOTE_ADDR"]} #{env["HTTP_HOST"]}\
+                    operation #{env["REQUEST_METHOD"]} #{env["PATH_INFO"]}#{env["QUERY_STRING"]}")
 
       start_time = Time.now
       status, headers, body = @app.call(env)
