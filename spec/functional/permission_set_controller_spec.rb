@@ -31,6 +31,8 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/permission_sets/#{body[:name]}")
+
       body[:name].to_s.should eql(permission_set_data[:name].to_s)
       body[:permissions].sort().should eql(permission_set_data[:permissions].sort())
       body[:additionalInfo].should eql(permission_set_data[:additionalInfo])
@@ -54,6 +56,8 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/permission_sets/#{body[:name]}")
+
       body[:name].to_s.should eql(permission_set_data[:name].to_s)
       body[:permissions].size().should eql(0)
       body[:additionalInfo].should eql(permission_set_data[:additionalInfo])
@@ -77,6 +81,7 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
 
       body[:code].should eql(1001)
       body[:description].should include("Invalid request")
@@ -97,6 +102,7 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
 
       body[:code].should eql(1001)
       body[:description].should include("Invalid request")
@@ -112,6 +118,7 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
 
       body[:code].should eql(1001)
       body[:description].should include("Invalid request")
@@ -141,6 +148,8 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/permission_sets/#{body[:name]}")
+
       original_ps = last_response.body
 
       get "/permission_sets/#{body[:name]}", {}, { "CONTENT_TYPE" => "application/json" }
@@ -150,6 +159,7 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       fetched_ps = last_response.body
+      last_response.original_headers["Location"].should be_nil
 
       original_ps.should eql(fetched_ps)
 
@@ -164,6 +174,7 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
 
       body[:code].should eql(1000)
       body[:description].should include("not found")
@@ -178,6 +189,7 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
 
       body[:code].should eql(1000)
       body[:description].should include("not found")

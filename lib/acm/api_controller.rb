@@ -1,7 +1,6 @@
 require 'acm/errors'
 require 'acm_controller'
 require 'acm/routes/object_controller'
-require 'acm/routes/subject_controller'
 require 'acm/routes/permission_set_controller'
 require 'acm/routes/group_controller'
 require 'acm/services/object_service'

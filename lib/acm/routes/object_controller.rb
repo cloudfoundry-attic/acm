@@ -51,6 +51,15 @@ module ACM::Controller
                                                 :acl => acl)
 
       @logger.debug("Response is #{object_json.inspect}")
+
+      #Set the Location response header
+      object = Yajl::Parser.parse(object_json, :symbolize_keys => true)
+      request_url = request.url
+      if(request_url.end_with? ["/"])
+        request_url.chop()
+      end
+      headers "Location" => "#{request_url}/#{object[:id]}"
+
       object_json
     end
 

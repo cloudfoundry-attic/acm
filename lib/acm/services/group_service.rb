@@ -34,14 +34,16 @@ module ACM::Services
             members = opts[:members]
             if(members.kind_of?(Array))
               members.each {|member|
-                begin
-                  user = ACM::Models::Subjects.filter(:immutable_id => member).first()
-                  if(user.nil?)
-                    @logger.debug("Could not find user #{member}. Creating the user")
-                    user = ACM::Models::Subjects.new(:immutable_id => member, :type => :user.to_s)
-                    user.save
+                if(!member.nil?)
+                  begin
+                    user = ACM::Models::Subjects.filter(:immutable_id => member).first()
+                    if(user.nil?)
+                      @logger.debug("Could not find user #{member}. Creating the user")
+                      user = ACM::Models::Subjects.new(:immutable_id => member, :type => :user.to_s)
+                      user.save
+                    end
+                    group.add_member(:user_id => user.id)
                   end
-                  group.add_member(:user_id => user.id)
                 end
               }
             else

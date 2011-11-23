@@ -48,6 +48,15 @@ module ACM::Controller
                                                               :permissions => permissions)
 
       @logger.debug("Response is #{ps_json.inspect}")
+
+      #Set the Location response header
+      ps = Yajl::Parser.parse(ps_json, :symbolize_keys => true)
+      request_url = request.url
+      if(request_url.end_with? ["/"])
+        request_url.chop()
+      end
+      headers "Location" => "#{request_url}/#{ps[:name]}"
+
       ps_json
     end
 

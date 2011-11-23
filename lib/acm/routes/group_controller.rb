@@ -8,7 +8,7 @@ module ACM::Controller
       content_type 'application/json', :charset => 'utf-8'
       @logger.debug("GET request for /groups/#{params[:group_id]}")
 
-      response = @group_service.read_group(params[:group_id])
+      response = @group_service.find_group(params[:group_id])
       @logger.debug("Response is #{response.inspect}")
 
       response
@@ -49,6 +49,14 @@ module ACM::Controller
                                               :members => members)
 
       @logger.debug("Response is #{group_json.inspect}")
+      #Set the Location response header
+      group = Yajl::Parser.parse(group_json, :symbolize_keys => true)
+      request_url = request.url
+      if(request_url.end_with? ["/"])
+        request_url.chop()
+      end
+      headers "Location" => "#{request_url}/#{group[:id]}"
+
       group_json
     end
 

@@ -23,6 +23,7 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
 
       body[:code].should eql(1001)
       body[:description].should include("Invalid request")
@@ -40,6 +41,7 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
 
       body[:code].should eql(1001)
       body[:description].should include("Invalid request")
@@ -94,6 +96,7 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/objects/#{body[:id]}")
 
       body[:name].to_s.should eql(object_data[:name].to_s)
       body[:permission_sets].should eql(object_data[:permission_sets])
@@ -124,6 +127,7 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/objects/#{body[:id]}")
 
       body[:name].to_s.should eql(object_data[:name].to_s)
       body[:permission_sets].should be_nil
@@ -172,6 +176,7 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/objects/#{body[:id]}")
 
       body[:acl].should_not be_nil
       sorted_acls = body[:acl].keys().sort()
@@ -216,6 +221,7 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/objects/#{body[:id]}")
 
       body[:acl].should_not be_nil
       sorted_acls = body[:acl].keys().sort()
@@ -259,6 +265,7 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
 
       body[:code].should eql(1001)
       body[:description].should include("Invalid request")
@@ -286,6 +293,7 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
 
       body[:code].should eql(1001)
       body[:description].should include("Invalid request")
@@ -343,6 +351,7 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       fetched_object = last_response.body
+      last_response.original_headers["Location"].should be_nil
 
       original_object.should eql(fetched_object)
 
@@ -357,6 +366,7 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
 
       body[:code].should eql(1000)
       body[:description].should include("not found")
@@ -371,6 +381,7 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
 
       body[:code].should eql(1000)
       body[:description].should include("not found")
@@ -420,6 +431,7 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/objects/#{body[:id]}")
 
       delete "/objects/#{body[:id]}", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("delete /objects/#{body[:id]} last response #{last_response.inspect}")
@@ -433,6 +445,7 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
 
       body[:code].should eql(1000)
       body[:description].should include("not found")
@@ -456,6 +469,7 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/objects/#{body[:id]}")
 
       body[:acl].should_not be_nil
       sorted_acls = body[:acl].keys().sort()
@@ -489,6 +503,7 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
 
       body[:code].should eql(1000)
       body[:description].should include("not found")
@@ -503,6 +518,7 @@ describe ACM::Controller::RackController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
 
       body[:code].should eql(1000)
       body[:description].should include("not found")
