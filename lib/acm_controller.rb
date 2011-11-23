@@ -27,7 +27,10 @@ module ACM::Controller
 
       @logger.debug("Received call with parameters #{env.inspect}")
 
+      start_time = Time.now
       status, headers, body = @app.call(env)
+      end_time = Time.now
+      @logger.debug("#{end_time - start_time}ms for operation #{env["REQUEST_METHOD"]} #{env["PATH_INFO"]}#{env["QUERY_STRING"]}")
       headers["Date"] = Time.now.rfc822 # As thin doesn't inject date
 
       @logger.debug("Sending response Status: #{status} Headers: #{headers} Body: #{body}")
