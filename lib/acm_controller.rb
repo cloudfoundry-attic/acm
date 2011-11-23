@@ -25,15 +25,17 @@ module ACM::Controller
 
     def call(env)
 
-      @logger.debug("Received call with for \
-                    #{env["rack.url_scheme"]} \
-                    from #{env["REMOTE_ADDR"]} #{env["HTTP_HOST"]}\
-                    operation #{env["REQUEST_METHOD"]} #{env["PATH_INFO"]}#{env["QUERY_STRING"]}")
+      @logger.debug("Received #{env["rack.url_scheme"].strip()} call " +
+                    "from #{env["REMOTE_ADDR"].strip()} - #{env["HTTP_HOST"].strip()} " +
+                    "operation #{env["REQUEST_METHOD"]} #{env["PATH_INFO"]}#{env["QUERY_STRING"]}")
 
       start_time = Time.now
       status, headers, body = @app.call(env)
       end_time = Time.now
-      @logger.debug("#{end_time - start_time}ms for operation #{env["REQUEST_METHOD"]} #{env["PATH_INFO"]}#{env["QUERY_STRING"]}")
+      @logger.debug("Completed #{env["rack.url_scheme"].strip()} call " +
+                    "from #{env["REMOTE_ADDR"].strip()} - #{env["HTTP_HOST"].strip()} " +
+                    "operation #{env["REQUEST_METHOD"]} #{env["PATH_INFO"]}#{env["QUERY_STRING"]} " +
+                    "Elapsed time #{end_time - start_time}ms")
       headers["Date"] = Time.now.rfc822 # As thin doesn't inject date
 
       @logger.debug("Sending response Status: #{status} Headers: #{headers} Body: #{body}")
