@@ -40,8 +40,6 @@ module ACM::Services
             end
             @logger.debug("permission_set_string_values requested for object #{o.inspect} are #{permission_set_string_values.inspect}")
 
-            @logger.debug("all permission sets #{ACM::Models::PermissionSets.all().inspect}")
-
             permission_set_entities = ACM::Models::PermissionSets.filter(:name => permission_set_string_values).all()
             @logger.debug("permission_set_entities are #{permission_set_entities.inspect}")
 

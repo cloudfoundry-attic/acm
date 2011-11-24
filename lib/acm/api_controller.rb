@@ -3,9 +3,11 @@ require 'acm_controller'
 require 'acm/routes/object_controller'
 require 'acm/routes/permission_set_controller'
 require 'acm/routes/group_controller'
+require 'acm/routes/access_controller'
 require 'acm/services/object_service'
 require 'acm/services/user_service'
 require 'acm/services/group_service'
+require 'acm/services/access_control_service'
 require 'sinatra/base'
 require 'json'
 require 'net/http'
@@ -23,6 +25,7 @@ module ACM::Controller
       @user_service = ACM::Services::UserService.new()
       @group_service = ACM::Services::GroupService.new()
       @permission_set_service = ACM::Services::PermissionSetService.new()
+      @access_control_service = ACM::Services::AccessControlService.new()
     end
 
     configure do

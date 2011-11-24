@@ -1,3 +1,5 @@
+require 'acm/rack_monkey_patch'
+
 require "acm/config"
 require "acm/api_controller"
 
@@ -25,16 +27,17 @@ module ACM::Controller
 
     def call(env)
 
+      @logger.debug("Request env #{env.inspect}")
       @logger.debug("Received #{env["rack.url_scheme"].strip()} call " +
                     "from #{env["REMOTE_ADDR"].strip()} - #{env["HTTP_HOST"].strip()} " +
-                    "operation #{env["REQUEST_METHOD"]} #{env["PATH_INFO"]}#{env["QUERY_STRING"]}")
+                    "operation #{env["REQUEST_METHOD"]} #{env["PATH_INFO"]} #{env["QUERY_STRING"]}")
 
       start_time = Time.now
       status, headers, body = @app.call(env)
       end_time = Time.now
       @logger.debug("Completed #{env["rack.url_scheme"].strip()} call " +
                     "from #{env["REMOTE_ADDR"].strip()} - #{env["HTTP_HOST"].strip()} " +
-                    "operation #{env["REQUEST_METHOD"]} #{env["PATH_INFO"]}#{env["QUERY_STRING"]} " +
+                    "operation #{env["REQUEST_METHOD"]} #{env["PATH_INFO"]} #{env["QUERY_STRING"]} " +
                     "Elapsed time #{end_time - start_time}ms")
       headers["Date"] = Time.now.rfc822 # As thin doesn't inject date
 

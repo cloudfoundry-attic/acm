@@ -34,6 +34,7 @@ module ACM::Services
         if (e.kind_of?(ACM::ACMError))
           raise e
         else
+          @logger.error("Unknown error #{e}")
           raise ACM::SystemInternalError.new(e)
         end
       end

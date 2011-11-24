@@ -3,7 +3,7 @@ require File.expand_path("../../spec_helper", __FILE__)
 require "rack/test"
 require "json"
 
-describe ACM::Controller::RackController do
+describe ACM::Controller::ApiController do
   include Rack::Test::Methods
 
   def app

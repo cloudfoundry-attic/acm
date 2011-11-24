@@ -3,14 +3,14 @@ require File.expand_path("../../spec_helper", __FILE__)
 require "rack/test"
 require "json"
 
-describe ACM::Controller::RackController do
+describe ACM::Controller::ApiController do
   include Rack::Test::Methods
 
   def app
     @app ||= ACM::Controller::RackController.new
   end
 
-  before(:all) do
+  before(:each) do
     @logger = ACM::Config.logger
   end
 
