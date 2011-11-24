@@ -22,16 +22,42 @@ describe ACM::Controller::ApiController do
       @user2 = SecureRandom.uuid
       @user3 = SecureRandom.uuid
       @user4 = SecureRandom.uuid
+      @user5 = SecureRandom.uuid
+      @user6 = SecureRandom.uuid
+      @user7 = SecureRandom.uuid
+
+      @group1 = SecureRandom.uuid
+      @group2 = SecureRandom.uuid
 
       basic_authorize "admin", "password"
+
+      group_data = {
+        :id => @group1,
+        :additional_info => "Developer group",
+        :members => [@user3, @user4]
+      }
+
+      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
+      @logger.debug("post /groups last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+
+      group_data = {
+        :id => @group2,
+        :additional_info => "Developer group",
+        :members => [@user5, @user6, @user7]
+      }
+
+      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
+      @logger.debug("post /groups last response #{last_response.inspect}")
+      last_response.status.should eql(200)
 
       object_data = {
         :name => "www_staging",
         :permission_sets => ["app_space"],
         :additionalInfo => "{component => cloud_controller}",
         :acl => {
-          :read_appspace => ["u:#{@user1}", "u:#{@user2}", "u:#{@user3}", "u:#{@user4}"],
-          :write_appspace => ["u:#{@user2}", "u:#{@user3}"],
+          :read_appspace => ["u:#{@user1}", "u:#{@user2}", "u:#{@user3}", "u:#{@user4}", "g:#{@group2}"],
+          :write_appspace => ["u:#{@user2}", "g:#{@group1}"],
           :delete_appspace => ["u:#{@user4}"]
          }
       }
@@ -39,15 +65,26 @@ describe ACM::Controller::ApiController do
       post "/objects", {}, { "CONTENT_TYPE" => "application/json", :input => object_data.to_json() }
       @logger.debug("post /objects last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
-      last_response.original_headers["Content-Length"].should_not eql("0")
-
       @object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
 
     end
 
     it "will return a 200 if access is granted" do
       get "/objects/#{@object[:id]}/access?id=#{@user2}&p=read_appspace&p=write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("get /objects/#{@object[:id]}/access last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+
+    end
+
+    it "will return a 200 if access is granted for a group" do
+      get "/objects/#{@object[:id]}/access?id=#{@group1}&p=write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("get /objects/#{@object[:id]}/access last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+
+    end
+
+    it "will return a 200 if access is granted for a member of a group" do
+      get "/objects/#{@object[:id]}/access?id=#{@user7}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("get /objects/#{@object[:id]}/access last response #{last_response.inspect}")
       last_response.status.should eql(200)
 

@@ -18,6 +18,10 @@ module ACM::Services
       if(permissions.nil? || permissions.size() == 0)
         @logger.debug("No permissions")
         raise ACM::ObjectNotFound.new("")
+      else
+        if(!permissions.kind_of?(Array)) #The code below only works with arrays
+          permissions = [permissions]
+        end
       end
 
       object = ACM::Models::Objects.filter(:immutable_id => object_id).first()
@@ -28,8 +32,8 @@ module ACM::Services
       end
 
       permission_ids = ACM::Models::Permissions.filter(:name => permissions).all().map{|p| p.id}
-      if(permission_ids.nil? || permission_ids.size() == 0 || permission_ids.size() != permissions.size())
-        @logger.debug("Permissions did not match")
+      if(permission_ids.nil? || permission_ids.size() == 0 || permission_ids.size() < permissions.size())
+        @logger.debug("Permissions did not match #{permission_ids.inspect} #{permissions.inspect} #{permission_ids.size()} #{permissions.size()}")
         raise ACM::ObjectNotFound.new("")
       end
 
@@ -48,11 +52,13 @@ module ACM::Services
             subject.immutable_id
           else
             group_id = subject.immutable_id
-            members = ACM::Models::Members.filter(:group_id => group_id).all().map { |member|
+            members = ACM::Models::Members.filter(:group_id => subject.id).all().map { |member|
               member.user.immutable_id
             }
+            [group_id, members]
           end
         }
+        subjects = subjects.flatten
         if(subjects.nil? || subjects.size() == 0)
           @logger.debug("No subjects for acl #{acl.inspect}")
           raise ACM::ObjectNotFound.new("")
