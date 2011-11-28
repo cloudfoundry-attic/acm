@@ -222,6 +222,51 @@ module ACM::Services
       nil
     end
 
+    def get_users_for_object(obj_id)
+      @logger.debug("get_users_for_object parameters #{obj_id.inspect}")
+      object = ACM::Models::Objects.filter(:immutable_id => obj_id).first()
+
+      user_permission_entries = {}
+      acl = object.access_control_entries
+      if(!acl.nil?)
+        acl.each { |ace|
+          permission = ace.permission.name
+          ace.subjects.each { |subject|
+            subjects = ace.subjects.map{|subject|
+              if(subject.type == :user.to_s)
+                subject = subject.immutable_id
+                user_permission_entry = user_permission_entries[subject]
+                if(!user_permission_entry.nil?)
+                  if(!user_permission_entry.include? permission)
+                    user_permission_entry.insert(0, permission)
+                  end
+                else
+                  user_permission_entry = []
+                end
+                user_permission_entries[subject] = user_permission_entry
+              else
+                group_id = subject.immutable_id
+                members = ACM::Models::Members.filter(:group_id => subject.id).all().map { |member|
+                  subject = member.user.immutable_id
+                  user_permission_entry = user_permission_entries[subject]
+                  if(!user_permission_entry.nil?)
+                    if(!user_permission_entry.include? permission)
+                      user_permission_entry.insert(0, permission)
+                    end
+                  else
+                    user_permission_entry = []
+                  end
+                  user_permission_entries[subject] = user_permission_entry
+                }
+              end
+            }
+          }
+        }
+      end
+
+      user_permission_entries
+    end
+
   end
 
 end

@@ -411,4 +411,59 @@ describe ACM::Services::ObjectService do
 
   end
 
+  describe "getting users for an object" do
+
+    before (:each) do
+      @logger = ACM::Config.logger
+
+      @user1 = SecureRandom.uuid
+      @user2 = SecureRandom.uuid
+      @user3 = SecureRandom.uuid
+      @user4 = SecureRandom.uuid
+      @user5 = SecureRandom.uuid
+      @user6 = SecureRandom.uuid
+      @user7 = SecureRandom.uuid
+
+      @group1 = SecureRandom.uuid
+      @group2 = SecureRandom.uuid
+
+      group_json = @group_service.create_group(:id => @group1,
+                                              :additional_info => "Developer group",
+                                              :members => [@user3, @user4])
+
+      group = Yajl::Parser.parse(group_json, :symbolize_keys => true)
+
+      group_json = @group_service.create_group(:id => @group2,
+                                              :additional_info => "Another developer group",
+                                              :members => [@user5, @user6, @user7])
+
+      group = Yajl::Parser.parse(group_json, :symbolize_keys => true)
+
+      o_json = @object_service.create_object(:name => "www_staging",
+                                      :additional_info => {:description => :staging_app_space}.to_json(),
+                                      :permission_sets => [:app_space],
+                                      :acl => {
+                                        :read_appspace => ["u:#{@user1}", "u:#{@user2}", "u:#{@user3}", "u:#{@user4}", "g:#{@group2}"],
+                                        :write_appspace => ["u:#{@user2}", "g:#{@group1}"],
+                                        :delete_appspace => ["u:#{@user4}"]
+                                      })
+      @object = Yajl::Parser.parse(o_json, :symbolize_keys => true)
+    end
+
+    it "should correctly fetch the users for an object along with it's permissions" do
+      object_id = @object[:id]
+
+      user_permission_entries = @object_service.get_users_for_object(object_id)
+      @logger.debug("user_permission_entries #{user_permission_entries.inspect}")
+
+      user_permission_entries[@user1].sort().should eql([:read_appspace.to_s].sort())
+      user_permission_entries[@user2].sort().should eql([:read_appspace.to_s, :write_appspace.to_s].sort())
+      user_permission_entries[@user3].sort().should eql([:read_appspace.to_s, :write_appspace.to_s].sort())
+      user_permission_entries[@user4].sort().should eql([:read_appspace.to_s, :write_appspace.to_s, :delete_appspace.to_s].sort())
+      user_permission_entries[@user5].sort().should eql([:read_appspace.to_s].sort())
+      user_permission_entries[@user6].sort().should eql([:read_appspace.to_s].sort())
+    end
+
+  end
+
 end
