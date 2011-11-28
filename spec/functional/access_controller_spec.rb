@@ -4,6 +4,12 @@ require "rack/test"
 
 describe ACM::Controller::ApiController do
   include Rack::Test::Methods
+  alias_method :old_get, :get
+
+  def get(uri, params = {}, env = {}, &block)
+    old_get(uri, params = {}, env = {}, &block)
+    @logger.debug("REQUEST #{last_request.inspect}")
+  end
 
   def app
     @app ||= ACM::Controller::RackController.new

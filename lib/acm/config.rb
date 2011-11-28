@@ -12,7 +12,6 @@ module ACM
     class << self
 
       CONFIG_OPTIONS = [
-        :base_dir,
         :logger,
         :db,
         :name,
@@ -31,9 +30,6 @@ module ACM
       end
 
       def configure(config)
-        @base_dir = config["dir"]
-        FileUtils.mkdir_p(@base_dir)
-
         @logger = Logger.new(config["logging"]["file"] || STDOUT)
         @logger.level = Logger.const_get(config["logging"]["level"].upcase)
         @logger.formatter = ThreadFormatter.new

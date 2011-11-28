@@ -3,8 +3,7 @@ name: Collab Spaces
 port: 9090
 logging:
   level: DEBUG
-  file: ../log/acm.log
-dir: /tmp/acm_dir
+  file: log/acm.log
 db:
   database: "sqlite://acm.db"
   max_connections: 32
