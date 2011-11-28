@@ -453,15 +453,18 @@ describe ACM::Services::ObjectService do
     it "should correctly fetch the users for an object along with it's permissions" do
       object_id = @object[:id]
 
-      user_permission_entries = @object_service.get_users_for_object(object_id)
-      @logger.debug("user_permission_entries #{user_permission_entries.inspect}")
+      user_permission_map = @object_service.get_users_for_object(object_id)
+      @logger.debug("user_permission_entries #{user_permission_map.inspect}")
 
-      user_permission_entries[@user1].sort().should eql([:read_appspace.to_s].sort())
-      user_permission_entries[@user2].sort().should eql([:read_appspace.to_s, :write_appspace.to_s].sort())
-      user_permission_entries[@user3].sort().should eql([:read_appspace.to_s, :write_appspace.to_s].sort())
-      user_permission_entries[@user4].sort().should eql([:read_appspace.to_s, :write_appspace.to_s, :delete_appspace.to_s].sort())
-      user_permission_entries[@user5].sort().should eql([:read_appspace.to_s].sort())
-      user_permission_entries[@user6].sort().should eql([:read_appspace.to_s].sort())
+      user_permission_map.size().should eql(7)
+
+      user_permission_map[@user1].sort().should eql([:read_appspace.to_s].sort())
+      user_permission_map[@user2].sort().should eql([:read_appspace.to_s, :write_appspace.to_s].sort())
+      user_permission_map[@user3].sort().should eql([:read_appspace.to_s, :write_appspace.to_s].sort())
+      user_permission_map[@user4].sort().should eql([:read_appspace.to_s, :write_appspace.to_s, :delete_appspace.to_s].sort())
+      user_permission_map[@user5].sort().should eql([:read_appspace.to_s].sort())
+      user_permission_map[@user6].sort().should eql([:read_appspace.to_s].sort())
+      user_permission_map[@user7].sort().should eql([:read_appspace.to_s].sort())
     end
 
   end

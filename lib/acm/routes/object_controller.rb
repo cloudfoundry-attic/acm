@@ -1,4 +1,5 @@
 require 'sinatra/base'
+require 'json'
 
 module ACM::Controller
 
@@ -12,6 +13,16 @@ module ACM::Controller
       @logger.debug("Response is #{response.inspect}")
 
       response
+    end
+
+    get '/objects/:object_id/users' do
+      content_type 'application/json', :charset => 'utf-8'
+      @logger.debug("GET request for /objects/#{params[:object_id]}/users")
+
+      response = @object_service.get_users_for_object(params[:object_id])
+      @logger.debug("Response is #{response.inspect}")
+
+      response.to_json
     end
 
     delete '/objects/:object_id' do

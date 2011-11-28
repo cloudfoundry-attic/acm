@@ -526,4 +526,87 @@ describe ACM::Controller::ApiController do
 
   end
 
+  describe "getting user information for an object" do
+
+    before (:each) do
+      @logger = ACM::Config.logger
+      @permission_set_service = ACM::Services::PermissionSetService.new()
+
+      @permission_set_service.create_permission_set(:name => :app_space,
+                                                    :permissions => [:read_appspace, :write_appspace, :delete_appspace],
+                                                    :additional_info => "this is the permission set for the app space")
+      @user1 = SecureRandom.uuid
+      @user2 = SecureRandom.uuid
+      @user3 = SecureRandom.uuid
+      @user4 = SecureRandom.uuid
+      @user5 = SecureRandom.uuid
+      @user6 = SecureRandom.uuid
+      @user7 = SecureRandom.uuid
+
+      @group1 = SecureRandom.uuid
+      @group2 = SecureRandom.uuid
+
+      basic_authorize "admin", "password"
+
+      group_data = {
+        :id => @group1,
+        :additional_info => "Developer group",
+        :members => [@user3, @user4]
+      }
+
+      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
+      @logger.debug("post /groups last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+
+      group_data = {
+        :id => @group2,
+        :additional_info => "Developer group",
+        :members => [@user5, @user6, @user7]
+      }
+
+      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
+      @logger.debug("post /groups last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+
+      object_data = {
+        :name => "www_staging",
+        :permission_sets => ["app_space"],
+        :additionalInfo => "{component => cloud_controller}",
+        :acl => {
+          :read_appspace => ["u:#{@user1}", "u:#{@user2}", "u:#{@user3}", "u:#{@user4}", "g:#{@group2}"],
+          :write_appspace => ["u:#{@user2}", "g:#{@group1}"],
+          :delete_appspace => ["u:#{@user4}"]
+         }
+      }
+
+      post "/objects", {}, { "CONTENT_TYPE" => "application/json", :input => object_data.to_json() }
+      @logger.debug("post /objects last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+      @object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+
+    end
+
+    it "should return all the users of an object with their associated permissions" do
+
+      get "/objects/#{@object[:id]}/users", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("get /objects/#{@object[:id]}/users last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      user_permission_map = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+
+      user_permission_map.size().should eql(7)
+
+      user_permission_map[@user1.to_sym].sort().should eql([:read_appspace.to_s].sort())
+      user_permission_map[@user2.to_sym].sort().should eql([:read_appspace.to_s, :write_appspace.to_s].sort())
+      user_permission_map[@user3.to_sym].sort().should eql([:read_appspace.to_s, :write_appspace.to_s].sort())
+      user_permission_map[@user4.to_sym].sort().should eql([:read_appspace.to_s, :write_appspace.to_s, :delete_appspace.to_s].sort())
+      user_permission_map[@user5.to_sym].sort().should eql([:read_appspace.to_s].sort())
+      user_permission_map[@user6.to_sym].sort().should eql([:read_appspace.to_s].sort())
+      user_permission_map[@user7.to_sym].sort().should eql([:read_appspace.to_s].sort())
+    end
+
+  end
+
 end
