@@ -62,6 +62,7 @@ module ACM::Services
 
       output = {:id => user[:immutable_id]}
 
+      #Get the groups that the user belongs to
       groups = ACM::Models::Members.
                         join_table(:inner, :subjects, :id => :group_id).
                         filter(:user_id => user[:id]).distinct.select(:immutable_id).all()
@@ -73,6 +74,7 @@ module ACM::Services
 
       @logger.debug("Output groups are #{output[:groups].inspect}")
 
+      #Find the objects that reference the group
       group_objects = []
       if(!output[:groups].nil? && output[:groups].size() > 0)
         #find the aces for the group
@@ -96,7 +98,7 @@ module ACM::Services
 
       @logger.debug("Group objects are #{group_objects.inspect}")
 
-      #find object's owner by the user
+      #Find the objects that reference the user
       user_objects = []
       user_aces = user.access_control_entries
       user_aces = user_aces
@@ -110,18 +112,11 @@ module ACM::Services
         }
       end
 
-      @logger.debug("User objects are #{user_objects.inspect}")
-
       output_objects = []
-      if(user_objects.size() > 0)
-        output_objects = output_objects | user_objects
-      end
-
+      @logger.debug("User objects are #{user_objects.inspect}")
+      output_objects = output_objects | user_objects
       @logger.debug("Group objects are #{group_objects.inspect}")
-
-      if(group_objects.size() > 0)
-        output_objects = output_objects | group_objects
-      end
+      output_objects = output_objects | group_objects
 
       if(output_objects.size() > 0)
         output[:objects] = output_objects
