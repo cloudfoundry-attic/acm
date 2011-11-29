@@ -67,10 +67,18 @@ ACM Entities
 .. DS: the example below seems realistic enough and AppSpace only has
 .. *one* permission set.  Why not restrict it that way at least to
 .. start with?
+.. JD: there probably is a need to have an object use multiple permission sets.
+.. we're restricting it to one right now because of the use-cases that we're
+.. discussing but we've kept the schema open for change. Neither the code nor
+.. the tests support multiple permission sets per object.
 
 .. DS: I wonder if after all "Object Type" might be a useful name for
 .. a wrapper for a named set of permissions, since they are always
 .. associated with an Object?
+.. JD: It depends how you look at it. Initially, we did have the type of object define
+.. the operations that can be performed on it. I think we're getting separate feedback
+.. on this item. Some feedback supports having a permission set and others don't.
+.. We'll implement it this way for now and further down the line retain the option of changing it.
 
 **Group**
 
@@ -285,6 +293,8 @@ Error code ranges
 .. preventing people from directly displaying or attempting to add
 .. localization tags to the errors. 
 .. All in all, I think I'd prefer strings, but I'll let Joel argue this one.
+.. JD: The strings look great. I'm just staying consistent with the cloudfoundry
+.. components. All of them use either exactly that format or some variant of the same.
 
 
 Operations on Permission Sets
@@ -300,6 +310,9 @@ Attributes
     permission sets. We may want to use ids to allow permission sets to be 
     renamed, but it just did not seem to be worth the indirection for the 
     expected use cases.
+    JD: permission sets can be renamed right now because ids are used internally.
+    However, it's better to have clients reference the permission by id so that if
+    the name changes, the reference does not need to. Agreed that it's not required now.
 
 ======================= ============== ===================================
 Property                Type           Description
@@ -688,16 +701,6 @@ Response Codes   | 200 - Operation was successful
                  | 401 - Not Authorized
 ===============  ===================================
 
-The method will return the following response if the subject (user/group) has all the requested 
-permissions::
-
-    {"response":"true"}
-
-If the subject does not have a permission in the requested list, the API will return the following::
-
-    {"response":"false"}
-    
-.. note:: DO: why do we need a response body here, do not the HTTP reponse codes suffice?
 
 
 Batch Check Access: POST /objects/access
@@ -845,25 +848,25 @@ First get the whole object so we can inspect it and verify that the user is in t
        },
        "acl":{
           "read_app":[
-             "3749285",
-             "4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+             "u:3749285",
+             "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
           ],
           "update_app":[
-             "3749285",
-             "4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+             "u:3749285",
+             "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
           ],
           "read_app_logs":[
-             "3749285",
-             "4a9a8c60-0cb2-11e1-be50-0800200c9a66",
+             "u:3749285",
+             "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66",
              "d1682c64-040f-4511-85a9-62fcff3cbbe2"
           ],
           "read_service":[
-             "3749285",
-             "4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+             "u:3749285",
+             "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
           ],
           "write_service":[
-             "3749285",
-             "4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+             "u:3749285",
+             "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
           ]
        },
        "meta":{
@@ -885,6 +888,10 @@ Now PUT the change including only the "acl" object:
 .. DO: Agreed. See long note at the end of the `partial update`_ 
 .. section. WDYT?
 
+.. JD: Agreed. We'll implement that for now to make the feature
+.. available and evaluate the feedback. We can implement the rest
+.. after the initial integration.
+
 ::
 
    PUT /objects/54947df8-0e9e-4471-a2f9-9af509fb5889
@@ -897,20 +904,20 @@ Now PUT the change including only the "acl" object:
    {
      "acl":{
         "read_app":[
-          "4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+          "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
         ],
         "update_app":[
-          "4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+          "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
         ],
         "read_app_logs":[
-          "4a9a8c60-0cb2-11e1-be50-0800200c9a66",
+          "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66",
           "d1682c64-040f-4511-85a9-62fcff3cbbe2"
         ],
         "read_service":[
-          "4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+          "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
         ],
         "write_service":[
-          "4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+          "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
         ]
      }
    }
@@ -929,20 +936,20 @@ Now PUT the change including only the "acl" object:
        },
       "acl":{
           "read_app":[
-             "4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+             "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
           ],
           "update_app":[
-             "4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+             "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
           ],
           "read_app_logs":[
-             "4a9a8c60-0cb2-11e1-be50-0800200c9a66",
+             "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66",
              "d1682c64-040f-4511-85a9-62fcff3cbbe2"
           ],
           "read_service":[
-             "4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+             "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
           ],
           "write_service":[
-             "4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+             "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
           ]
        },
        "meta":{
@@ -966,6 +973,10 @@ Delete a Permission from an Object's ACL
 .. permission from an ACL. Perhaps we could rewrite or add an example that 
 .. shows how remove all permission for a specific user -- in an easier way
 .. than the example above.
+
+.. JD: It's just an example of how you could achieve such functionality.
+.. You might have a use-case where you may want to remove update_app rights
+.. from the app space completely. I'll look for a better example though.
 
 ::
 
@@ -996,17 +1007,17 @@ Delete a Permission from an Object's ACL
      },
      "acl":{
         "read_app":[
-          "4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+          "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
         ],
         "read_app_logs":[
-          "4a9a8c60-0cb2-11e1-be50-0800200c9a66",
+          "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66",
           "d1682c64-040f-4511-85a9-62fcff3cbbe2"
         ],
         "read_service":[
-          "4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+          "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
         ],
         "write_service":[
-          "4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+          "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
         ]
       },
       "meta":{

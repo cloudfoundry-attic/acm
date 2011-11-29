@@ -57,8 +57,11 @@ module ACM
 
         @basic_auth = {:user => config["basic_auth"]["user"], :password => config["basic_auth"]["password"]}
 
-        puts "Configuration complete"
+        puts("Configuration complete")
         @logger.debug("ACM running")
+        if(!config["logging"]["file"].nil?)
+          puts("Logs are at #{config["logging"]["file"]}")
+        end
       end
 
       def logger=(logger)
