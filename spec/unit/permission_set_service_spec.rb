@@ -46,10 +46,8 @@ describe ACM::Services::PermissionSetService do
 
     it "should reject duplicate permission names even in different permission sets" do
       lambda {
-        ps_json = @permission_set_service.create_permission_set(:name => :app_space, :permissions => [:read, :write])
-        puts ps_json.inspect
-        ps_json = @permission_set_service.create_permission_set(:name => :collab_space, :permissions => [:delete, :create])
-        puts ps_json.inspect
+        @permission_set_service.create_permission_set(:name => :app_space, :permissions => [:read, :write])
+        @permission_set_service.create_permission_set(:name => :collab_space, :permissions => [:delete, :write])
       }.should raise_error(ACM::ACMError)
     end
 
