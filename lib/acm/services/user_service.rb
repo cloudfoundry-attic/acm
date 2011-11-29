@@ -49,6 +49,88 @@ module ACM::Services
       user.to_json()
     end
 
+    def get_user_info(user_id)
+      @logger.debug("find_user parameters #{user_id.inspect}")
+      user = ACM::Models::Subjects.filter(:immutable_id => user_id, :type => :user.to_s).first()
+
+      if(user.nil?)
+        @logger.error("Could not find user with id #{user_id.inspect}")
+        raise ACM::ObjectNotFound.new("#{user_id.inspect}")
+      else
+        @logger.debug("Found user #{user.inspect}")
+      end
+
+      output = {:id => user[:immutable_id]}
+
+      groups = ACM::Models::Members.
+                        join_table(:inner, :subjects, :id => :group_id).
+                        filter(:user_id => user[:id]).distinct.select(:immutable_id).all()
+      @logger.debug("Groups for user #{user.immutable_id} are #{groups.inspect}")
+
+      if(!groups.nil? && groups.size > 0)
+        output[:groups] = groups.map {|group| group[:immutable_id]}
+      end
+
+      @logger.debug("Output groups are #{output[:groups].inspect}")
+
+      group_objects = []
+      if(!output[:groups].nil? && output[:groups].size() > 0)
+        #find the aces for the group
+        group_aces = ACM::Models::AccessControlEntries.
+                      join_table(:inner, :ace_subject_map, :access_control_entry_id => :id).
+                      join_table(:inner, :subjects, :id => :subject_id).
+                      filter(:immutable_id => output[:groups]).select(:access_control_entries__object_id).all()
+
+        if(!group_aces.nil? && group_aces.size > 0)
+          group_aces = group_aces.map{|group_ace| group_ace[:object_id]}
+        end
+
+        @logger.debug("Aces for the group are #{group_aces.inspect}")
+        group_aces.each { |ace_id|
+          object_immutable_id = ACM::Models::Objects.filter(:id => ace_id).select(:immutable_id).first()
+          if(!object_immutable_id.nil? && !group_objects.include?(object_immutable_id[:immutable_id]))
+            group_objects.insert(0, object_immutable_id[:immutable_id])
+          end
+        }
+      end
+
+      @logger.debug("Group objects are #{group_objects.inspect}")
+
+      #find object's owner by the user
+      user_objects = []
+      user_aces = user.access_control_entries
+      user_aces = user_aces
+      @logger.debug("Aces for the user are #{user_aces.inspect}")
+      if(!user_aces.nil?)
+        user_aces.each { |ace|
+          object = ACM::Models::Objects.filter(:id => ace[:object_id]).select(:immutable_id).first()
+          if(!object.nil? && !user_objects.include?(object[:immutable_id]))
+            user_objects.insert(0, object[:immutable_id])
+          end
+        }
+      end
+
+      @logger.debug("User objects are #{user_objects.inspect}")
+
+      output_objects = []
+      if(user_objects.size() > 0)
+        output_objects = output_objects | user_objects
+      end
+
+      @logger.debug("Group objects are #{group_objects.inspect}")
+
+      if(group_objects.size() > 0)
+        output_objects = output_objects | group_objects
+      end
+
+      if(output_objects.size() > 0)
+        output[:objects] = output_objects
+      end
+
+      @logger.debug("Output is #{output.inspect}")
+      output.to_json
+    end
+
   end
 
 end
