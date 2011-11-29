@@ -568,6 +568,95 @@ Response Codes   | 200 - Operation was successful
 The service responds with the json for the entire object.
 
 
+List of users that have access to an object: GET /objects/*id*/users
+------------------------------------------------------------------------------------
+
+===============  ===================================
+HTTP Method      GET
+URI              /objects/*id*/users
+Request Format   N/A
+Response Format  As below
+Response Codes   | 200 - Operation was successful
+                 | 400 - Malformed request format
+                 | 401 - Not Authorized
+===============  ===================================
+
+The response for this request is something like
+
+    GET /objects/0a59970a-3cf1-44a5-996d-eed9c0fe1c1e/users
+    Host: internal.vcap.acm.com
+    Accept: application/json
+    Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+
+    HTTP/1.1 200 OK
+    Content-Type: application/json
+
+    {
+       "00ccb9a7-c545-4881-98de-1589114a5b1b":[
+          "read_appspace"
+       ],
+       "c34c43cb-ff0b-4c3c-a5a8-683ea33d7bf8":[
+          "write_appspace",
+          "read_appspace"
+       ],
+       "9b74f996-9136-4553-b5be-3dee06ee91fd":[
+          "write_appspace",
+          "read_appspace"
+       ],
+       "875ec30a-e44b-40ee-bb56-7aa05308078f":[
+          "delete_appspace",
+          "write_appspace",
+          "read_appspace"
+       ],
+       "c0f59b9b-ad39-4c5b-9ad5-d6441f3a4868":[
+          "read_appspace"
+       ],
+       "58d8bf72-4cc6-430f-810b-b7032e633f24":[
+          "read_appspace"
+       ],
+       "360f0b1e-44d8-42b3-b013-fbc5b725699e":[
+          "read_appspace"
+       ]
+    }
+
+
+Find Objects and Groups that refer to a particular user: GET /users/*user_id*
+------------------------------------------------------------------------------------
+
+===============  ===================================
+HTTP Method      GET
+URI              /users/*user_id*
+Request Format   N/A
+Response Format  As below
+Response Codes   | 200 - Operation was successful
+                 | 400 - Malformed request format
+                 | 401 - Not Authorized
+===============  ===================================
+
+The response for this request is something like
+
+    GET /users/572be387-b3e2-446f-a34a-ac5967685706
+    Host: internal.vcap.acm.com
+    Accept: application/json
+    Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+
+    HTTP/1.1 200 OK
+    Content-Type: application/json
+
+    {
+       "id":"572be387-b3e2-446f-a34a-ac5967685706",
+       "groups":[
+          "25d9933c-d8fb-4a72-8791-1e94bc2ce7eb",
+          "6a9969ac-fa9a-4d28-9fe2-a3a6bc930211"
+       ],
+       "objects":[
+          "b6f80ef2-4fca-47e2-88f6-323d0db78472",
+          "fcf363c8-5365-49cc-8284-e371e97ecd5d"
+       ]
+    }
+
+
+
 Delete Object: DELETE /objects/*id*
 ------------------------------------------------------------------------------------
 
@@ -1042,6 +1131,5 @@ Open Issues
 - Even without inheritance of ACLs, some notion of relationships/containment between objects and groups could 
   be very useful and not require the client to implement it. 
 
-- Do we need an API that just returns a list of users that have access to an object?
 
 - Add an API that returns all objects and groups that refer to a particular user.
