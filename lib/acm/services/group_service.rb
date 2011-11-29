@@ -79,6 +79,32 @@ module ACM::Services
       group.to_json()
     end
 
+    def delete_group(group_id)
+      @logger.debug("delete parameters #{group_id.inspect}")
+      group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
+
+      if(group.nil?)
+        @logger.error("Could not find group with id #{group_id.inspect}")
+        raise ACM::ObjectNotFound.new("#{group_id.inspect}")
+      else
+        @logger.debug("Found group #{group.inspect}")
+      end
+
+      ACM::Config.db.transaction do
+        group_members = group.members
+        group_members.each { |group_member|
+          group_member.delete
+        }
+
+        group.remove_all_access_control_entries
+
+        #TODO: Delete the associated object
+
+        group.delete
+        nil
+      end
+    end
+
   end
 
 end

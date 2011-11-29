@@ -11,7 +11,7 @@ module ACM::Models
       validates_includes [:user.to_s, :group.to_s], :type, :message => 'is not valid'
     end
 
-    one_to_one  :object, :class => "ACM::Models::Objects"
+    one_to_one  :object, :key => :id, :class => "ACM::Models::Objects"
     one_to_many :members, :key => :group_id, :class => "ACM::Models::Members"
     many_to_many :access_control_entries,
                  :left_key => :subject_id, :right_key => :access_control_entry_id,

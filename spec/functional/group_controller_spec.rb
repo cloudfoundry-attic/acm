@@ -224,4 +224,41 @@ describe ACM::Controller::ApiController do
 
   end
 
+  describe "when deleting a group" do
+    before(:each) do
+      @user1 = SecureRandom.uuid
+      @user2 = SecureRandom.uuid
+      @user3 = SecureRandom.uuid
+      @user4 = SecureRandom.uuid
+
+      @group1 = SecureRandom.uuid
+
+      @group_service = ACM::Services::GroupService.new()
+
+      group_data = {
+        :id => @group1,
+        :additional_info => "Developer group",
+        :members => [@user1, @user2, @user3]
+      }
+
+      basic_authorize "admin", "password"
+      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
+      @logger.debug("post /groups last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+
+
+    end
+
+    it "should delete the requested group successfully" do
+      basic_authorize "admin", "password"
+
+      delete "/groups/#{@group1}"
+      @logger.debug("get /groups last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+      last_response.original_headers["Location"].should be_nil
+
+    end
+
+  end
+
 end
