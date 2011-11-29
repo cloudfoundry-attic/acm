@@ -30,12 +30,12 @@ Sequel.migration do
     create_table :permissions do
       primary_key :id
       foreign_key :permission_set_id, :permission_sets
-      string :name, :null => false
+      string :name, :null => false, :unique => true
 
       time :created_at, :null => false
       time :last_updated_at, :null => false
 
-      unique ([:permission_set_id, :name])
+      #unique ([:permission_set_id, :name])
 
     end
 
@@ -47,7 +47,7 @@ Sequel.migration do
       time :created_at, :null => false
       time :last_updated_at, :null => false
 
-      unique ([:object_id, :permission_id])
+      unique [:object_id, :permission_id]
     end
 
     create_table :ace_subject_map do
@@ -75,7 +75,7 @@ Sequel.migration do
       time :created_at, :null => false
       time :last_updated_at, :null => false
 
-      unique ([:group_id, :user_id])
+      unique [:group_id, :user_id]
     end
 
   end

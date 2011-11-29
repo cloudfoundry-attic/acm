@@ -527,15 +527,13 @@ For some examples see `Example Requests and Responses`_.
     Following this model we could also easily support add permissions for a user, get all permissions 
     for a user, delete all permissions for a user:
 
-    POST /objects/*id*/acl/*subject* 
-        (permissions)
+    POST /objects/*id*/acl/*subject*    (permissions)
     GET /objects/*id*/acl/*subject*
     DELETE /objects/*id*/acl/*subject*
     
     A similar approach could be used with Group members:
 
-    POST /groups/*id*/members
-        (users)
+    POST /groups/*id*/members           (users)
     DELETE /groups/*id*/members/*user*    
 
 
@@ -1036,10 +1034,3 @@ Open Issues
 - Do we need an API that just returns a list of users that have access to an object?
 
 - Add an API that returns all objects and groups that refer to a particular user.
-
-
-
-
-
-
-
