@@ -12,6 +12,7 @@ module ACM
 
   INTERNAL_SERVER_ERROR = 500
 
+  #Error class for the ACM
   class ACMError < StandardError
     attr_reader :response_code
     attr_reader :error_code
@@ -24,6 +25,8 @@ module ACM
     end
   end
 
+  #Each of the strings below is used
+  #to create an error class with the same name
   [
    ["ObjectNotFound",        NOT_FOUND,   1000, "Object %s not found"],
    ["InvalidRequest",          BAD_REQUEST, 1001, "Invalid request: \"%s\""],

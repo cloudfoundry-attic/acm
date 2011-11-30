@@ -16,18 +16,22 @@ require 'net/http'
 
 module ACM::Controller
 
+  #Sinatra controller that responds to all ACM requests
+  #For code organization purposes, it's broken up into
+  #multiple files, one for each set of routes. See routes/
   class ApiController < Sinatra::Base
 
     def initialize
       super
       @logger = ACM::Config.logger
-      @logger.debug("ACM ApiController is up")
 
       @object_service = ACM::Services::ObjectService.new()
       @user_service = ACM::Services::UserService.new()
       @group_service = ACM::Services::GroupService.new()
       @permission_set_service = ACM::Services::PermissionSetService.new()
       @access_control_service = ACM::Services::AccessControlService.new()
+
+      @logger.debug("ACM ApiController is up")
     end
 
     configure do
@@ -36,27 +40,31 @@ module ACM::Controller
       set(:dump_errors, false)
     end
 
+    #Main error handler for the ACM
     error do
       content_type 'application/json', :charset => 'utf-8'
 
-      @logger.debug("Reached error handler")
       exception = request.env["sinatra.error"]
+      @logger.debug("Reached error handler #{exception.inspect}")
       if exception.kind_of?(ACM::ACMError)
-        @logger.debug("Request failed with response code: #{exception.response_code} error code: " +
+        @logger.error("Request failed with response code: #{exception.response_code} error code: " +
                          "#{exception.error_code} error: #{exception.message}")
         status(exception.response_code)
         error_payload                = Hash.new
         error_payload['code']        = exception.error_code
         error_payload['description'] = exception.message
+        error_payload['schema'] = "urn:acm:schemas:1.0"
         #TODO: Handle meta and uri. Exception class to contain to_json
         Yajl::Encoder.encode(error_payload)
       else
         msg = ["#{exception.class} - #{exception.message}"]
-        @logger.warn(msg.join("\n"))
+        @logger.error(msg.join("\n"))
         status(500)
       end
     end
 
+    #not found sinatra handler for the ACM. Handles routes that cannot
+    #be found and avoids the standard sinatra response
     not_found do
       content_type 'application/json', :charset => 'utf-8'
 
@@ -65,6 +73,7 @@ module ACM::Controller
       error_payload                = Hash.new
       error_payload['code']        = ACM::ObjectNotFound.new("").error_code
       error_payload['description'] = "The object was not found"
+      error_payload['schema'] = "urn:acm:schemas:1.0"
       #TODO: Handle meta and uri
       Yajl::Encoder.encode(error_payload)
     end

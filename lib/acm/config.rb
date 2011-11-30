@@ -10,6 +10,7 @@ module ACM
 
     class << self
 
+      #Configuration options that can be accessed throughout the app
       CONFIG_OPTIONS = [
         :logger,
         :db,
@@ -28,6 +29,7 @@ module ACM
         end
       end
 
+      #Called by the acm binary to consume the configuration and set up the app
       def configure(config)
         @logger = Logger.new(config["logging"]["file"] || STDOUT)
         @logger.level = Logger.const_get(config["logging"]["level"].upcase)

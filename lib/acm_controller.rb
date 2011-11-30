@@ -8,6 +8,8 @@ require "yajl"
 
 module ACM::Controller
 
+  #Main application controller that receives all requests and passes them on to
+  #the ApiController (Sinatra) for handling
   class RackController
     PUBLIC_URLS = ["/info"]
 
@@ -18,6 +20,7 @@ module ACM::Controller
 
       @logger.debug("Created ApiController")
 
+      #Configure basic auth for all urls
       @app = Rack::Auth::Basic.new(api_controller) do |username, password|
         [username, password] == [ACM::Config.basic_auth[:user], ACM::Config.basic_auth[:password]]
       end
@@ -25,21 +28,19 @@ module ACM::Controller
 
     end
 
+    #Rack requires the controller to respond to this message
     def call(env)
 
       @logger.debug("Request env #{env.inspect}")
-      @logger.debug("Received #{env["rack.url_scheme"].strip()} call " +
-                    "from #{env["REMOTE_ADDR"].strip()} - #{env["HTTP_HOST"].strip()} " +
-                    "operation #{env["REQUEST_METHOD"]} #{env["PATH_INFO"]} #{env["QUERY_STRING"]}")
+      request = Rack::Request.new(env)
+      @logger.debug("Incoming request #{request.request_method} #{request.url}")
 
       start_time = Time.now
       status, headers, body = @app.call(env)
       end_time = Time.now
-      @logger.debug("Completed #{env["rack.url_scheme"].strip()} call " +
-                    "from #{env["REMOTE_ADDR"].strip()} - #{env["HTTP_HOST"].strip()} " +
-                    "operation #{env["REQUEST_METHOD"]} #{env["PATH_INFO"]} #{env["QUERY_STRING"]} " +
-                    "Elapsed time #{end_time - start_time}ms")
-      headers["Date"] = Time.now.rfc822 # As thin doesn't inject date
+      @logger.debug("Done request #{request.request_method} #{request.url}" +
+                    " Elapsed time #{((end_time - start_time) * 1000.0).to_i}ms")
+      headers["Date"] = end_time.rfc822 # As thin doesn't inject date
 
       @logger.debug("Sending response Status: #{status} Headers: #{headers} Body: #{body}")
       [ status, headers, body ]
