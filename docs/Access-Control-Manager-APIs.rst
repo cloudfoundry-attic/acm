@@ -432,7 +432,7 @@ Example::
        "acl": {
              "read_app": ["3749285", "4a9a8c60-0cb2-11e1-be50-0800200c9a66"],
              "update_app": ["3749285", "4a9a8c60-0cb2-11e1-be50-0800200c9a66"],
-             "read_app_logs": ["3749285", "4a9a8c60-0cb2-11e1-be50-0800200c9a66", "d1682c64-040f-4511-85a9-62fcff3cbbe2"],
+             "read_app_logs": ["3749285", "4a9a8c60-0cb2-11e1-be50-0800200c9a66", "g-d1682c64-040f-4511-85a9-62fcff3cbbe2"],
             "read_service": ["3749285", "4a9a8c60-0cb2-11e1-be50-0800200c9a66"],
              "write_service": ["3749285", "4a9a8c60-0cb2-11e1-be50-0800200c9a66"]
        },
@@ -854,7 +854,7 @@ object::
         "permissions": ["permission1", "permission2", ...]
     }
 
-If the subject does not have a permission, the API will return the following::
+If the subject does not have a permission, the API will return the following-:
 
     {
         "permissions": [ ]
@@ -937,25 +937,25 @@ First get the whole object so we can inspect it and verify that the user is in t
        },
        "acl":{
           "read_app":[
-             "u:3749285",
-             "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+             "u-3749285",
+             "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66"
           ],
           "update_app":[
-             "u:3749285",
-             "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+             "u-3749285",
+             "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66"
           ],
           "read_app_logs":[
-             "u:3749285",
-             "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66",
-             "d1682c64-040f-4511-85a9-62fcff3cbbe2"
+             "u-3749285",
+             "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66",
+             "g-d1682c64-040f-4511-85a9-62fcff3cbbe2"
           ],
           "read_service":[
-             "u:3749285",
-             "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+             "u-3749285",
+             "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66"
           ],
           "write_service":[
-             "u:3749285",
-             "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+             "u-3749285",
+             "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66"
           ]
        },
        "meta":{
@@ -993,20 +993,20 @@ Now PUT the change including only the "acl" object:
    {
      "acl":{
         "read_app":[
-          "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+          "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66"
         ],
         "update_app":[
-          "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+          "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66"
         ],
         "read_app_logs":[
-          "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66",
-          "d1682c64-040f-4511-85a9-62fcff3cbbe2"
+          "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66",
+          "g-d1682c64-040f-4511-85a9-62fcff3cbbe2"
         ],
         "read_service":[
-          "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+          "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66"
         ],
         "write_service":[
-          "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+          "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66"
         ]
      }
    }
@@ -1025,20 +1025,20 @@ Now PUT the change including only the "acl" object:
        },
       "acl":{
           "read_app":[
-             "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+             "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66"
           ],
           "update_app":[
-             "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+             "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66"
           ],
           "read_app_logs":[
-             "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66",
-             "d1682c64-040f-4511-85a9-62fcff3cbbe2"
+             "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66",
+             "g-d1682c64-040f-4511-85a9-62fcff3cbbe2"
           ],
           "read_service":[
-             "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+             "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66"
           ],
           "write_service":[
-             "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+             "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66"
           ]
        },
        "meta":{
@@ -1096,17 +1096,17 @@ Delete a Permission from an Object's ACL
      },
      "acl":{
         "read_app":[
-          "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+          "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66"
         ],
         "read_app_logs":[
-          "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66",
-          "d1682c64-040f-4511-85a9-62fcff3cbbe2"
+          "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66",
+          "g-d1682c64-040f-4511-85a9-62fcff3cbbe2"
         ],
         "read_service":[
-          "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+          "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66"
         ],
         "write_service":[
-          "g:4a9a8c60-0cb2-11e1-be50-0800200c9a66"
+          "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66"
         ]
       },
       "meta":{
