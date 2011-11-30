@@ -1199,6 +1199,3 @@ Open Issues
 
 - Even without inheritance of ACLs, some notion of relationships/containment between objects and groups could 
   be very useful and not require the client to implement it. 
-
-
-- Add an API that returns all objects and groups that refer to a particular user.
