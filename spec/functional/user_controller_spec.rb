@@ -47,9 +47,9 @@ describe ACM::Controller::ApiController do
                                       :additional_info => {:description => :staging_app_space}.to_json(),
                                       :permission_sets => [:app_space],
                                       :acl => {
-                                        :read_appspace => ["u:#{@user1}", "u:#{@user3}", "u:#{@user4}", "g:#{@group2}"],
-                                        :write_appspace => ["u:#{@user3}", "g:#{@group1}"],
-                                        :delete_appspace => ["u:#{@user4}"]
+                                        :read_appspace => ["u-#{@user1}", "u-#{@user3}", "u-#{@user4}", "g-#{@group2}"],
+                                        :write_appspace => ["u-#{@user3}", "g-#{@group1}"],
+                                        :delete_appspace => ["u-#{@user4}"]
                                       })
       @object1 = Yajl::Parser.parse(o_json, :symbolize_keys => true)
 
@@ -57,8 +57,8 @@ describe ACM::Controller::ApiController do
                                       :additional_info => {:description => :staging_app_space}.to_json(),
                                       :permission_sets => [:app_space],
                                       :acl => {
-                                        :write_appspace => ["g:#{@group2}"],
-                                        :delete_appspace => ["u:#{@user1}"]
+                                        :write_appspace => ["g-#{@group2}"],
+                                        :delete_appspace => ["u-#{@user1}"]
                                       })
       @object2 = Yajl::Parser.parse(o_json, :symbolize_keys => true)
 

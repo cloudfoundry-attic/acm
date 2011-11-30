@@ -62,9 +62,9 @@ describe ACM::Controller::ApiController do
         :permission_sets => ["app_space"],
         :additionalInfo => "{component => cloud_controller}",
         :acl => {
-          :read_appspace => ["u:#{@user1}", "u:#{@user2}", "u:#{@user3}", "u:#{@user4}", "g:#{@group2}"],
-          :write_appspace => ["u:#{@user2}", "g:#{@group1}"],
-          :delete_appspace => ["u:#{@user4}"]
+          :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}", "g-#{@group2}"],
+          :write_appspace => ["u-#{@user2}", "g-#{@group1}"],
+          :delete_appspace => ["u-#{@user4}"]
          }
       }
 

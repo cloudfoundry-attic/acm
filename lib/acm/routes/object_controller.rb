@@ -74,6 +74,27 @@ module ACM::Controller
       object_json
     end
 
+    #Add a permission for a user to an ace
+    put '/objects/:object_id/acl/:permission/:subject_id' do
+      content_type 'application/json', :charset => 'utf-8'
+      @logger.debug("PUT request for /objects/#{params[:object_id]}/acl/#{params[:permission]}/#{params[:subject_id]}")
+
+      @object_service.add_subject_to_ace(params[:object_id], params[:permission], params[:subject_id])
+
+      object_json = @object_service.read_object(params[:object_id])
+      @logger.debug("Modified object #{object_json.inspect}")
+
+      #Set the Location response header
+      object = Yajl::Parser.parse(object_json, :symbolize_keys => true)
+      request_url = request.url
+      if(request_url.end_with? ["/"])
+        request_url.chop()
+      end
+      headers "Location" => "#{request_url}/#{object[:id]}"
+
+      object_json
+    end
+
   end
 
 end

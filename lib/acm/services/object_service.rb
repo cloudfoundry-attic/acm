@@ -59,42 +59,7 @@ module ACM::Services
               if(user_id_set.kind_of?(Array))
                 user_id_set.each { |user_id|
                   begin
-                    subject = nil
-                    if(user_id.index("u:") == 0)
-                      #search for the user. if the user does not exist create it
-                      user_id = user_id.sub(/(u:)/, '')
-                      user_json = nil
-                      begin
-                        user_json = @user_service.find_user(user_id)
-                      rescue => e
-                        if(e.kind_of?(ACM::ObjectNotFound))
-                          @logger.debug("Could not find user #{user_id}. Creating the user")
-                          user_json = @user_service.create_user(:id => user_id)
-                        else
-                          @logger.error("Internal error #{e.message}")
-                          raise ACM::SystemInternalError.new()
-                        end
-                      end
-
-                      subject = Yajl::Parser.parse(user_json, :symbolize_keys => true)
-                    elsif(user_id.index("g:") == 0)
-                      #search for the group. If the group does not exist, error out
-                      group_id = user_id.sub(/(g:)/, '')
-                      group_json = nil
-                      begin
-                        group_json = @group_service.find_group(group_id)
-                      rescue => e
-                        if(e.kind_of?(ACM::ObjectNotFound))
-                          @logger.error("Could not find group #{group_id} #{e.message}")
-                          raise e
-                        else
-                          @logger.error("Internal error #{e.message}")
-                          raise ACM::SystemInternalError.new()
-                        end
-                      end
-
-                      subject = Yajl::Parser.parse(group_json, :symbolize_keys => true)
-                    end
+                    subject = get_subject(user_id)
                     #TODO: icky code. should allow a set of permissions to be accepted... later
                     add_permission(o.immutable_id, permission, subject[:id])
                   rescue => e
@@ -127,8 +92,57 @@ module ACM::Services
       o.to_json
     end
 
+    def get_subject(subject_id)
+      subject = nil
+      if(subject_id.index("u-") == 0)
+        #search for the user. if the user does not exist create it
+        subject_id = subject_id.sub(/(u-)/, '')
+        user_json = nil
+        begin
+          user_json = @user_service.find_user(subject_id)
+        rescue => e
+          if(e.kind_of?(ACM::ObjectNotFound))
+            @logger.debug("Could not find user #{subject_id}. Creating the user")
+            user_json = @user_service.create_user(:id => subject_id)
+          else
+            @logger.error("Internal error #{e.message}")
+            raise ACM::SystemInternalError.new()
+          end
+        end
+
+        subject = Yajl::Parser.parse(user_json, :symbolize_keys => true)
+      elsif(subject_id.index("g-") == 0)
+        #search for the group. If the group does not exist, error out
+        group_id = subject_id.sub(/(g-)/, '')
+        group_json = nil
+        begin
+          group_json = @group_service.find_group(group_id)
+        rescue => e
+          if(e.kind_of?(ACM::ObjectNotFound))
+            @logger.error("Could not find group #{group_id} #{e.message}")
+            raise e
+          else
+            @logger.error("Internal error #{e.message}")
+            raise ACM::SystemInternalError.new()
+          end
+        end
+
+        subject = Yajl::Parser.parse(group_json, :symbolize_keys => true)
+      end
+
+      subject
+    end
+
     def get_option(map, key)
       map[key].nil? ? nil : map[key]
+    end
+
+    def add_subject_to_ace(obj_id, permission, subject_id)
+
+      subject = get_subject(subject_id)
+      object = add_permission(obj_id, permission, subject[:id])
+
+      object
     end
 
     def add_permission(obj_id, permission, user_id)
@@ -138,6 +152,10 @@ module ACM::Services
       #Find the object
       object = ACM::Models::Objects.filter(:immutable_id => obj_id.to_s).first()
       @logger.debug("requested object #{object.inspect}")
+      if(object.nil?)
+        @logger.error("Could not find subject #{user_id.to_s}")
+        raise ACM::ObjectNotFound.new("Could not find object #{obj_id}")
+      end
 
       #Find the requested permission only if it belongs to a permission set that is related to that object
       requested_permission = ACM::Models::Permissions.join(:permission_sets, :id => :permission_set_id)
@@ -173,7 +191,13 @@ module ACM::Services
           @logger.debug("found ace #{ace.inspect}")
         end
 
-        ace.add_subject(subject)
+        #Does ace already contain the subject?
+        existing_ace_subject = ace.subjects_dataset.filter(:subject_id => subject.id).all()
+        @logger.debug("existing_ace_subject #{existing_ace_subject.inspect}")
+
+        if(existing_ace_subject.nil? || existing_ace_subject.size() == 0)
+          ace.add_subject(subject)
+        end
 
         @logger.debug("subjects for ace #{ace.id} are #{ACM::Models::AceSubjectMap.filter(:access_control_entry_id => ace.id).count().inspect}")
       end

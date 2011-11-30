@@ -95,8 +95,8 @@ describe ACM::Services::ObjectService do
                                             :additional_info => {:description => :staging_app_space}.to_json(),
                                             :permission_sets => [:app_space],
                                             :acl => {
-                                                :read_appspace => ["u:#{@user1}", "u:#{@user2}", "u:#{@user3}", "u:#{@user4}"],
-                                                :update_appspace => ["u:#{@user1}", "u:#{@user3}", "u:#{@user4}"]
+                                                :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
+                                                :update_appspace => ["u-#{@user1}", "u-#{@user3}", "u-#{@user4}"]
                                             })
       }.should raise_error(ACM::InvalidRequest)
 
@@ -116,15 +116,15 @@ describe ACM::Services::ObjectService do
                                             :additional_info => {:description => :staging_app_space}.to_json(),
                                             :permission_sets => [:app_space],
                                             :acl => {
-                                                :read_appspace => ["u:#{@user1}", "u:#{@user2}", "u:#{@user3}", "u:#{@user4}"],
-                                                :write_appspace => ["u:#{@user1}", "u:#{@user3}", "u:#{@user4}"]
+                                                :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
+                                                :write_appspace => ["u-#{@user1}", "u-#{@user3}", "u-#{@user4}"]
                                             })
       object = Yajl::Parser.parse(o_json, :symbolize_keys => true)
 
       object[:name].should eql("www_staging")
 
-      object[:acl][:read_appspace].sort().should eql(["u:#{@user1}", "u:#{@user2}", "u:#{@user3}", "u:#{@user4}"].sort())
-      object[:acl][:write_appspace].sort().should eql(["u:#{@user1}", "u:#{@user3}", "u:#{@user4}"].sort())
+      object[:acl][:read_appspace].sort().should eql(["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"].sort())
+      object[:acl][:write_appspace].sort().should eql(["u-#{@user1}", "u-#{@user3}", "u-#{@user4}"].sort())
 
     end
 
@@ -142,15 +142,15 @@ describe ACM::Services::ObjectService do
                                             :additional_info => {:description => :staging_app_space}.to_json(),
                                             :permission_sets => [:app_space],
                                             :acl => {
-                                                :read_appspace => ["g:#{@group1}", "g:#{@group2}", "g:#{@group3}", "g:#{@group4}"],
-                                                :write_appspace => ["g:#{@group1}", "g:#{@group3}", "g:#{@group4}"]
+                                                :read_appspace => ["g-#{@group1}", "g-#{@group2}", "g-#{@group3}", "g-#{@group4}"],
+                                                :write_appspace => ["g-#{@group1}", "g-#{@group3}", "g-#{@group4}"]
                                             })
       object = Yajl::Parser.parse(o_json, :symbolize_keys => true)
 
       object[:name].should eql("www_staging")
 
-      object[:acl][:read_appspace].sort().should eql(["g:#{@group1}", "g:#{@group2}", "g:#{@group3}", "g:#{@group4}"].sort())
-      object[:acl][:write_appspace].sort().should eql(["g:#{@group1}", "g:#{@group3}", "g:#{@group4}"].sort())
+      object[:acl][:read_appspace].sort().should eql(["g-#{@group1}", "g-#{@group2}", "g-#{@group3}", "g-#{@group4}"].sort())
+      object[:acl][:write_appspace].sort().should eql(["g-#{@group1}", "g-#{@group3}", "g-#{@group4}"].sort())
 
     end
 
@@ -168,8 +168,8 @@ describe ACM::Services::ObjectService do
                                               :additional_info => {:description => :staging_app_space}.to_json(),
                                               :permission_sets => [:app_space],
                                               :acl => {
-                                                  :read_appspace => ["g:#{@group1}", "g:#{@group2}", "g:#{@group3}", "g:#{@group4}"],
-                                                  :write_appspace => ["g:#{@group1}", "g:#{@group3}", "g:#{@group4}"]
+                                                  :read_appspace => ["g-#{@group1}", "g-#{@group2}", "g-#{@group3}", "g-#{@group4}"],
+                                                  :write_appspace => ["g-#{@group1}", "g-#{@group3}", "g-#{@group4}"]
                                               })
       }.should raise_error(ACM::InvalidRequest)
 
@@ -199,17 +199,17 @@ describe ACM::Services::ObjectService do
                                             :additional_info => {:description => :staging_app_space}.to_json(),
                                             :permission_sets => [:app_space],
                                             :acl => {
-                                                :read_appspace => ["g:#{@group1}", "g:#{@group2}", "g:#{@group4}", "u:#{@user1}", "u:#{@user6}"],
-                                                :write_appspace => ["g:#{@group1}", "g:#{@group3}", "g:#{@group4}"],
-                                                :delete_appspace => ["u:#{@user2}", "u:#{@user5}", "g:#{@group3}"]
+                                                :read_appspace => ["g-#{@group1}", "g-#{@group2}", "g-#{@group4}", "u-#{@user1}", "u-#{@user6}"],
+                                                :write_appspace => ["g-#{@group1}", "g-#{@group3}", "g-#{@group4}"],
+                                                :delete_appspace => ["u-#{@user2}", "u-#{@user5}", "g-#{@group3}"]
                                             })
       object = Yajl::Parser.parse(o_json, :symbolize_keys => true)
 
       object[:name].should eql("www_staging")
 
-      object[:acl][:read_appspace].sort().should eql(["g:#{@group1}", "g:#{@group2}", "g:#{@group4}", "u:#{@user1}", "u:#{@user6}"].sort())
-      object[:acl][:write_appspace].sort().should eql(["g:#{@group1}", "g:#{@group3}", "g:#{@group4}"].sort())
-      object[:acl][:delete_appspace].sort().should eql(["u:#{@user2}", "u:#{@user5}", "g:#{@group3}"].sort())
+      object[:acl][:read_appspace].sort().should eql(["g-#{@group1}", "g-#{@group2}", "g-#{@group4}", "u-#{@user1}", "u-#{@user6}"].sort())
+      object[:acl][:write_appspace].sort().should eql(["g-#{@group1}", "g-#{@group3}", "g-#{@group4}"].sort())
+      object[:acl][:delete_appspace].sort().should eql(["u-#{@user2}", "u-#{@user5}", "g-#{@group3}"].sort())
 
     end
 
@@ -237,9 +237,9 @@ describe ACM::Services::ObjectService do
                                               :additional_info => {:description => :staging_app_space}.to_json(),
                                               :permission_sets => [:app_space],
                                               :acl => {
-                                                  :read_appspace => ["u:#{@group1}", "g:#{@group2}", "g:#{@group4}", "u:#{@user1}", "u:#{@user6}"],
-                                                  :write_appspace => ["g:#{@group1}", "g:#{@group3}", "g:#{@group4}"],
-                                                  :delete_appspace => ["u:#{@user2}", "u:#{@user5}", "g:#{@group3}"]
+                                                  :read_appspace => ["u-#{@group1}", "g-#{@group2}", "g-#{@group4}", "u-#{@user1}", "u-#{@user6}"],
+                                                  :write_appspace => ["g-#{@group1}", "g-#{@group3}", "g-#{@group4}"],
+                                                  :delete_appspace => ["u-#{@user2}", "u-#{@user5}", "g-#{@group3}"]
                                               })
       }.should raise_error(ACM::InvalidRequest)
 
@@ -248,9 +248,9 @@ describe ACM::Services::ObjectService do
                                               :additional_info => {:description => :staging_app_space}.to_json(),
                                               :permission_sets => [:app_space],
                                               :acl => {
-                                                  :read_appspace => ["g:#{@group1}", "g:#{@group2}", "g:#{@group4}", "u:#{@user1}", "u:#{@user6}"],
-                                                  :write_appspace => ["g:#{@group1}", "g:#{@group3}", "g:#{@group4}"],
-                                                  :delete_appspace => ["u:#{@user2}", "g:#{@user5}", "g:#{@group3}"]
+                                                  :read_appspace => ["g-#{@group1}", "g-#{@group2}", "g-#{@group4}", "u-#{@user1}", "u-#{@user6}"],
+                                                  :write_appspace => ["g-#{@group1}", "g-#{@group3}", "g-#{@group4}"],
+                                                  :delete_appspace => ["u-#{@user2}", "g-#{@user5}", "g-#{@group3}"]
                                               })
       }.should raise_error(ACM::InvalidRequest)
 
@@ -293,7 +293,7 @@ describe ACM::Services::ObjectService do
       new_object = Yajl::Parser.parse(new_object_json, :symbolize_keys => true)
 
       new_object[:id].should eql(@obj_id)
-      (new_object[:acl][:read_appspace].include? "u:#{@user_id}").should be_true
+      (new_object[:acl][:read_appspace].include? "u-#{@user_id}").should be_true
     end
 
     it "should correctly update the object with multiple acls " do
@@ -309,8 +309,8 @@ describe ACM::Services::ObjectService do
       new_object[:id].should eql(@obj_id)
       new_object2[:id].should eql(@obj_id)
 
-      (new_object[:acl][:read_appspace].include? "u:#{@user1}").should be_true
-      (new_object2[:acl][:read_appspace].include? "u:#{@user2}").should be_true
+      (new_object[:acl][:read_appspace].include? "u-#{@user1}").should be_true
+      (new_object2[:acl][:read_appspace].include? "u-#{@user2}").should be_true
     end
 
     it "should correctly update the object acls with multiple permissions" do
@@ -326,8 +326,8 @@ describe ACM::Services::ObjectService do
       new_object[:id].should eql(@obj_id)
       new_object2[:id].should eql(@obj_id)
 
-      (new_object[:acl][:read_appspace].include? "u:#{@user1}").should be_true
-      (new_object2[:acl][:write_appspace].include? "u:#{@user2}").should be_true
+      (new_object[:acl][:read_appspace].include? "u-#{@user1}").should be_true
+      (new_object2[:acl][:write_appspace].include? "u-#{@user2}").should be_true
     end
 
     it "should correctly update the object acls that have multiple permissions with multiple permissions" do
@@ -353,10 +353,10 @@ describe ACM::Services::ObjectService do
       new_object3[:id].should eql(@obj_id)
       new_object4[:id].should eql(@obj_id)
 
-      (new_object[:acl][:read_appspace].include? "u:#{@user1}").should be_true
-      (new_object2[:acl][:read_appspace].include? "u:#{@user2}").should be_true
-      (new_object3[:acl][:write_appspace].include? "u:#{@user3}").should be_true
-      (new_object4[:acl][:write_appspace].include? "u:#{@user4}").should be_true
+      (new_object[:acl][:read_appspace].include? "u-#{@user1}").should be_true
+      (new_object2[:acl][:read_appspace].include? "u-#{@user2}").should be_true
+      (new_object3[:acl][:write_appspace].include? "u-#{@user3}").should be_true
+      (new_object4[:acl][:write_appspace].include? "u-#{@user4}").should be_true
     end
 
   end
@@ -443,9 +443,9 @@ describe ACM::Services::ObjectService do
                                       :additional_info => {:description => :staging_app_space}.to_json(),
                                       :permission_sets => [:app_space],
                                       :acl => {
-                                        :read_appspace => ["u:#{@user1}", "u:#{@user2}", "u:#{@user3}", "u:#{@user4}", "g:#{@group2}"],
-                                        :write_appspace => ["u:#{@user2}", "g:#{@group1}"],
-                                        :delete_appspace => ["u:#{@user4}"]
+                                        :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}", "g-#{@group2}"],
+                                        :write_appspace => ["u-#{@user2}", "g-#{@group1}"],
+                                        :delete_appspace => ["u-#{@user4}"]
                                       })
       @object = Yajl::Parser.parse(o_json, :symbolize_keys => true)
     end

@@ -50,9 +50,9 @@ module ACM::Models
         subject_list = []
         subjects.each{|subject|
           if(subject.type.to_sym == :user)
-            subject_list.insert(0, "u:#{subject.immutable_id}")
+            subject_list.insert(0, "u-#{subject.immutable_id}")
           else
-            subject_list.insert(0, "g:#{subject.immutable_id}")
+            subject_list.insert(0, "g-#{subject.immutable_id}")
           end
         }
 
