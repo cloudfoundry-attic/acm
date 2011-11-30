@@ -678,6 +678,7 @@ describe ACM::Controller::ApiController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
 
       (updated_object[:acl][:delete_appspace].include? ("u-#{@user4}")).should be_true
       updated_object[:id].should eql(@object[:id])
@@ -695,6 +696,7 @@ describe ACM::Controller::ApiController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
 
       (updated_object[:acl][:write_appspace].include? ("u-#{@user4}")).should be_true
       updated_object[:id].should eql(@object[:id])
@@ -712,6 +714,7 @@ describe ACM::Controller::ApiController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
 
       (updated_object[:acl][:read_appspace].include? ("u-#{@user1}")).should be_true
       updated_object[:acl][:read_appspace].size().should eql(@object[:acl][:read_appspace].size())
@@ -730,6 +733,7 @@ describe ACM::Controller::ApiController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       error = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
 
       error[:code].should eql(1001)
       error[:description].should include("Invalid request")
@@ -746,6 +750,7 @@ describe ACM::Controller::ApiController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       error = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
 
       error[:code].should eql(1000)
       error[:description].should include("not found")
@@ -762,6 +767,7 @@ describe ACM::Controller::ApiController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
 
       (updated_object[:acl][:read_appspace].include? ("u-#{new_user}")).should be_true
       updated_object[:id].should eql(@object[:id])
@@ -779,6 +785,7 @@ describe ACM::Controller::ApiController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
 
       (updated_object[:acl][:read_appspace].include? ("g-#{@group1}")).should be_true
       updated_object[:id].should eql(@object[:id])
@@ -796,6 +803,7 @@ describe ACM::Controller::ApiController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
 
       (updated_object[:acl][:read_appspace].include? ("g-#{@group2}")).should be_true
       updated_object[:acl][:read_appspace].size().should eql(@object[:acl][:read_appspace].size())
@@ -815,6 +823,7 @@ describe ACM::Controller::ApiController do
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       error = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
 
       error[:code].should eql(1000)
       error[:description].should include("not found")

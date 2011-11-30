@@ -67,6 +67,8 @@ module ACM::Controller
       updated_group = @group_service.add_user_to_group(params[:group_id], params[:user_id])
 
       @logger.debug("Updated group #{updated_group.inspect}")
+      parsed_group = Yajl::Parser.parse(updated_group, :symbolize_keys => true)
+      headers "Location" => "#{request.scheme}://#{request.host_with_port}/groups/#{parsed_group[:id]}"
 
       updated_group
     end

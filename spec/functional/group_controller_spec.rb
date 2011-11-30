@@ -309,6 +309,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/groups/#{body[:id]}")
 
       body[:id].to_s.should eql(@group1_data[:id].to_s)
       (body[:members].include? ("#{@user4}")).should be_true
@@ -326,6 +327,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/groups/#{body[:id]}")
 
       body[:id].to_s.should eql(@group1_data[:id].to_s)
       (body[:members].include? ("#{@user5}")).should be_true
@@ -344,6 +346,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(404)
 
       error = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
 
       error[:code].should eql(1000)
       error[:description].should include("not found")

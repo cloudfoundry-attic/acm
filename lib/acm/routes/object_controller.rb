@@ -86,11 +86,7 @@ module ACM::Controller
 
       #Set the Location response header
       object = Yajl::Parser.parse(object_json, :symbolize_keys => true)
-      request_url = request.url
-      if(request_url.end_with? ["/"])
-        request_url.chop()
-      end
-      headers "Location" => "#{request_url}/#{object[:id]}"
+      headers "Location" => "#{request.scheme}://#{request.host_with_port}/objects/#{object[:id]}"
 
       object_json
     end
