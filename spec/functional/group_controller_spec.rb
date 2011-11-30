@@ -261,4 +261,95 @@ describe ACM::Controller::ApiController do
 
   end
 
+  describe "when adding a user to a group" do
+
+    before(:each) do
+      @user1 = SecureRandom.uuid
+      @user2 = SecureRandom.uuid
+      @user3 = SecureRandom.uuid
+      @user4 = SecureRandom.uuid
+      @user5 = SecureRandom.uuid
+      @user6 = SecureRandom.uuid
+
+      @group1 = SecureRandom.uuid
+
+      @group_service = ACM::Services::GroupService.new()
+
+      @group1_data = {
+        :id => @group1,
+        :additional_info => "Developer group",
+        :members => [@user1, @user2, @user3]
+      }
+
+      basic_authorize "admin", "password"
+      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => @group1_data.to_json() }
+      @logger.debug("post /groups last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+
+      @group2 = SecureRandom.uuid
+
+      group2_data = {
+        :id => @group2,
+        :additional_info => "Developer group",
+        :members => [@user5, @user6]
+      }
+
+      basic_authorize "admin", "password"
+      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => group2_data.to_json() }
+      @logger.debug("post /groups last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+
+    end
+
+    it "should create a user that does not exist and return the updated group" do
+      basic_authorize "admin", "password"
+
+      put "/groups/#{@group1}/users/#{@user4}", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("post /groups last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+
+      body[:id].to_s.should eql(@group1_data[:id].to_s)
+      (body[:members].include? ("#{@user4}")).should be_true
+      body[:additionalInfo].should eql(@group1_data[:additionalInfo])
+      body[:meta][:created].should_not be_nil
+      body[:meta][:updated].should_not be_nil
+      body[:meta][:schema].should eql("urn:acm:schemas:1.0")
+    end
+
+    it "should add the user to the group and return the updated group" do
+      basic_authorize "admin", "password"
+
+      put "/groups/#{@group1}/users/#{@user5}", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("post /groups last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+
+      body[:id].to_s.should eql(@group1_data[:id].to_s)
+      (body[:members].include? ("#{@user5}")).should be_true
+      body[:additionalInfo].should eql(@group1_data[:additionalInfo])
+      body[:meta][:created].should_not be_nil
+      body[:meta][:updated].should_not be_nil
+      body[:meta][:schema].should eql("urn:acm:schemas:1.0")
+    end
+
+    it "should return an error if the group does not exist" do
+      basic_authorize "admin", "password"
+
+      new_group = SecureRandom.uuid
+      put "/groups/#{new_group}/users/#{@user5}", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("post /groups last response #{last_response.inspect}")
+      last_response.status.should eql(404)
+
+      error = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+
+      error[:code].should eql(1000)
+      error[:description].should include("not found")
+    end
+
+
+  end
+
 end

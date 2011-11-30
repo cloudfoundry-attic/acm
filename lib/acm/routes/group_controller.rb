@@ -60,6 +60,17 @@ module ACM::Controller
       group_json
     end
 
+    put '/groups/:group_id/users/:user_id' do
+      content_type 'application/json', :charset => 'utf-8'
+      @logger.debug("PUT request for /groups/#{params[:group_id]}/users/#{params[:user_id]}")
+
+      updated_group = @group_service.add_user_to_group(params[:group_id], params[:user_id])
+
+      @logger.debug("Updated group #{updated_group.inspect}")
+
+      updated_group
+    end
+
   end
 
 end

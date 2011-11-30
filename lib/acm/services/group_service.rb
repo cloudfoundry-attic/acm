@@ -66,17 +66,57 @@ module ACM::Services
     end
 
     def find_group(group_id)
-      @logger.debug("find_user parameters #{group_id.inspect}")
+      @logger.debug("find_group parameters #{group_id.inspect}")
       group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
 
       if(group.nil?)
-        @logger.error("Could not find user with id #{group_id.inspect}")
+        @logger.error("Could not group user with id #{group_id.inspect}")
         raise ACM::ObjectNotFound.new("#{group_id.inspect}")
       else
-        @logger.debug("Found user #{group.inspect}")
+        @logger.debug("Found group #{group.inspect}")
       end
 
       group.to_json()
+    end
+
+    def add_user_to_group(group_id, user_id)
+      @logger.debug("find_group parameters #{group_id.inspect}")
+      group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
+
+      if(group.nil?)
+        @logger.error("Could not group user with id #{group_id.inspect}")
+        raise ACM::ObjectNotFound.new("#{group_id.inspect}")
+      else
+        @logger.debug("Found group #{group.inspect}")
+      end
+
+      user_json = nil
+      begin
+        user_json = @user_service.find_user(user_id)
+      rescue => e
+        if(e.kind_of?(ACM::ObjectNotFound))
+          @logger.debug("Could not find user #{user_id}. Creating the user")
+          user_json = @user_service.create_user(:id => user_id)
+        else
+          @logger.error("Internal error #{e.message}")
+          raise ACM::SystemInternalError.new()
+        end
+      end
+
+      user = Yajl::Parser.parse(user_json, :symbolize_keys => true)
+
+      #Is the user already a member of the group?
+      group_members = group.members_dataset.filter(:user_id => user[:id]).all()
+      @logger.debug("Existing group members #{group_members.inspect}")
+      if(group_members.nil? || group_members.size() == 0)
+        user = ACM::Models::Subjects.filter(:immutable_id => user_id, :type => :user.to_s).first()
+        @logger.debug("new user #{user.id} group #{group.id}")
+        group.add_member(:user_id => user.id)
+      end
+
+      group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
+      @logger.debug("Updated group #{group.inspect}")
+      group.to_json
     end
 
     def delete_group(group_id)

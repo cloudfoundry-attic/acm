@@ -657,9 +657,9 @@ The response for this request is something like
 
 
 Add a User to an Object ACL with a permission: PUT /objects/*object_id*/acl/*permission*/*subject_id*
-------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
 
-===============  ===================================
+===============  ==================================================
 HTTP Method      PUT
 URI              /objects/*object_id*/acl/*permission*/*subject_id*
 Request Format   N/A
@@ -667,7 +667,7 @@ Response Format  Refer to the `Object Schema`_
 Response Codes   | 200 - Operation was successful
                  | 400 - Malformed request format
                  | 401 - Not Authorized
-===============  ===================================
+===============  ==================================================
 
 For example
 
@@ -791,7 +791,23 @@ Response Codes   | 200 - Operation was successful
 ===============  ===================================
 
 See `partial update`_ for more information and alternate API possibilities 
-to add and remove members of a group. 
+to add and remove members of a group.
+
+
+Add a user to a group: PUT /groups/*id*/users/*user_id*
+------------------------------------------------------------------------------------
+
+Updates an ACM group
+
+===============  ===================================
+HTTP Method      PUT
+URI              /groups/*id*/users/*user_id*
+Request Format   N/A
+Response Format  Refer to the `Group Schema`_
+Response Codes   | 200 - Operation was successful
+                 | 400 - Malformed request format
+                 | 401 - Not Authorized
+===============  ===================================
 
 
 Get Group: GET /groups/*id*

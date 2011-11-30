@@ -101,4 +101,21 @@ describe ACM::Services::GroupService do
 
   end
 
+  describe "adding a member to a group" do
+
+    it "should add a member to a group" do
+      group_json = @group_service.create_group(:id => @group1,
+                                              :additional_info => "Developer group",
+                                              :members => [@user1, @user2, @user3, @user4])
+      group = Yajl::Parser.parse(group_json, :symbolize_keys => true)
+
+      new_user = SecureRandom.uuid
+      new_group_json = @group_service.add_user_to_group(group[:id], new_user)
+      new_group = Yajl::Parser.parse(new_group_json, :symbolize_keys => true)
+
+      (new_group[:members].include? (new_user)).should be_true
+    end
+
+  end
+
 end
