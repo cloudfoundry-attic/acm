@@ -568,7 +568,7 @@ Response Codes   | 200 - Operation was successful
 The service responds with the json for the entire object.
 
 
-List of users that have access to an object: GET /objects/*id*/users
+List of Users that have access to an object: GET /objects/*id*/users
 ------------------------------------------------------------------------------------
 
 ===============  ===================================
@@ -655,6 +655,59 @@ The response for this request is something like
        ]
     }
 
+
+Add a User to an Object ACL with a permission: PUT /objects/*object_id*/acl/*permission*/*subject_id*
+------------------------------------------------------------------------------------
+
+===============  ===================================
+HTTP Method      PUT
+URI              /objects/*object_id*/acl/*permission*/*subject_id*
+Request Format   N/A
+Response Format  Refer to the `Object Schema`_
+Response Codes   | 200 - Operation was successful
+                 | 400 - Malformed request format
+                 | 401 - Not Authorized
+===============  ===================================
+
+For example
+
+    PUT /objects/11c32e98-e9e4-43ca-8ac4-164ecbcb71b1/acl/delete_appspace/u-dc06aceb-ecde-45a4-ba96-7a7fbd866902
+    Host: internal.vcap.acm.com
+    Accept: application/json
+    Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+
+    HTTP/1.1 200 OK
+    Content-Type: application/json
+
+    {
+       "name":"www_staging",
+       "permission_sets":[
+          "app_space"
+       ],
+       "id":"11c32e98-e9e4-43ca-8ac4-164ecbcb71b1",
+       "additionalInfo":"{component => cloud_controller}",
+       "acl":{
+          "read_appspace":[
+             "g-d0f42b1e-6d5b-4ea3-a15b-59c7320ec477",
+             "u-dc06aceb-ecde-45a4-ba96-7a7fbd866902",
+             "u-b3e5a4b8-39cb-4bbf-9884-94ba7a8b6eee",
+             "u-8cbcbf18-4ec9-40ce-a2af-058377c8c2b7",
+             "u-e2803726-5f04-4754-9f6c-c22fe27f4f92"
+          ],
+          "write_appspace":[
+             "g-a0c16b18-8f66-4b2f-aa9a-ce590eeed13c",
+             "u-8cbcbf18-4ec9-40ce-a2af-058377c8c2b7"
+          ],
+          "delete_appspace":[
+             "u-dc06aceb-ecde-45a4-ba96-7a7fbd866902"
+          ]
+       },
+       "meta":{
+          "created":"2011-11-29 17:18:47 -0800",
+          "updated":"2011-11-29 17:18:47 -0800",
+          "schema":"urn:acm:schemas:1.0"
+       }
+    }
 
 
 Delete Object: DELETE /objects/*id*
