@@ -12,6 +12,12 @@ module ACM::Services
       @user_service = ACM::Services::UserService.new()
     end
 
+    # Creates a group
+    # @param opts
+    #     :id => optional group id
+    #     :additional_info => additional group information as a string
+    #     :members => array of members for the group
+    # @returns the group as json
     def create_group(opts = {})
 
       group = ACM::Models::Subjects.new(
@@ -65,6 +71,10 @@ module ACM::Services
       group.to_json()
     end
 
+
+    # finds the group given the group id
+    # @params group_id - Group id
+    # @returns the group as json
     def find_group(group_id)
       @logger.debug("find_group parameters #{group_id.inspect}")
       group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
@@ -79,6 +89,11 @@ module ACM::Services
       group.to_json()
     end
 
+
+    # adds a user to a group
+    # @params group_id - Group id
+    # @params user_id - Id of the user to be added
+    # @returns the modified group as json
     def add_user_to_group(group_id, user_id)
       @logger.debug("find_group parameters #{group_id.inspect}")
       group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
@@ -119,6 +134,9 @@ module ACM::Services
       group.to_json
     end
 
+    # adds a user to a group
+    # @params group_id - Id of the group to be deleted
+    # @returns nothing
     def delete_group(group_id)
       @logger.debug("delete parameters #{group_id.inspect}")
       group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
