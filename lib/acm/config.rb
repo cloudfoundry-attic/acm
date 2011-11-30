@@ -1,4 +1,3 @@
-require "monitor"
 require "logger"
 require "securerandom"
 
@@ -53,12 +52,10 @@ module ACM
         @db.sql_log_level = :debug
         Sequel::Model.plugin :validation_helpers
 
-        @lock = Monitor.new
-
         @basic_auth = {:user => config["basic_auth"]["user"], :password => config["basic_auth"]["password"]}
 
         puts("Configuration complete")
-        @logger.debug("ACM running")
+        @logger.debug("ACM running #{@revision}")
         if(!config["logging"]["file"].nil?)
           puts("Logs are at #{config["logging"]["file"]}")
         end
