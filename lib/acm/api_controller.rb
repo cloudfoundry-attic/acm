@@ -16,9 +16,9 @@ require 'net/http'
 
 module ACM::Controller
 
-  #Sinatra controller that responds to all ACM requests
-  #For code organization purposes, it's broken up into
-  #multiple files, one for each set of routes. See routes/
+  # Sinatra controller that responds to all ACM requests
+  # For code organization purposes, it's broken up into
+  # multiple files, one for each set of routes. See routes/
   class ApiController < Sinatra::Base
 
     def initialize
@@ -40,7 +40,7 @@ module ACM::Controller
       set(:dump_errors, false)
     end
 
-    #Main error handler for the ACM
+    # Main error handler for the ACM
     error do
       content_type 'application/json', :charset => 'utf-8'
 
@@ -63,8 +63,8 @@ module ACM::Controller
       end
     end
 
-    #not found sinatra handler for the ACM. Handles routes that cannot
-    #be found and avoids the standard sinatra response
+    # not_found sinatra handler for the ACM. Handles routes that cannot
+    # be found and avoids the standard sinatra response
     not_found do
       content_type 'application/json', :charset => 'utf-8'
 

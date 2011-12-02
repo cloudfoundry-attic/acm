@@ -1,4 +1,4 @@
-
+# Default error classes for the ACM
 module ACM
 
   OK                    = 200
@@ -29,10 +29,10 @@ module ACM
   #to create an error class with the same name
   [
    ["ObjectNotFound",        NOT_FOUND,   1000, "Object %s not found"],
-   ["InvalidRequest",          BAD_REQUEST, 1001, "Invalid request: \"%s\""],
-   ["Unauthorized",            UNAUTHORIZED, 1002, "Unauthorized"],
+   ["InvalidRequest",        BAD_REQUEST, 1001, "Invalid request: \"%s\""],
+   ["Unauthorized",          UNAUTHORIZED, 1002, "Unauthorized"],
 
-   ["SystemInternalError",     INTERNAL_SERVER_ERROR,   2000, "An unknown error occurred" ]
+   ["SystemInternalError",   INTERNAL_SERVER_ERROR,   2000, "An unknown error occurred" ]
 
   ].each do |e|
     class_name, response_code, error_code, format = e
