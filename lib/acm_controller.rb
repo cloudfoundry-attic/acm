@@ -8,8 +8,8 @@ require "yajl"
 
 module ACM::Controller
 
-  #Main application controller that receives all requests and passes them on to
-  #the ApiController (Sinatra) for handling
+  # Main application controller that receives all requests and passes them on to
+  # the ApiController (Sinatra) for handling
   class RackController
     PUBLIC_URLS = ["/info"]
 
@@ -28,7 +28,7 @@ module ACM::Controller
 
     end
 
-    #Rack requires the controller to respond to this message
+    # Rack requires the controller to respond to this message
     def call(env)
 
       @logger.debug("Request env #{env.inspect}")
