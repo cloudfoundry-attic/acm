@@ -19,12 +19,10 @@ group :production do
 end
 
 group :test do
-  gem "autotest", :platforms => :ruby_19
   gem "machinist"
   gem "rspec"
   gem "ruby-debug", :platforms => :ruby_18
   gem "ruby-debug19", :platforms => :ruby_19
-  gem "simplecov", :platforms => :ruby_19
   gem "sqlite3"
   gem "simplecov", :platforms => :ruby_19
 end
