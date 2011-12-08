@@ -55,7 +55,7 @@ module ACM
 
         @db = Sequel.connect(config["db"]["database"], connection_options)
 
-        puts("Database connection successful #{@db.inspect}")
+        puts("Database connection successful")
         @db.logger = @logger
         @db.sql_log_level = :debug
 
