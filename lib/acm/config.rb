@@ -35,7 +35,7 @@ module ACM
       #Called by the acm binary to consume the configuration and set up the app
       def configure(config)
         @log_file = config["logging"]["log_file"]
-        @logger = Logger.new(config["logging"]["log_file"] || STDOUT)
+        @logger = Logger.new(config["logging"]["log_file"] || STDOUT, "daily")
         @logger.level = Logger.const_get(config["logging"]["level"].upcase)
         @logger.formatter = ThreadFormatter.new
 
