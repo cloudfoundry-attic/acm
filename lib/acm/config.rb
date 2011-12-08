@@ -1,5 +1,6 @@
 require "logger"
 require "securerandom"
+require "sequel"
 
 require "acm/thread_formatter"
 
@@ -13,10 +14,12 @@ module ACM
       #Configuration options that can be accessed throughout the app
       CONFIG_OPTIONS = [
         :logger,
+        :log_file,
         :db,
         :name,
         :revision,
-        :basic_auth
+        :basic_auth,
+        :pid_file
       ]
 
       CONFIG_OPTIONS.each do |option|
@@ -31,7 +34,8 @@ module ACM
 
       #Called by the acm binary to consume the configuration and set up the app
       def configure(config)
-        @logger = Logger.new(config["logging"]["file"] || STDOUT)
+        @log_file = config["logging"]["log_file"]
+        @logger = Logger.new(config["logging"]["log_file"] || STDOUT)
         @logger.level = Logger.const_get(config["logging"]["level"].upcase)
         @logger.formatter = ThreadFormatter.new
 
@@ -39,6 +43,8 @@ module ACM
         @revision = `(git show-ref --head --hash=8 2> /dev/null || echo 00000000) | head -n1`.strip
 
         @name = config["name"] || ""
+
+        @pid_file = config["pid"]
 
         if config["db"]["database"].index("sqlite://") == 0
           patch_sqlite
@@ -52,14 +58,19 @@ module ACM
         puts("Database connection successful #{@db.inspect}")
         @db.logger = @logger
         @db.sql_log_level = :debug
+
+        #Run the db migrations if they have not already been run
+        Sequel.extension :migration
+        Sequel::Migrator.apply(@db, '../../db/migrations')
+
         Sequel::Model.plugin :validation_helpers
 
         @basic_auth = {:user => config["basic_auth"]["user"], :password => config["basic_auth"]["password"]}
 
         puts("Configuration complete")
         @logger.debug("ACM running #{@revision}")
-        if(!config["logging"]["file"].nil?)
-          puts("Logs are at #{config["logging"]["file"]}")
+        if(!@log_file.nil?)
+          puts("Logs are at #{@log_file}")
         end
       end
 

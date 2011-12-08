@@ -2,8 +2,8 @@ Sequel.migration do
   up do
     create_table :objects do
       primary_key :id
-      string :immutable_id, :null => false, :unique => true
-      string :name
+      String :immutable_id, :null => false, :unique => true
+      String :name
       text :additional_info
 
       time :created_at, :null => false
@@ -13,7 +13,7 @@ Sequel.migration do
 
     create_table :permission_sets do
       primary_key :id
-      string :name, :null => false, :unique => true
+      String :name, :null => false, :unique => true
       text :additional_info
 
       time :created_at, :null => false
@@ -30,7 +30,7 @@ Sequel.migration do
     create_table :permissions do
       primary_key :id
       foreign_key :permission_set_id, :permission_sets
-      string :name, :null => false, :unique => true
+      String :name, :null => false, :unique => true
 
       time :created_at, :null => false
       time :last_updated_at, :null => false
@@ -49,22 +49,22 @@ Sequel.migration do
 
       unique [:object_id, :permission_id]
     end
-
-    create_table :ace_subject_map do
-      primary_key :id
-      foreign_key :access_control_entry_id, :access_control_entries
-      foreign_key :subject_id, :subjects
-    end
-
+    
     create_table :subjects do
       primary_key :id
-      string :immutable_id, :null => false, :unique => true
-      string :type, :null => false
+      String :immutable_id, :null => false, :unique => true
+      String :type, :null => false
       foreign_key :object_id, :objects
       text :additional_info
 
       time :created_at, :null => false
       time :last_updated_at, :null => false
+    end
+
+    create_table :ace_subject_map do
+      primary_key :id
+      foreign_key :access_control_entry_id, :access_control_entries
+      foreign_key :subject_id, :subjects
     end
 
     create_table :members do

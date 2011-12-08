@@ -29,7 +29,7 @@ ACM::Config.configure(config)
 
 require "acm_controller"
 
-thin_server = Thin::Server.new("0.0.0.0", config["port"], :signals => false) do
+@thin_server = Thin::Server.new("0.0.0.0", config["port"], :signals => false, :daemonize => true) do
   use Rack::CommonLogger
   map "/" do
     run ACM::Controller::RackController.new
@@ -38,8 +38,13 @@ end
 
 ["TERM", "INT", "QUIT"].each do |signal|
   trap(signal) do
-    thin_server.stop!
+    @thin_server.stop!
   end
 end
 
-thin_server.start!
+@thin_server.pid_file=ACM::Config.pid_file
+@thin_server.log_file=ACM::Config.log_file
+@thin_server.timeout=50
+@thin_server.daemonize
+    
+@thin_server.start!
