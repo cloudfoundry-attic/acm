@@ -43,6 +43,9 @@ end
 end
 
 @thin_server.pid_file=ACM::Config.pid_file
+#Log file is mandatory
+#daemonize requires a log file. Take this from the configuration
+#All STDOUT from the acm will flow there
 @thin_server.log_file=ACM::Config.log_file
 @thin_server.timeout=50
 @thin_server.daemonize
