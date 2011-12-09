@@ -10,10 +10,15 @@ describe ACM::Controller::ApiController do
     @app ||= ACM::Controller::RackController.new
   end
 
+
+  before(:each) do
+    @logger = ACM::Config.logger
+  end
+
   describe "when sending an invalid request for object creation" do
 
     it "should respond with an error on an incorrectly formatted request" do
-      @logger = ACM::Config.logger
+      
       basic_authorize "admin", "password"
 
       post "/objects", {}, { "CONTENT_TYPE" => "application/json", :input => "object_data" }
@@ -31,7 +36,7 @@ describe ACM::Controller::ApiController do
     end
 
     it "should respond with an error on an empty request" do
-      @logger = ACM::Config.logger
+      
       basic_authorize "admin", "password"
 
       post "/objects", {}, { "CONTENT_TYPE" => "application/json", :input => nil }
@@ -71,7 +76,7 @@ describe ACM::Controller::ApiController do
       @user_service = ACM::Services::UserService.new()
       @group_service = ACM::Services::GroupService.new()
 
-      @logger = ACM::Config.logger
+      
     end
 
     it "should create a new object and return it's representation" do
@@ -318,7 +323,7 @@ describe ACM::Controller::ApiController do
       @user3 = SecureRandom.uuid
       @user4 = SecureRandom.uuid
 
-      @logger = ACM::Config.logger
+      
     end
 
     it "should return the object that's requested" do
@@ -407,7 +412,7 @@ describe ACM::Controller::ApiController do
       @user3 = SecureRandom.uuid
       @user4 = SecureRandom.uuid
 
-      @logger = ACM::Config.logger
+      
     end
 
     it "should delete the object that's requested" do
@@ -529,7 +534,7 @@ describe ACM::Controller::ApiController do
   describe "getting user information for an object" do
 
     before (:each) do
-      @logger = ACM::Config.logger
+      
       @permission_set_service = ACM::Services::PermissionSetService.new()
 
       @permission_set_service.create_permission_set(:name => :app_space,
@@ -612,7 +617,7 @@ describe ACM::Controller::ApiController do
   describe "when updating an acl" do
 
     before (:each) do
-      @logger = ACM::Config.logger
+      
       @permission_set_service = ACM::Services::PermissionSetService.new()
 
       @permission_set_service.create_permission_set(:name => :app_space,
@@ -830,5 +835,7 @@ describe ACM::Controller::ApiController do
     end
 
   end
-
 end
+
+
+
