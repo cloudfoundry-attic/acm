@@ -1,9 +1,10 @@
 ---
+pid: /tmp/acm.pid
 name: ACM
 port: 9090
 logging:
   level: DEBUG
-  file: log/acm.log
+  file: /tmp/acm.log
 db:
   database: "sqlite://acm.db"
   max_connections: 32
