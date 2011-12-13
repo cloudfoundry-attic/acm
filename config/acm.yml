@@ -1,6 +1,8 @@
 ---
 pid: /tmp/acm.pid
 name: ACM
+pid: /var/vcap/sys/run/acm.pid
+mbus: nats://localhost:4222
 port: 9090
 logging:
   level: DEBUG
