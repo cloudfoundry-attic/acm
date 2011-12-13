@@ -35,8 +35,6 @@ Sequel.migration do
       time :created_at, :null => false
       time :last_updated_at, :null => false
 
-      #unique ([:permission_set_id, :name])
-
     end
 
     create_table :access_control_entries do
