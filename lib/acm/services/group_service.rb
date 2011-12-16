@@ -105,23 +105,23 @@ module ACM::Services
         @logger.debug("Found group #{group.inspect}")
       end
 
-      user_json = nil
+      user = nil
       begin
-        user_json = @user_service.find_user(user_id)
+        user = ACM::Models::Subjects.filter(:immutable_id => user_id, :type => :user.to_s).first()
+        @logger.debug("Found user to be added #{user.inspect}")
       rescue => e
-        if(e.kind_of?(ACM::ObjectNotFound))
-          @logger.debug("Could not find user #{user_id}. Creating the user")
-          user_json = @user_service.create_user(:id => user_id)
-        else
-          @logger.error("Internal error #{e.message}")
-          raise ACM::SystemInternalError.new()
-        end
+        @logger.error("Internal error #{e.message}")
+        raise ACM::SystemInternalError.new()
       end
 
-      user = Yajl::Parser.parse(user_json, :symbolize_keys => true)
+      if (user.nil?)
+        @logger.debug("Could not find user #{user_id}. Creating the user")
+        user_json = @user_service.create_user(:id => user_id)
+        user = ACM::Models::Subjects.filter(:immutable_id => user_id, :type => :user.to_s).first()
+      end
 
       #Is the user already a member of the group?
-      group_members = group.members_dataset.filter(:user_id => user[:id]).all()
+      group_members = group.members_dataset.filter(:user_id => user.id).all()
       @logger.debug("Existing group members #{group_members.inspect}")
       if(group_members.nil? || group_members.size() == 0)
         user = ACM::Models::Subjects.filter(:immutable_id => user_id, :type => :user.to_s).first()
