@@ -9,6 +9,7 @@ gem "SystemTimer", :platforms => :ruby_18
 gem "thin"
 gem "uuidtools"
 gem "yajl-ruby"
+gem "pg"
 
 group :development do
   gem "sqlite3"
