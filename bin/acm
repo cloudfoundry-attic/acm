@@ -27,9 +27,12 @@ config = YAML.load_file(config_file)
 
 ACM::Config.configure(config)
 
-require "acm_controller"
+event_thread = Thread.new { EM.run }
 
-@thin_server = Thin::Server.new("0.0.0.0", config["port"], :signals => false, :daemonize => true) do
+require "acm_controller"
+require "utils"
+
+thin_server = Thin::Server.new("0.0.0.0", config["port"], :signals => false) do
   use Rack::CommonLogger
   map "/" do
     run ACM::Controller::RackController.new
@@ -38,16 +41,11 @@ end
 
 ["TERM", "INT", "QUIT"].each do |signal|
   trap(signal) do
-    @thin_server.stop!
+    thin_server.stop!
+    EM.stop
+    stop(ACM::Config.pid_file)
   end
 end
 
-@thin_server.pid_file=ACM::Config.pid_file
-#Log file is mandatory
-#daemonize requires a log file. Take this from the configuration
-#All STDOUT from the acm will flow there
-@thin_server.log_file=ACM::Config.log_file
-@thin_server.timeout=50
-@thin_server.daemonize
-    
-@thin_server.start!
+thin_server.start!
+event_thread.join

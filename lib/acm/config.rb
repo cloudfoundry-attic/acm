@@ -3,12 +3,12 @@ require "securerandom"
 require "sequel"
 
 require "acm/thread_formatter"
+require "acm/utils"
 
 
 module ACM
 
-  class Config
-
+  module Config
     class << self
 
       #Configuration options that can be accessed throughout the app
@@ -19,12 +19,15 @@ module ACM
         :name,
         :revision,
         :basic_auth,
-        :pid_file
+        :pid_file,
+        :acm_shutting_down
       ]
 
       CONFIG_OPTIONS.each do |option|
         attr_accessor option
       end
+
+      alias :acm_shutting_down? :acm_shutting_down
 
       def clear
         CONFIG_OPTIONS.each do |option|
@@ -34,8 +37,8 @@ module ACM
 
       #Called by the acm binary to consume the configuration and set up the app
       def configure(config)
-        @log_file = config["logging"]["file"]
-        @logger = Logger.new(STDOUT, "daily")
+        @log_file = config["logging"]["file"] || STDOUT
+        @logger = Logger.new(@log_file, "daily")
         @logger.level = Logger.const_get(config["logging"]["level"].upcase)
         @logger.formatter = ThreadFormatter.new
 
@@ -45,6 +48,7 @@ module ACM
         @name = config["name"] || ""
 
         @pid_file = config["pid"]
+        create_pid_file(@pid_file)
 
         if config["db"]["database"].index("sqlite://") == 0
           patch_sqlite
@@ -57,7 +61,7 @@ module ACM
 
         puts("Database connection successful")
         @db.logger = @logger
-        @db.sql_log_level = :debug
+        @db.sql_log_level = config["logging"]["level"].downcase.to_sym
 
         #Run the db migrations if they have not already been run
         Sequel.extension :migration
@@ -104,7 +108,6 @@ module ACM
           end
         end
       end
-
     end
   end
 end
