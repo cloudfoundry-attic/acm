@@ -4,7 +4,7 @@ def create_pid_file(pidfile)
   begin
     FileUtils.mkdir_p(File.dirname(pidfile))
   rescue => e
-     ACM::Config.logger.fatal "Can't create pid directory, exiting: #{e}"
+     ACM::Config.logger.fatal("Can't create pid directory, exiting: #{e}")
   end
   File.open(pidfile, 'w') { |f| f.puts "#{Process.pid}" }
 end
@@ -13,6 +13,6 @@ def stop(pidfile)
   # Double ctrl-c just terminates
   exit if ACM::Config.acm_shutting_down?
   ACM::Config.acm_shutting_down = true
-  ACM::Config.logger.info 'Signal caught, shutting down..'
+  ACM::Config.logger.info("Signal caught, shutting down..")
 end
 

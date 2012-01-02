@@ -30,7 +30,6 @@ ACM::Config.configure(config)
 event_thread = Thread.new { EM.run }
 
 require "acm_controller"
-require "utils"
 
 thin_server = Thin::Server.new("0.0.0.0", config["port"], :signals => false) do
   use Rack::CommonLogger
@@ -43,7 +42,6 @@ end
   trap(signal) do
     thin_server.stop!
     EM.stop
-    stop(ACM::Config.pid_file)
   end
 end
 

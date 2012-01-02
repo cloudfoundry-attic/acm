@@ -48,7 +48,6 @@ module ACM
         @name = config["name"] || ""
 
         @pid_file = config["pid"]
-        create_pid_file(@pid_file)
 
         if config["db"]["database"].index("sqlite://") == 0
           patch_sqlite
@@ -76,6 +75,8 @@ module ACM
         if(!@log_file.nil?)
           puts("Logs are at #{@log_file}")
         end
+
+        create_pid_file(@pid_file)
       end
 
       def logger=(logger)
