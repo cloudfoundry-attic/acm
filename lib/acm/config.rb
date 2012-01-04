@@ -37,6 +37,9 @@ module ACM
 
       #Called by the acm binary to consume the configuration and set up the app
       def configure(config)
+        @pid_file = config["pid"]
+        create_pid_file(@pid_file)
+
         @log_file = config["logging"]["file"] || STDOUT
         @logger = Logger.new(@log_file, "daily")
         @logger.level = Logger.const_get(config["logging"]["level"].upcase)
@@ -47,8 +50,6 @@ module ACM
 
         @name = config["name"] || ""
 
-        @pid_file = config["pid"]
-
         if config["db"]["database"].index("sqlite://") == 0
           patch_sqlite
         end
@@ -58,13 +59,13 @@ module ACM
 
         @db = Sequel.connect(config["db"]["database"], connection_options)
 
-        puts("Database connection successful")
         @db.logger = @logger
         @db.sql_log_level = config["logging"]["level"].downcase.to_sym
 
         #Run the db migrations if they have not already been run
         Sequel.extension :migration
         Sequel::Migrator.apply(@db, '../../db/migrations')
+        puts("Database connection successful")
 
         Sequel::Model.plugin :validation_helpers
 
@@ -75,8 +76,6 @@ module ACM
         if(!@log_file.nil?)
           puts("Logs are at #{@log_file}")
         end
-
-        create_pid_file(@pid_file)
       end
 
       def logger=(logger)
