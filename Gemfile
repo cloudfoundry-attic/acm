@@ -8,7 +8,7 @@ gem "sinatra"
 gem "SystemTimer", :platforms => :ruby_18
 gem "thin"
 gem "uuidtools"
-gem "yajl-ruby"
+gem "yajl-ruby", '~> 0.8.3'
 gem "pg"
 
 group :development do
