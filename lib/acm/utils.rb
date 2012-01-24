@@ -9,10 +9,3 @@ def create_pid_file(pidfile)
   File.open(pidfile, 'w') { |f| f.puts "#{Process.pid}" }
 end
 
-def stop(pidfile)
-  # Double ctrl-c just terminates
-  exit if ACM::Config.acm_shutting_down?
-  ACM::Config.acm_shutting_down = true
-  ACM::Config.logger.info("Signal caught, shutting down..")
-end
-

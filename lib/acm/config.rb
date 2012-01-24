@@ -19,15 +19,12 @@ module ACM
         :name,
         :revision,
         :basic_auth,
-        :pid_file,
-        :acm_shutting_down
+        :pid_file
       ]
 
       CONFIG_OPTIONS.each do |option|
         attr_accessor option
       end
-
-      alias :acm_shutting_down? :acm_shutting_down
 
       def clear
         CONFIG_OPTIONS.each do |option|
