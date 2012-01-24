@@ -20,7 +20,6 @@ group :production do
 end
 
 group :test do
-  gem "machinist"
   gem "rspec"
   gem "sqlite3"
   gem "simplecov", :platforms => :ruby_19

@@ -43,11 +43,6 @@ require "fileutils"
 require "tmpdir"
 require "zlib"
 
-require "machinist/sequel"
-require "sham"
-require "blueprints"
-
-
 acm_dir = Dir.mktmpdir("acm_dir")
 acm_tmp_dir = Dir.mktmpdir("acm_tmp_dir")
 
@@ -76,6 +71,7 @@ Rspec.configure do |rspec_config|
     ACM::Config.logger = logger
     ACM::Config.db = db
     ACM::Config.basic_auth = { :user => :admin.to_s, :password => :password.to_s }
+    ACM::Config.default_schema_version = "urn:acm:schemas:1.0"
 
     logger.info("Start test #{example.example.metadata[:full_description]}")
 
