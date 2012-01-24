@@ -23,7 +23,7 @@ module ACM::Models
     end
 
     def latest_schema
-      "urn:acm:schemas:1.0"
+      ACM::Config.default_schema_version
     end
 
   end

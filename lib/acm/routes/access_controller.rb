@@ -6,6 +6,8 @@ module ACM::Controller
 
     get '/objects/:object_id/access/?' do
       #params ?id=1234&p=read_appspace&p=write_appspace
+      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+
       object_id = params[:object_id]
       subject_id = params[:id]
       permissions = params[:p]

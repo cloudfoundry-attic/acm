@@ -19,7 +19,8 @@ module ACM
         :name,
         :revision,
         :basic_auth,
-        :pid_file
+        :pid_file,
+        :default_schema_version
       ]
 
       CONFIG_OPTIONS.each do |option|
@@ -36,6 +37,8 @@ module ACM
       def configure(config)
         @pid_file = config["pid"]
         create_pid_file(@pid_file)
+
+        @default_schema_version = "urn:acm:schemas:1.0"
 
         @log_file = config["logging"]["file"] || STDOUT
         @logger = Logger.new(@log_file, "daily")

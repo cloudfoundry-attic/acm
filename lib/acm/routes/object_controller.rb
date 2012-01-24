@@ -6,7 +6,7 @@ module ACM::Controller
   class ApiController < Sinatra::Base
 
     get '/objects/:object_id' do
-      content_type 'application/json', :charset => 'utf-8'
+      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
       @logger.debug("GET request for /objects/#{params[:object_id]}")
 
       response = @object_service.read_object(params[:object_id])
@@ -16,7 +16,7 @@ module ACM::Controller
     end
 
     get '/objects/:object_id/users' do
-      content_type 'application/json', :charset => 'utf-8'
+      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
       @logger.debug("GET request for /objects/#{params[:object_id]}/users")
 
       response = @object_service.get_users_for_object(params[:object_id])
@@ -26,14 +26,14 @@ module ACM::Controller
     end
 
     delete '/objects/:object_id' do
-      content_type 'application/json', :charset => 'utf-8'
+      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
       @logger.debug("DELETE request for /objects/#{params[:object_id]}")
 
       @object_service.delete_object(params[:object_id])
     end
 
     post '/objects' do
-      content_type 'application/json', :charset => 'utf-8'
+      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
       @logger.debug("POST request for /objects")
 
       request_json = nil
@@ -76,7 +76,7 @@ module ACM::Controller
 
     #Add a permission for a user to an ace
     put '/objects/:object_id/acl/:permission/:subject_id' do
-      content_type 'application/json', :charset => 'utf-8'
+      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
       @logger.debug("PUT request for /objects/#{params[:object_id]}/acl/#{params[:permission]}/#{params[:subject_id]}")
 
       @object_service.add_subject_to_ace(params[:object_id], params[:permission], params[:subject_id])

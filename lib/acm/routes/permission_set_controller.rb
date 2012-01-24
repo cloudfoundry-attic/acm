@@ -5,7 +5,7 @@ module ACM::Controller
   class ApiController < Sinatra::Base
 
     get '/permission_sets/:name' do
-      content_type 'application/json', :charset => 'utf-8'
+      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
       @logger.debug("GET request for /permission_sets/#{params[:name]}")
 
       response = @permission_set_service.read_permission_set(params[:name])
@@ -15,7 +15,7 @@ module ACM::Controller
     end
 
     post '/permission_sets' do
-      content_type 'application/json', :charset => 'utf-8'
+      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
 
       @logger.debug("POST request for /permission_sets")
 

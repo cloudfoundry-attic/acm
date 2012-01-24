@@ -5,7 +5,7 @@ module ACM::Controller
   class ApiController < Sinatra::Base
 
     get '/groups/:group_id' do
-      content_type 'application/json', :charset => 'utf-8'
+      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
       @logger.debug("GET request for /groups/#{params[:group_id]}")
 
       response = @group_service.find_group(params[:group_id])
@@ -15,14 +15,14 @@ module ACM::Controller
     end
 
     delete '/groups/:group_id' do
-      content_type 'application/json', :charset => 'utf-8'
+      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
       @logger.debug("DELETE request for /groups/#{params[:group_id]}")
 
       @group_service.delete_group(params[:group_id])
     end
 
     post '/groups' do
-      content_type 'application/json', :charset => 'utf-8'
+      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
       @logger.debug("POST request for /groups")
 
       request_json = nil
@@ -61,7 +61,7 @@ module ACM::Controller
     end
 
     put '/groups/:group_id/users/:user_id' do
-      content_type 'application/json', :charset => 'utf-8'
+      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
       @logger.debug("PUT request for /groups/#{params[:group_id]}/users/#{params[:user_id]}")
 
       updated_group = @group_service.add_user_to_group(params[:group_id], params[:user_id])

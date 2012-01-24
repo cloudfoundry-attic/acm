@@ -70,7 +70,7 @@ describe ACM::Controller::ApiController do
       get "/users/#{@user1}"
       @logger.debug("get /users/#{@user1} last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
       user = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       user[:id].should eql(@user1)
@@ -80,7 +80,7 @@ describe ACM::Controller::ApiController do
       get "/users/#{@user3}"
       @logger.debug("get /users/#{@user3} last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
       user = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       user[:id].should eql(@user3)
@@ -90,7 +90,7 @@ describe ACM::Controller::ApiController do
       get "/users/#{@user4}"
       @logger.debug("get /users/#{@user4} last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
       user = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       user[:id].should eql(@user4)
@@ -100,7 +100,7 @@ describe ACM::Controller::ApiController do
       get "/users/#{@user5}"
       @logger.debug("get /users/#{@user5} last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
       user = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       user[:id].should eql(@user5)
@@ -110,7 +110,7 @@ describe ACM::Controller::ApiController do
       get "/users/#{@user6}"
       @logger.debug("get /users/#{@user6} last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
       user = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       user[:id].should eql(@user6)
@@ -120,7 +120,7 @@ describe ACM::Controller::ApiController do
       get "/users/#{@user7}"
       @logger.debug("get /users/#{@user7} last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
       user = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       user[:id].should eql(@user7)
@@ -130,7 +130,7 @@ describe ACM::Controller::ApiController do
       get "/users/#{@user8}"
       @logger.debug("get /users/#{@user8} last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
       user = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       user[:id].should eql(@user8)
