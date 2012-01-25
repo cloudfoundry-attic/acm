@@ -62,7 +62,11 @@ ACM Entities
 **Permission Sets**
 
     A permission set contains a collection of permission names. One or more permission sets must 
-    be specified when an object is created. Only ACEs with permissions from those sets are allowed on the object.
+    be specified when an object is created. Only ACEs with permissions from the specified sets are 
+    allowed on the object. A single permission name will not be allowed in multiple permission sets.
+    
+    Although the API supports multiple permission sets for an object, the implementation for now 
+    will only support a single permission set for an object.
 
 .. DS: the example below seems realistic enough and AppSpace only has
 .. *one* permission set.  Why not restrict it that way at least to
@@ -76,9 +80,10 @@ ACM Entities
 .. a wrapper for a named set of permissions, since they are always
 .. associated with an Object?
 .. JD: It depends how you look at it. Initially, we did have the type of object define
-.. the operations that can be performed on it. I think we're getting separate feedback
-.. on this item. Some feedback supports having a permission set and others don't.
-.. We'll implement it this way for now and further down the line retain the option of changing it.
+.. the operations that can be performed on it. The feedback we've received supports
+.. having permission sets somewhat like schemas that restrict the permission names that
+.. can be used in the acl of an object.
+.. To move forward, we will implement it using permission sets.
 
 **Group**
 
@@ -141,10 +146,26 @@ Let's illustrate how the cloud controller (CC) would enable collaboration spaces
 Versioning of Resource Representations
 ----------------------------------------
 
-Versioning of the format of resources such as objects and groups is based on the Accept/Content-Type headers in the HTTP protocol.
+Versioning of the format of resources such as objects or groups is based on Accept/Content-Type 
+headers in the HTTP protocol.
 
-The request/response schema versioning element is depicted in the schema. Future versions of the schema may be 
-defined but clients will request versions that they understand so that newer servers may choose to support older clients.
+The client provided "Accept" header value "application/json" will always result in a response with 
+the latest schema.
+
+Additionally, different versions of the schema can be returned by setting alternate Accept header 
+values.
+
+For example, 
+
+An "Accept" header as follows::
+
+    Accept: application/json; schema=urn:acm:schemas:1.0
+
+will return a response with the schema version urn:acm:schemas:1.0
+
+The request/response schema versioning element is depicted in the subsequent sections. 
+Future versions of the schema may be defined but clients can always request versions that 
+they support using this method.
 
 .. _`etag header`:
 
@@ -310,9 +331,10 @@ Attributes
     permission sets. We may want to use ids to allow permission sets to be 
     renamed, but it just did not seem to be worth the indirection for the 
     expected use cases.
-    JD: permission sets can be renamed right now because ids are used internally.
-    However, it's better to have clients reference the permission by id so that if
-    the name changes, the reference does not need to. Agreed that it's not required now.
+    JD: At the moment, I do not see a compelling reason for renaming a permission set. 
+    If the operations allowed on an object need to be re-arranged, a new permission set 
+    can be created and added to the object. Some operations can then be moved to the new 
+    permission set using a permission set update.
 
 ======================= ============== ===================================
 Property                Type           Description
@@ -345,7 +367,7 @@ Example::
 Create Permission Set: POST /permissions
 ------------------------------------------------------------------------------------
 
-Creates ACM permission set
+Creates a permission set
 
 ===============  ===================================
 HTTP Method      POST
@@ -353,14 +375,19 @@ URI              /permissions
 Request Format   Refer to the `Permission Set Schema`_
 Response Format  Refer to the `Permission Set Schema`_ 
 Response Codes   | 200 - Operation was successful
-                 | 400 - Malformed request format
-                 | 401 - Not Authorized
+                 | 400 - Bad request
+                 | 401 - Not authorized
 ===============  ===================================
+
+A permission set cannot contain duplicate permissions. If a permission is already assigned to 
+another permission set and is referenced in this update, the permission will be removed from it's 
+previous assignment and added to the updated permission set.
+
 
 Update Permission Set: PUT /permissions/*name*
 ------------------------------------------------------------------------------------
 
-Updates an ACM permission set.
+Complete update of a permission set.
 
 ===============  ===================================
 HTTP Method      PUT
@@ -368,40 +395,57 @@ URI              /permissions/*name*
 Request Format   Refer to the `Permission Set Schema`_
 Response Format  Refer to the `Permission Set Schema`_ 
 Response Codes   | 200 - Operation was successful
-                 | 400 - Malformed request format
-                 | 401 - Not Authorized
+                 | 400 - Bad request
+                 | 401 - Not authorized
 ===============  ===================================
+
+The permission set update replaces all the properties of a permission set. The "name"
+property in the request is ignored. 
+
+If an operation of a permission set assigned to an object is already referenced in an acl of any
+object, the operation cannot be removed from the permission set. An attempt to perform such an 
+operation will result in an HTTP 400.
+
+If a permission is already assigned to another permission set and is referenced in this update, the 
+permission will be removed from it's previous assignment and added to the updated permission set.
 
 
 Get Permission Set: GET /permissions/*name*
 ------------------------------------------------------------------------------------
 
-Gets a Permission Set
-
-===============  ===================================
-HTTP Method      GET
-URI              /permissions/*name*
-Request Format   Refer to the `Permission Set Schema`_
-Response Format  Refer to the `Permission Set Schema`_ 
-Response Codes   | 200 - Operation was successful
-                 | 400 - Malformed request format
-                 | 401 - Not Authorized
-===============  ===================================
-
-
-Delete Permission Set: DELETE /permissions/*name*
---------------------------------------------------------------------------------------
-
-Deletes an ACM permission set
+Gets the json representation of a permission set.
 
 ===============  ===================================
 HTTP Method      GET
 URI              /permissions/*name*
 Request Format   N/A
+Response Format  Refer to the `Permission Set Schema`_ 
+Response Codes   | 200 - Operation was successful
+                 | 400 - Bad request
+                 | 401 - Not authorized
+                 | 404 - Not found
+===============  ===================================
+
+To request specific versions of the permission set schema, see "Versioning of Resource Representations".
+
+Delete Permission Set: DELETE /permissions/*name*
+--------------------------------------------------------------------------------------
+
+Deletes a permission set.
+
+===============  ===================================
+HTTP Method      DELETE
+URI              /permissions/*name*
+Request Format   N/A
 Response Format  N/A
 Response Codes   | 200 - Operation was successful
-                 | 401 - Not Authorized
+    			 | 400 - Bad request
+                 | 401 - Not authorized
+                 | 404 - Not found
 ===============  ===================================
+
+If the permission set to be deleted is referenced by an object, it cannot be deleted until that 
+reference ceases to exist. 
 
 
 Operations on Objects
@@ -417,7 +461,8 @@ Property                Type            Description
 ======================= ==============  ===================================
 id                      string          immutable identifier (not to be included in a request). 
                                         It is returned in the response.
-permission sets         Array[String]   names of permission sets allowed in this object.
+permission sets         Array[String]   names of permission sets allowed in this object. Currently,
+										the API only supports a single permission set.
 additionalInfo          object          optional - additional information this object.
 acl                     object          map of object permissions => set of users.
 meta                    object          meta information about this entity.
@@ -433,7 +478,7 @@ Example::
              "read_app": ["3749285", "4a9a8c60-0cb2-11e1-be50-0800200c9a66"],
              "update_app": ["3749285", "4a9a8c60-0cb2-11e1-be50-0800200c9a66"],
              "read_app_logs": ["3749285", "4a9a8c60-0cb2-11e1-be50-0800200c9a66", "g-d1682c64-040f-4511-85a9-62fcff3cbbe2"],
-            "read_service": ["3749285", "4a9a8c60-0cb2-11e1-be50-0800200c9a66"],
+             "read_service": ["3749285", "4a9a8c60-0cb2-11e1-be50-0800200c9a66"],
              "write_service": ["3749285", "4a9a8c60-0cb2-11e1-be50-0800200c9a66"]
        },
        "meta":{
@@ -454,8 +499,8 @@ URI              /objects
 Request Format   Refer to the `Object Schema`_
 Response Format  Refer to the `Object Schema`_ 
 Response Codes   | 200 - Operation was successful
-                 | 400 - Malformed request format
-                 | 401 - Not Authorized
+                 | 400 - Bad request
+                 | 401 - Not authorized
 ===============  ===================================
 
 The service responds with an instance of the object that was created.
@@ -463,7 +508,7 @@ The service responds with an instance of the object that was created.
 Complete Object Update: PUT /objects/*id*
 ------------------------------------------------------------------------------------
 
-Complete update of an ACM object.
+Complete update of an object.
 
 ===============  ===================================
 HTTP Method      PUT
@@ -471,9 +516,12 @@ URI              /objects/*id*
 Request Format   Refer to the `Object Schema`_
 Response Format  Refer to the `Object Schema`_ 
 Response Codes   | 200 - Operation was successful
-                 | 400 - Malformed request format
-                 | 401 - Not Authorized
+                 | 400 - Bad request
+                 | 401 - Not authorized
 ===============  ===================================
+
+The object update replaces all the properties of an object. The "id"
+property in the request is ignored. 
 
 The service responds with an instance of the object in its updated state.
 
@@ -496,8 +544,8 @@ Additional header  X-HTTP-Method-Override PATCH
 Request Format     Refer to the `Object Schema`_
 Response Format    Refer to the `Object Schema`_ 
 Response Codes     | 200 - Operation was successful
-                   | 400 - Malformed request format
-                   | 401 - Not Authorized
+                   | 400 - Bad request
+                   | 401 - Not authorized
 =================  ===================================
 
 The service responds with an instance of the object schema.
@@ -561,11 +609,13 @@ URI              /objects/*id*
 Request Format   N/A
 Response Format  Refer to the `Object Schema`_ 
 Response Codes   | 200 - Operation was successful
-                 | 400 - Malformed request format
-                 | 401 - Not Authorized
+                 | 400 - Bad request
+                 | 401 - Not authorized
 ===============  ===================================
 
-The service responds with the json for the entire object.
+The service responds with the json for the entire object. To request specific versions of the 
+object schema, see "Versioning of Resource Representations".
+
 
 
 List of Users that have access to an object: GET /objects/*id*/users
@@ -577,11 +627,11 @@ URI              /objects/*id*/users
 Request Format   N/A
 Response Format  As below
 Response Codes   | 200 - Operation was successful
-                 | 400 - Malformed request format
-                 | 401 - Not Authorized
+                 | 400 - Bad request
+                 | 401 - Not authorized
 ===============  ===================================
 
-The response for this request is something like
+The response for this request is something like::
 
     GET /objects/0a59970a-3cf1-44a5-996d-eed9c0fe1c1e/users
     Host: internal.vcap.acm.com
@@ -629,11 +679,11 @@ URI              /users/*user_id*
 Request Format   N/A
 Response Format  As below
 Response Codes   | 200 - Operation was successful
-                 | 400 - Malformed request format
-                 | 401 - Not Authorized
+                 | 400 - Bad request
+                 | 401 - Not authorized
 ===============  ===================================
 
-The response for this request is something like
+The response for this request is something like::
 
     GET /users/572be387-b3e2-446f-a34a-ac5967685706
     Host: internal.vcap.acm.com
@@ -656,22 +706,25 @@ The response for this request is something like
     }
 
 
-Add a User to an Object ACL with a permission: PUT /objects/*object_id*/acl/*permission*/*subject_id*
-----------------------------------------------------------------------------------------------------------
+Add a set of permissions for a subject to an object: PUT /objects/*object_id*/acl?id=*subject*&p=*permission1*,*permission2*
+-----------------------------------------------------------------------------------------------------------------------------
+
+Adds a subject *subject_id* to an ace for each permission *permission* on the object *object_id*.
 
 ===============  ==================================================
 HTTP Method      PUT
-URI              /objects/*object_id*/acl/*permission*/*subject_id*
+URI              /objects/*object_id*/acl?id=*subject*&p=*permission1*,*permission2*
 Request Format   N/A
 Response Format  Refer to the `Object Schema`_
 Response Codes   | 200 - Operation was successful
-                 | 400 - Malformed request format
-                 | 401 - Not Authorized
+                 | 400 - Bad request
+                 | 401 - Not authorized
+                 | 404 - Not found
 ===============  ==================================================
 
-For example
+For example::
 
-    PUT /objects/11c32e98-e9e4-43ca-8ac4-164ecbcb71b1/acl/delete_appspace/u-dc06aceb-ecde-45a4-ba96-7a7fbd866902
+    PUT /objects/11c32e98-e9e4-43ca-8ac4-164ecbcb71b1/access?id=u-dc06aceb-ecde-45a4-ba96-7a7fbd866902&p=read_appspace,write_appspace,delete_appspace
     Host: internal.vcap.acm.com
     Accept: application/json
     Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
@@ -696,6 +749,63 @@ For example
           ],
           "write_appspace":[
              "g-a0c16b18-8f66-4b2f-aa9a-ce590eeed13c",
+             "u-8cbcbf18-4ec9-40ce-a2af-058377c8c2b7",
+        	 "u-dc06aceb-ecde-45a4-ba96-7a7fbd866902"
+          ],
+          "delete_appspace":[
+             "u-dc06aceb-ecde-45a4-ba96-7a7fbd866902"
+          ]
+       },
+       "meta":{
+          "created":"2011-11-29 17:18:47 -0800",
+          "updated":"2011-11-29 17:18:47 -0800",
+          "schema":"urn:acm:schemas:1.0"
+       }
+    }
+
+
+Remove a set of permissions for a subject from an object: DELETE /objects/*object_id*/acl?id=*subject*&p=*permission1*,*permission2*
+-----------------------------------------------------------------------------------------------------------------------------
+
+Removes the specified permissions for that subject on that object
+
+===============  ==================================================
+HTTP Method      DELETE
+URI              /objects/*object_id*/acl?id=*subject*&p=*permission1*,*permission2*
+Request Format   N/A
+Response Format  Refer to the `Object Schema`_
+Response Codes   | 200 - Operation was successful
+                 | 400 - Bad request
+                 | 401 - Not authorized
+                 | 404 - Not found
+===============  ==================================================
+
+For example::
+
+    DELETE /objects/11c32e98-e9e4-43ca-8ac4-164ecbcb71b1/access?id=u-dc06aceb-ecde-45a4-ba96-7a7fbd866902&p=delete_appspace
+    Host: internal.vcap.acm.com
+    Accept: application/json
+    Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+
+    HTTP/1.1 200 OK
+    Content-Type: application/json
+
+    {
+       "name":"www_staging",
+       "permission_sets":[
+          "app_space"
+       ],
+       "id":"11c32e98-e9e4-43ca-8ac4-164ecbcb71b1",
+       "additionalInfo":"{component => cloud_controller}",
+       "acl":{
+          "read_appspace":[
+             "g-d0f42b1e-6d5b-4ea3-a15b-59c7320ec477",
+             "u-b3e5a4b8-39cb-4bbf-9884-94ba7a8b6eee",
+             "u-8cbcbf18-4ec9-40ce-a2af-058377c8c2b7",
+             "u-e2803726-5f04-4754-9f6c-c22fe27f4f92"
+          ],
+          "write_appspace":[
+             "g-a0c16b18-8f66-4b2f-aa9a-ce590eeed13c",
              "u-8cbcbf18-4ec9-40ce-a2af-058377c8c2b7"
           ],
           "delete_appspace":[
@@ -710,10 +820,11 @@ For example
     }
 
 
+
 Delete Object: DELETE /objects/*id*
 ------------------------------------------------------------------------------------
 
-Deletes an ACM object
+Deletes an object
 
 ===============  ===================================
 HTTP Method      DELETE
@@ -721,7 +832,8 @@ URI              /objects/*id*
 Request Format   N/A
 Response Format  N/A
 Response Codes   | 200 - Operation was successful
-                 | 401 - Not Authorized
+                 | 401 - Not authorized
+                 | 404 - Not found                 
 ===============  ===================================
 
 
@@ -762,7 +874,7 @@ Example::
 Create Group: POST /groups
 ------------------------------------------------------------------------------------
 
-Creates ACM group
+Creates a group
 
 ===============  ===================================
 HTTP Method      POST
@@ -770,15 +882,15 @@ URI              /groups
 Request Format   Refer to the `Group Schema`_
 Response Format  Refer to the `Group Schema`_ 
 Response Codes   | 200 - Operation was successful
-                 | 400 - Malformed request format
-                 | 401 - Not Authorized
+                 | 400 - Bad request
+                 | 401 - Not authorized
 ===============  ===================================
 
 
 Update Group: PUT /groups/*id*
 ------------------------------------------------------------------------------------
 
-Updates an ACM group
+Updates a group
 
 ===============  ===================================
 HTTP Method      PUT
@@ -786,18 +898,17 @@ URI              /groups/*id*
 Request Format   Refer to the `Group Schema`_
 Response Format  Refer to the `Group Schema`_ 
 Response Codes   | 200 - Operation was successful
-                 | 400 - Malformed request format
-                 | 401 - Not Authorized
+                 | 400 - Bad request
+                 | 401 - Not authorized
+                 | 404 - Not found                 
 ===============  ===================================
 
-See `partial update`_ for more information and alternate API possibilities 
-to add and remove members of a group.
-
+Replaces all the properties of a group. The "id" property is ignored.
 
 Add a user to a group: PUT /groups/*id*/users/*user_id*
 ------------------------------------------------------------------------------------
 
-Updates an ACM group
+Adds the user with the id *user_id* to the group *id*
 
 ===============  ===================================
 HTTP Method      PUT
@@ -805,15 +916,33 @@ URI              /groups/*id*/users/*user_id*
 Request Format   N/A
 Response Format  Refer to the `Group Schema`_
 Response Codes   | 200 - Operation was successful
-                 | 400 - Malformed request format
-                 | 401 - Not Authorized
+                 | 400 - Bad request
+                 | 401 - Not authorized
+                 | 404 - Not found
+===============  ===================================
+
+
+Remove a user from a group: DELETE /groups/*id*/users/*user_id*
+------------------------------------------------------------------------------------
+
+Removes the user with the id *user_id* from the group *id*
+
+===============  ===================================
+HTTP Method      DELETE
+URI              /groups/*id*/users/*user_id*
+Request Format   N/A
+Response Format  Refer to the `Group Schema`_
+Response Codes   | 200 - Operation was successful
+                 | 400 - Bad request
+                 | 401 - Not authorized
+                 | 404 - Not found
 ===============  ===================================
 
 
 Get Group: GET /groups/*id*
 ------------------------------------------------------------------------------------
 
-Gets an ACM group
+Gets a group
 
 ===============  ===================================
 HTTP Method      GET
@@ -821,15 +950,19 @@ URI              /groups/*id*
 Request Format   N/A
 Response Format  Refer to the `Group Schema`_ 
 Response Codes   | 200 - Operation was successful
-                 | 400 - Malformed request format
-                 | 401 - Not Authorized
+                 | 400 - Bad request
+                 | 401 - Not authorized
+                 | 404 - Not found
 ===============  ===================================
+
+The service responds with the json representation of the group. To request specific versions of the 
+group schema, see "Versioning of Resource Representations".
 
 
 Delete Group: DELETE /groups/*id*
 ------------------------------------------------------------------------------------
 
-Deletes an ACM group
+Deletes a group
 
 ===============  ===================================
 HTTP Method      DELETE
@@ -837,28 +970,33 @@ URI              /groups/*id*
 Request Format   N/A
 Response Format  N/A
 Response Codes   | 200 - Operation was successful
-                 | 401 - Not Authorized
+                 | 401 - Not authorized
 ===============  ===================================
 
+Deleting a group causes the group to be removed from all existing ACEs in any referencing
+objects.
 
 
 Access Control Checks
 =======================
 
-Check Access: GET /objects/*id*/access?id=*subject*&p=*permission1*&p=*permission2*
+Check Access: GET /objects/*id*/access?id=*subject*&p=*permission1*,*permission2*
 --------------------------------------------------------------------------------------------------------------------------------
 
-Checks Access of a subject (user/group) to an ACM object
+Checks Access of a subject (user/group) to an object
 
 ===============  ===================================
 HTTP Method      GET
-URI              /objects/*id*/access?id=*subject*&p=*permission1*&p=*permission2*
+URI              /objects/*id*/access?id=*subject*&p=*permission1*,*permission2*
 Request Format   N/A
 Response Format  See below
 Response Codes   | 200 - Operation was successful
-                 | 401 - Not Authorized
+                 | 401 - Not authorized
+                 | 404 - Not found
 ===============  ===================================
 
+If access is permitted for the subject on the object for each permission, HTTP 200
+is returned, else HTTP 401 is returned
 
 
 Batch Check Access: POST /objects/access
@@ -872,7 +1010,7 @@ URI              /objects/access
 Request Format   See below
 Response Format  See below
 Response Codes   | 200 - Operation was successful
-                 | 401 - Not Authorized
+                 | 401 - Not authorized
 ===============  ===================================
 
 Request format:: 
@@ -902,18 +1040,18 @@ Response format::
     ]
 
 
-Check Permissions: GET /objects/*id*/permissions?id=*subject*
+Check Permissions: GET /objects/*id*/acl/*subject*
 --------------------------------------------------------------------------------------------------------------
 
 Gets the permission set for the subject (user/group) on an object
 
 ===============  ===================================
 HTTP Method      GET
-URI              /objects/*id*/permissions?id=*subject*
+URI              /objects/*id*/acl/*subject*
 Request Format   N/A
 Response Format  N/A
 Response Codes   | 200 - Operation was successful
-                 | 401 - Not Authorized
+                 | 401 - Not authorized
 ===============  ===================================
 
 The method will return the following response if the subject (user/group) has some permissions on the
@@ -929,14 +1067,6 @@ If the subject does not have a permission, the API will return the following-:
         "permissions": [ ]
     }
 
-.. note:: 
-    DO: as noted in the `partial update`_ section, this API could also be expressed as
-    
-    GET /objects/*id*/acl/*subject*
-    
-    which would be much more natural if we supported that path for partial updates of
-    an ACL. 
-
 
 Batch Check Permissions: POST /objects/permissions
 ----------------------------------------------------------------------------------
@@ -949,7 +1079,7 @@ URI              /objects/permissions
 Request Format   See below
 Response Format  See below
 Response Codes   | 200 - Operation was successful
-                 | 401 - Not Authorized
+                 | 401 - Not authorized
 ===============  ===================================
 
 Request format:: 
@@ -985,7 +1115,7 @@ Example Requests and Responses
 Partial Updates to an Object: Delete User from ACL
 ----------------------------------------------------
 
-First get the whole object so we can inspect it and verify that the user is in there:
+First get the whole object so we can inspect it and verify that the user is referenced in the acl:
 
 ::
 
