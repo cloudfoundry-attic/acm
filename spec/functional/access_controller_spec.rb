@@ -76,7 +76,7 @@ describe ACM::Controller::ApiController do
     end
 
     it "will return a 200 if access is granted" do
-      get "/objects/#{@object[:id]}/access?id=#{@user2}&p=read_appspace&p=write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      get "/objects/#{@object[:id]}/access?id=#{@user2}&p=read_appspace,write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("get /objects/#{@object[:id]}/access last response #{last_response.inspect}")
       last_response.status.should eql(200)
 
@@ -96,64 +96,64 @@ describe ACM::Controller::ApiController do
 
     end
 
-    it "will return a 404 for an empty subject" do
-      get "/objects/#{@object[:id]}/access?p=read_appspace&p=write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+    it "will return a 400 for an empty subject" do
+      get "/objects/#{@object[:id]}/access?p=read_appspace,write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("get /objects/#{@object[:id]}/access last response #{last_response.inspect}")
-      last_response.status.should eql(404)
+      last_response.status.should eql(400)
 
     end
 
-    it "will return a 404 for no permissions" do
+    it "will return a 400 for no permissions" do
       get "/objects/#{@object[:id]}/access?id=#{@user1}", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("get /objects/#{@object[:id]}/access last response #{last_response.inspect}")
-      last_response.status.should eql(404)
+      last_response.status.should eql(400)
 
     end
 
-    it "will return a 404 for no subject or permissions" do
+    it "will return a 400 for no subject or permissions" do
       get "/objects/#{@object[:id]}/access", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("get /objects/#{@object[:id]}/access last response #{last_response.inspect}")
-      last_response.status.should eql(404)
+      last_response.status.should eql(400)
 
     end
 
     it "will return a 404 for permissions that do not exist" do
-      get "/objects/#{@object[:id]}/access?id=#{@user2}&p=read_appspace&p=some_random_permission", {}, { "CONTENT_TYPE" => "application/json" }
+      get "/objects/#{@object[:id]}/access?id=#{@user2}&p=read_appspace,some_random_permission", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("get /objects/#{@object[:id]}/access last response #{last_response.inspect}")
       last_response.status.should eql(404)
 
     end
 
     it "will return a 404 if there are existing permissions that do not apply to this user" do
-      get "/objects/#{@object[:id]}/access?id=#{@user2}&p=read_appspace&p=delete_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      get "/objects/#{@object[:id]}/access?id=#{@user2}&p=read_appspace,delete_appspace", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("get /objects/#{@object[:id]}/access last response #{last_response.inspect}")
       last_response.status.should eql(404)
 
     end
 
     it "will return a 404 for an object that does not exist" do
-      get "/objects/12345/access?id=#{@user1}&p=read_appspace&p=write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      get "/objects/12345/access?id=#{@user1}&p=read_appspace,write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("get /objects/12345/access last response #{last_response.inspect}")
       last_response.status.should eql(404)
 
     end
 
     it "will return a 404 for a user that does not exist" do
-      get "/objects/#{@object[:id]}/access?id=55555&p=read_appspace&p=write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      get "/objects/#{@object[:id]}/access?id=55555&p=read_appspace,write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("get /objects/#{@object[:id]}/access last response #{last_response.inspect}")
       last_response.status.should eql(404)
 
     end
 
     it "will return a 404 if the user is in one ace but not the other" do
-      get "/objects/#{@object[:id]}/access?id=#{@user1}&p=read_appspace&p=write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      get "/objects/#{@object[:id]}/access?id=#{@user1}&p=read_appspace,write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("get /objects/#{@object[:id]}/access last response #{last_response.inspect}")
       last_response.status.should eql(404)
 
     end
 
     it "will return a 404 if the user is in neither of the aces" do
-      get "/objects/#{@object[:id]}/access?id=44444&p=read_appspace&p=write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      get "/objects/#{@object[:id]}/access?id=44444&p=read_appspace,write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("get /objects/#{@object[:id]}/access last response #{last_response.inspect}")
       last_response.status.should eql(404)
 

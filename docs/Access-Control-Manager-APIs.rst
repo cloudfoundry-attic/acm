@@ -991,6 +991,7 @@ URI              /objects/*id*/access?id=*subject*&p=*permission1*,*permission2*
 Request Format   N/A
 Response Format  See below
 Response Codes   | 200 - Operation was successful
+                 | 400 - Bad Request
                  | 401 - Not authorized
                  | 404 - Not found
 ===============  ===================================

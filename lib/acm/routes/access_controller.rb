@@ -5,12 +5,16 @@ module ACM::Controller
   class ApiController < Sinatra::Base
 
     get '/objects/:object_id/access/?' do
-      #params ?id=1234&p=read_appspace&p=write_appspace
+      #params ?id=1234&p=read_appspace,write_appspace
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
 
       object_id = params[:object_id]
+      if(params[:id].nil? || params[:p].nil?)
+        @logger.error("check_access empty subject or permissions")
+        raise ACM::InvalidRequest.new("Could not find subject or permissions in the request")
+      end
       subject_id = params[:id]
-      permissions = params[:p]
+      permissions = params[:p].split(',')
       @logger.debug("Access check for object #{object_id} subject #{subject_id} permissions #{permissions.inspect}")
 
       return_code = 404
