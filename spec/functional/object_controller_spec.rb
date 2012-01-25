@@ -621,7 +621,7 @@ describe ACM::Controller::ApiController do
       @permission_set_service = ACM::Services::PermissionSetService.new()
 
       @permission_set_service.create_permission_set(:name => :app_space,
-                                                    :permissions => [:read_appspace, :write_appspace, :delete_appspace],
+                                                    :permissions => [:read_appspace, :write_appspace, :delete_appspace, :add_app_to_appspace, :remove_app_from_appspace],
                                                     :additional_info => "this is the permission set for the app space")
       @user1 = SecureRandom.uuid
       @user2 = SecureRandom.uuid
@@ -676,8 +676,8 @@ describe ACM::Controller::ApiController do
     it "should return an object with a new ace for a permission that does not exist in the object" do
       basic_authorize "admin", "password"
 
-      put "/objects/#{@object[:id]}/acl/delete_appspace/u-#{@user4}", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("put /objects/#{@object[:id]}/acl/delete_appspace/u-#{@user4} last response #{last_response.inspect}")
+      put "/objects/#{@object[:id]}/acl?id=u-#{@user4}&p=delete_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("put /objects/#{@object[:id]}/acl?id=u-#{@user4}&p=delete_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
@@ -691,11 +691,31 @@ describe ACM::Controller::ApiController do
       updated_object[:additionalInfo].should eql(@object[:additionalInfo])
     end
 
-    it "should return an object with an updated ace for a permission that exists in the object" do
+    it "should return an object with a new ace for a set of permissions that do not exist in the object" do
       basic_authorize "admin", "password"
 
-      put "/objects/#{@object[:id]}/acl/write_appspace/u-#{@user4}", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("put /objects/#{@object[:id]}/acl/write_appspace/u-#{@user4} last response #{last_response.inspect}")
+      put "/objects/#{@object[:id]}/acl?id=u-#{@user4}&p=delete_appspace,add_app_to_appspace,remove_app_from_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("put /objects/#{@object[:id]}/acl?id=u-#{@user4}&p=delete_appspace,add_app_to_appspace,remove_app_from_appspace last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
+
+      (updated_object[:acl][:delete_appspace].include? ("u-#{@user4}")).should be_true
+      (updated_object[:acl][:add_app_to_appspace].include? ("u-#{@user4}")).should be_true
+      (updated_object[:acl][:remove_app_from_appspace].include? ("u-#{@user4}")).should be_true
+      updated_object[:id].should eql(@object[:id])
+      updated_object[:permission_sets].should eql(@object[:permission_sets])
+      updated_object[:additionalInfo].should eql(@object[:additionalInfo])
+    end
+
+   it "should return an object with an updated ace for a permission that exists in the object" do
+      basic_authorize "admin", "password"
+
+      put "/objects/#{@object[:id]}/acl?id=u-#{@user4}&p=write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("put /objects/#{@object[:id]}/acl?id=u-#{@user4}&p=write_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
@@ -709,11 +729,31 @@ describe ACM::Controller::ApiController do
       updated_object[:additionalInfo].should eql(@object[:additionalInfo])
     end
 
+   it "should return an object with an updated ace for a set of permissions that exists on the object" do
+      basic_authorize "admin", "password"
+
+      put "/objects/#{@object[:id]}/acl?id=u-#{@user7}&p=read_appspace,write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("put /objects/#{@object[:id]}/acl?id=u-#{@user7}&p=read_appspace,write_appspace last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
+
+      (updated_object[:acl][:write_appspace].include? ("u-#{@user7}")).should be_true
+      (updated_object[:acl][:read_appspace].include? ("u-#{@user7}")).should be_true
+      updated_object[:id].should eql(@object[:id])
+      updated_object[:permission_sets].should eql(@object[:permission_sets])
+      updated_object[:additionalInfo].should eql(@object[:additionalInfo])
+    end
+
+
     it "should not return the same user twice in the ace if it already exists" do
       basic_authorize "admin", "password"
 
-      put "/objects/#{@object[:id]}/acl/read_appspace/u-#{@user1}", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("put /objects/#{@object[:id]}/acl/read_appspace/u-#{@user1} last response #{last_response.inspect}")
+      put "/objects/#{@object[:id]}/acl?id=u-#{@user1}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("put /objects/#{@object[:id]}/acl?id=u-#{@user1}&p=read_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
@@ -731,8 +771,8 @@ describe ACM::Controller::ApiController do
     it "should return an error for a permission that is not in the permission set" do
       basic_authorize "admin", "password"
 
-      put "/objects/#{@object[:id]}/acl/clobber_appspace/u-#{@user1}", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("put /objects/#{@object[:id]}/acl/clobber_appspace/u-#{@user1} last response #{last_response.inspect}")
+      put "/objects/#{@object[:id]}/acl?id=u-#{@user1}&p=clobber_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("put /objects/#{@object[:id]}/acl?id=u-#{@user1}&p=clobber_appspace last response #{last_response.inspect}")
       last_response.status.should eql(400)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
@@ -744,12 +784,29 @@ describe ACM::Controller::ApiController do
       error[:description].should include("Invalid request")
     end
 
+    it "should return an error if a single permission is not in the permission set" do
+      basic_authorize "admin", "password"
+
+      put "/objects/#{@object[:id]}/acl?id=u-#{@user1}&p=read_appspace,clobber_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("put /objects/#{@object[:id]}/acl?id=u-#{@user1}&p=read_appspace,clobber_appspace last response #{last_response.inspect}")
+      last_response.status.should eql(400)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      error = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
+
+      error[:code].should eql(1001)
+      error[:description].should include("Invalid request")
+    end
+
+
     it "should return an error for an object that does not exist" do
       basic_authorize "admin", "password"
 
       new_object_id = SecureRandom.uuid
-      put "/objects/#{new_object_id}/acl/read_appspace/u-#{@user1}", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("put /objects/#{new_object_id}/acl/read_appspace/u-#{@user1} last response #{last_response.inspect}")
+      put "/objects/#{new_object_id}/acl?id=u-#{@user1}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("put /objects/#{new_object_id}/acl?id=u-#{@user1}&p=read_appspace last response #{last_response.inspect}")
       last_response.status.should eql(404)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
@@ -765,8 +822,8 @@ describe ACM::Controller::ApiController do
       basic_authorize "admin", "password"
 
       new_user = SecureRandom.uuid
-      put "/objects/#{@object[:id]}/acl/read_appspace/u-#{new_user}", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("put /objects/#{@object[:id]}/acl/read_appspace/u-#{new_user} last response #{last_response.inspect}")
+      put "/objects/#{@object[:id]}/acl?id=u-#{new_user}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("put /objects/#{@object[:id]}/acl?id=u-#{new_user}&p=read_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
@@ -783,8 +840,8 @@ describe ACM::Controller::ApiController do
     it "should update the object if the subject is a group that exists" do
       basic_authorize "admin", "password"
 
-      put "/objects/#{@object[:id]}/acl/read_appspace/g-#{@group1}", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("put /objects/#{@object[:id]}/acl/read_appspace/g-#{@group1} last response #{last_response.inspect}")
+      put "/objects/#{@object[:id]}/acl?id=g-#{@group1}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("put /objects/#{@object[:id]}/acl?id=g-#{@group1}&p=read_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
@@ -801,8 +858,8 @@ describe ACM::Controller::ApiController do
     it "should update the object if the subject is a group that exists and already has the same permission" do
       basic_authorize "admin", "password"
 
-      put "/objects/#{@object[:id]}/acl/read_appspace/g-#{@group2}", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("put /objects/#{@object[:id]}/acl/read_appspace/g-#{@group2} last response #{last_response.inspect}")
+      put "/objects/#{@object[:id]}/acl?id=g-#{@group2}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("put /objects/#{@object[:id]}/acl?id=g-#{@group2}&p=read_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
@@ -821,8 +878,8 @@ describe ACM::Controller::ApiController do
       basic_authorize "admin", "password"
 
       new_group = SecureRandom.uuid
-      put "/objects/#{@object[:id]}/acl/read_appspace/g-#{new_group}", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("put /objects/#{@object[:id]}/acl/read_appspace/g-#{new_group} last response #{last_response.inspect}")
+      put "/objects/#{@object[:id]}/acl?id=g-#{new_group}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("put /objects/#{@object[:id]}/acl?id=g-#{new_group}&p=read_appspace last response #{last_response.inspect}")
       last_response.status.should eql(404)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")

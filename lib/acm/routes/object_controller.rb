@@ -74,12 +74,16 @@ module ACM::Controller
       object_json
     end
 
-    #Add a permission for a user to an ace
-    put '/objects/:object_id/acl/:permission/:subject_id' do
+    #Add permission(s) for a user to an acl
+    put '/objects/:object_id/acl' do
+      # PUT /objects/*object_id*/acl?id=*subject*&p=*permission1*,*permission2*
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
-      @logger.debug("PUT request for /objects/#{params[:object_id]}/acl/#{params[:permission]}/#{params[:subject_id]}")
+      @logger.debug("PUT request for /objects/#{params[:object_id]}/acl Params are #{params.inspect}")
 
-      @object_service.add_subject_to_ace(params[:object_id], params[:permission], params[:subject_id])
+      permissions_request = params[:p].split(',')
+      @logger.debug("Permissions requested #{permissions_request}")
+
+      @object_service.add_subjects_to_ace(params[:object_id], permissions_request, params[:id])
 
       object_json = @object_service.read_object(params[:object_id])
       @logger.debug("Modified object #{object_json.inspect}")

@@ -137,10 +137,18 @@ module ACM::Services
       map[key].nil? ? nil : map[key]
     end
 
-    def add_subject_to_ace(obj_id, permission, subject_id)
+    def add_subjects_to_ace(obj_id, permissions, subject_id)
 
       subject = get_subject(subject_id)
-      object = add_permission(obj_id, permission, subject[:id])
+      if(permissions.respond_to?(:each))
+        ACM::Config.db.transaction do
+          permissions.each { |permission|
+            object = add_permission(obj_id, permission, subject[:id])
+          }
+        end
+      else
+        object = add_permission(obj_id, permissions, subject[:id])
+      end
 
       object
     end
