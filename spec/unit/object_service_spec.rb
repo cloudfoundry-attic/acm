@@ -469,4 +469,75 @@ describe ACM::Services::ObjectService do
 
   end
 
+  describe "removing users from an object's ace" do
+
+    before (:each) do
+      @logger = ACM::Config.logger
+
+      @user1 = SecureRandom.uuid
+      @user2 = SecureRandom.uuid
+      @user3 = SecureRandom.uuid
+      @user4 = SecureRandom.uuid
+      @user5 = SecureRandom.uuid
+      @user6 = SecureRandom.uuid
+      @user7 = SecureRandom.uuid
+
+      @group1 = SecureRandom.uuid
+      @group2 = SecureRandom.uuid
+
+      group_json = @group_service.create_group(:id => @group1,
+                                              :additional_info => "Developer group",
+                                              :members => [@user3, @user4])
+
+      group = Yajl::Parser.parse(group_json, :symbolize_keys => true)
+
+      group_json = @group_service.create_group(:id => @group2,
+                                              :additional_info => "Another developer group",
+                                              :members => [@user5, @user6, @user7])
+
+      group = Yajl::Parser.parse(group_json, :symbolize_keys => true)
+
+      o_json = @object_service.create_object(:name => "www_staging",
+                                      :additional_info => {:description => :staging_app_space}.to_json(),
+                                      :permission_sets => [:app_space],
+                                      :acl => {
+                                        :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}", "g-#{@group2}"],
+                                        :write_appspace => ["u-#{@user2}", "g-#{@group1}"],
+                                        :delete_appspace => ["u-#{@user4}"]
+                                      })
+      @object = Yajl::Parser.parse(o_json, :symbolize_keys => true)
+    end
+
+    it "should correctly remove a user from an object's ace given a single permission" do
+      object_id = @object[:id]
+
+      o_json = @object_service.remove_subjects_from_ace(object_id, :read_appspace, @user1)
+
+      o_json.should_not be_nil
+      @updated_object_json = Yajl::Parser.parse(o_json, :symbolize_keys => true)
+      (@updated_object_json[:acl][:read_appspace].include? "u-#{@user1}").should_not be_true
+        
+      o_json = @object_service.remove_subjects_from_ace(object_id, :read_appspace, @user4)
+
+      o_json.should_not be_nil
+      @updated_object_json = Yajl::Parser.parse(o_json, :symbolize_keys => true)
+      (@updated_object_json[:acl][:read_appspace].include? "u-#{@user4}").should_not be_true
+
+
+    end
+    
+    it "should correctly remove a set of permissions from an object's ace given a single permission" do
+      object_id = @object[:id]
+
+      o_json = @object_service.remove_subjects_from_ace(object_id, [:read_appspace, :write_appspace], @user2)
+
+      o_json.should_not be_nil
+      @updated_object_json = Yajl::Parser.parse(o_json, :symbolize_keys => true)
+      (@updated_object_json[:acl][:read_appspace].include? "u-#{@user2}").should_not be_true
+      (@updated_object_json[:acl][:write_appspace].include? "u-#{@user2}").should_not be_true
+
+    end
+  end
+
 end
+

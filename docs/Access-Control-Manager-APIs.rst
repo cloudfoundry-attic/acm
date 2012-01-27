@@ -767,7 +767,7 @@ For example::
 Remove a set of permissions for a subject from an object: DELETE /objects/*object_id*/acl?id=*subject*&p=*permission1*,*permission2*
 -----------------------------------------------------------------------------------------------------------------------------
 
-Removes the specified permissions for that subject on that object
+Removes the specified permissions for the subject *subject* on the object *object_id*
 
 ===============  ==================================================
 HTTP Method      DELETE

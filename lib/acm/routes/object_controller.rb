@@ -74,18 +74,43 @@ module ACM::Controller
       object_json
     end
 
-    #Add permission(s) for a user to an acl
+    #Add permission(s) for a subject to an object's acl
     put '/objects/:object_id/acl' do
       # PUT /objects/*object_id*/acl?id=*subject*&p=*permission1*,*permission2*
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
       @logger.debug("PUT request for /objects/#{params[:object_id]}/acl Params are #{params.inspect}")
 
       permissions_request = params[:p].split(',')
-      @logger.debug("Permissions requested #{permissions_request}")
+      @logger.debug("Permissions requested #{permissions_request.inspect}")
 
-      @object_service.add_subjects_to_ace(params[:object_id], permissions_request, params[:id])
+      object_json = @object_service.add_subjects_to_ace(params[:object_id], permissions_request, params[:id])
 
-      object_json = @object_service.read_object(params[:object_id])
+      @logger.debug("Modified object #{object_json.inspect}")
+
+      #Set the Location response header
+      object = Yajl::Parser.parse(object_json, :symbolize_keys => true)
+      headers "Location" => "#{request.scheme}://#{request.host_with_port}/objects/#{object[:id]}"
+
+      object_json
+    end
+
+    #Remove permissions for a subject from an object's acl
+    delete '/objects/:object_id/acl' do 
+      # DELETE /objects/*object_id*/acl?id=*subject*&p=*permission1*,*permission2*
+      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      @logger.debug("DELETE request for /objects/#{params[:object_id]}/acl Params are #{params.inspect}")
+
+      permissions_request = params[:p].split(',')
+      @logger.debug("Permissions requested to be removed are #{permissions_request.inspect}")
+
+      subject = params[:id]
+      if(subject.start_with?("u-") || subject.start_with?("g-"))
+        subject = subject[2..subject.length]
+        @logger.debug("Stripping subject of prefix #{subject}")
+      end
+
+      object_json = @object_service.remove_subjects_from_ace(params[:object_id], permissions_request, subject)
+
       @logger.debug("Modified object #{object_json.inspect}")
 
       #Set the Location response header

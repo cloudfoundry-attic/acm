@@ -694,8 +694,8 @@ describe ACM::Controller::ApiController do
     it "should return an object with a new ace for a set of permissions that do not exist in the object" do
       basic_authorize "admin", "password"
 
-      put "/objects/#{@object[:id]}/acl?id=u-#{@user4}&p=delete_appspace,add_app_to_appspace,remove_app_from_appspace", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("put /objects/#{@object[:id]}/acl?id=u-#{@user4}&p=delete_appspace,add_app_to_appspace,remove_app_from_appspace last response #{last_response.inspect}")
+      delete "/objects/#{@object[:id]}/acl?id=u-#{@user2}&p=read_appspace,write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("delete /objects/#{@object[:id]}/acl?id=u-#{@user2}&p=read_appspace,write_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
@@ -703,13 +703,65 @@ describe ACM::Controller::ApiController do
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
 
-      (updated_object[:acl][:delete_appspace].include? ("u-#{@user4}")).should be_true
-      (updated_object[:acl][:add_app_to_appspace].include? ("u-#{@user4}")).should be_true
-      (updated_object[:acl][:remove_app_from_appspace].include? ("u-#{@user4}")).should be_true
+      (updated_object[:acl][:read_appspace].include? ("u-#{@user2}")).should_not be_true
+      (updated_object[:acl][:write_appspace].include? ("u-#{@user2}")).should_not be_true
+      updated_object[:id].should eql(@object[:id])
+      updated_object[:permission_sets].should eql(@object[:permission_sets])
+      updated_object[:additionalInfo].should eql(@object[:additionalInfo])
+   end
+
+   it "should remove an ace for a subject when a permission has been deleted" do
+      basic_authorize "admin", "password"
+
+      delete "/objects/#{@object[:id]}/acl?id=u-#{@user1}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("delete /objects/#{@object[:id]}/acl?id=u-#{@user1}&p=read_appspace last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
+
+      (updated_object[:acl][:read_appspace].include? ("u-#{@user1}")).should_not be_true
       updated_object[:id].should eql(@object[:id])
       updated_object[:permission_sets].should eql(@object[:permission_sets])
       updated_object[:additionalInfo].should eql(@object[:additionalInfo])
     end
+
+    it "should remove the required aces for a subject when a set of permission has been deleted" do
+      basic_authorize "admin", "password"
+
+      delete "/objects/#{@object[:id]}/acl?id=u-#{@user1}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("delete /objects/#{@object[:id]}/acl?id=u-#{@user1}&p=read_appspace last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
+
+      (updated_object[:acl][:read_appspace].include? ("u-#{@user1}")).should_not be_true
+      updated_object[:id].should eql(@object[:id])
+      updated_object[:permission_sets].should eql(@object[:permission_sets])
+      updated_object[:additionalInfo].should eql(@object[:additionalInfo])
+    end
+
+    it "should return an error when trying to remove a non-existent permission" do
+      basic_authorize "admin", "password"
+
+      delete "/objects/#{@object[:id]}/acl?id=u-#{@user4}&p=delete_appspace,add_app_to_appspace,remove_app_from_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("delete /objects/#{@object[:id]}/acl?id=u-#{@user4}&p=delete_appspace,add_app_to_appspace,remove_app_from_appspace last response #{last_response.inspect}")
+
+      last_response.status.should eql(400)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
+
+      body[:code].should eql(1001)
+      body[:description].should include("Could not find an access control entry")
+   end
 
    it "should return an object with an updated ace for a permission that exists in the object" do
       basic_authorize "admin", "password"
