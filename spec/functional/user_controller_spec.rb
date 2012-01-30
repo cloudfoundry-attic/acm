@@ -10,6 +10,28 @@ describe ACM::Controller::ApiController do
     @app ||= ACM::Controller::RackController.new
   end
 
+  describe "creating a user" do 
+    before(:each) do
+      @logger = ACM::Config.logger
+    end
+
+    it "should create a user with the correct id" do
+      basic_authorize "admin", "password"
+
+      user_id = SecureRandom.uuid
+
+      get "/users/#{user_id}"
+      @logger.debug("get /users/#{user_id} last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+      user = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      user[:id].should eql(user_id)
+      user[:groups].should be_nil
+    end
+
+  end
+
   describe "getting user information" do
 
     before(:each) do
