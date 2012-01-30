@@ -323,7 +323,7 @@ describe ACM::Controller::ApiController do
     it "should not create a user that does not exist and return the updated group" do
       basic_authorize "admin", "password"
 
-      put "/groups/#{@group1}/users/#{@user4}", {}, { "CONTENT_TYPE" => "application/json" }
+      put "/groups/#{@group1}/members/#{@user4}", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(404)
 
@@ -340,7 +340,7 @@ describe ACM::Controller::ApiController do
     it "should add the user to the group and return the updated group" do
       basic_authorize "admin", "password"
 
-      put "/groups/#{@group1}/users/#{@user5}", {}, { "CONTENT_TYPE" => "application/json" }
+      put "/groups/#{@group1}/members/#{@user5}", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(200)
 
@@ -359,7 +359,7 @@ describe ACM::Controller::ApiController do
       basic_authorize "admin", "password"
 
       new_group = SecureRandom.uuid
-      put "/groups/#{new_group}/users/#{@user5}", {}, { "CONTENT_TYPE" => "application/json" }
+      put "/groups/#{new_group}/members/#{@user5}", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(404)
 

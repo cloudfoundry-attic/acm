@@ -905,14 +905,14 @@ Response Codes   | 200 - Operation was successful
 
 Replaces all the properties of a group. The "id" property is ignored.
 
-Add a user to a group: PUT /groups/*id*/users/*user_id*
+Add a user to a group: PUT /groups/*id*/members/*user_id*
 ------------------------------------------------------------------------------------
 
 Adds the user with the id *user_id* to the group *id*
 
 ===============  ===================================
 HTTP Method      PUT
-URI              /groups/*id*/users/*user_id*
+URI              /groups/*id*/members/*user_id*
 Request Format   N/A
 Response Format  Refer to the `Group Schema`_
 Response Codes   | 200 - Operation was successful
@@ -922,14 +922,14 @@ Response Codes   | 200 - Operation was successful
 ===============  ===================================
 
 
-Remove a user from a group: DELETE /groups/*id*/users/*user_id*
+Remove a user from a group: DELETE /groups/*id*/members/*user_id*
 ------------------------------------------------------------------------------------
 
 Removes the user with the id *user_id* from the group *id*
 
 ===============  ===================================
 HTTP Method      DELETE
-URI              /groups/*id*/users/*user_id*
+URI              /groups/*id*/members/*user_id*
 Request Format   N/A
 Response Format  Refer to the `Group Schema`_
 Response Codes   | 200 - Operation was successful

@@ -60,9 +60,9 @@ module ACM::Controller
       group_json
     end
 
-    put '/groups/:group_id/users/:user_id' do
+    put '/groups/:group_id/members/:user_id' do
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
-      @logger.debug("PUT request for /groups/#{params[:group_id]}/users/#{params[:user_id]}")
+      @logger.debug("PUT request for /groups/#{params[:group_id]}/members/#{params[:user_id]}")
 
       updated_group = @group_service.add_user_to_group(params[:group_id], params[:user_id])
 
@@ -73,9 +73,9 @@ module ACM::Controller
       updated_group
     end
 
-    delete '/groups/:group_id/users/:user_id' do
+    delete '/groups/:group_id/members/:user_id' do
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
-      @logger.debug("DELETE request for /groups/#{params[:group_id]}/users/#{params[:user_id]}")
+      @logger.debug("DELETE request for /groups/#{params[:group_id]}/members/#{params[:user_id]}")
 
       updated_group = @group_service.remove_user_from_group(params[:group_id], params[:user_id])
 
