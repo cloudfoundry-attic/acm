@@ -182,8 +182,11 @@ describe ACM::Services::ObjectService do
       @user_service.create_user(:id => @user2)
       @user3 = SecureRandom.uuid
       @user4 = SecureRandom.uuid
+      @user_service.create_user(:id => @user4)
       @user5 = SecureRandom.uuid
+      @user_service.create_user(:id => @user5)
       @user6 = SecureRandom.uuid
+      @user_service.create_user(:id => @user6)
 
       @group1 = SecureRandom.uuid
       @group_service.create_group(:id => @group1, :members => [@user1])
@@ -220,8 +223,12 @@ describe ACM::Services::ObjectService do
       @user_service.create_user(:id => @user2)
       @user3 = SecureRandom.uuid
       @user4 = SecureRandom.uuid
+      @user_service.create_user(:id => @user4)
       @user5 = SecureRandom.uuid
+      @user_service.create_user(:id => @user5)
       @user6 = SecureRandom.uuid
+      @user_service.create_user(:id => @user6)
+
 
       @group1 = SecureRandom.uuid
       @group_service.create_group(:id => @group1, :members => [@user1])
@@ -419,10 +426,15 @@ describe ACM::Services::ObjectService do
       @user1 = SecureRandom.uuid
       @user2 = SecureRandom.uuid
       @user3 = SecureRandom.uuid
+      @user_service.create_user(:id => @user3)
       @user4 = SecureRandom.uuid
+      @user_service.create_user(:id => @user4)
       @user5 = SecureRandom.uuid
+      @user_service.create_user(:id => @user5)
       @user6 = SecureRandom.uuid
+      @user_service.create_user(:id => @user6)
       @user7 = SecureRandom.uuid
+      @user_service.create_user(:id => @user7)
 
       @group1 = SecureRandom.uuid
       @group2 = SecureRandom.uuid
@@ -477,10 +489,16 @@ describe ACM::Services::ObjectService do
       @user1 = SecureRandom.uuid
       @user2 = SecureRandom.uuid
       @user3 = SecureRandom.uuid
+      @user_service.create_user(:id => @user3)
       @user4 = SecureRandom.uuid
+      @user_service.create_user(:id => @user4)
       @user5 = SecureRandom.uuid
+      @user_service.create_user(:id => @user5)
       @user6 = SecureRandom.uuid
+      @user_service.create_user(:id => @user6)
       @user7 = SecureRandom.uuid
+      @user_service.create_user(:id => @user7)
+
 
       @group1 = SecureRandom.uuid
       @group2 = SecureRandom.uuid

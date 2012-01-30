@@ -73,6 +73,18 @@ module ACM::Controller
       updated_group
     end
 
+    delete '/groups/:group_id/users/:user_id' do
+      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      @logger.debug("DELETE request for /groups/#{params[:group_id]}/users/#{params[:user_id]}")
+
+      updated_group = @group_service.remove_user_from_group(params[:group_id], params[:user_id])
+
+      @logger.debug("Updated group #{updated_group.inspect}")
+      parsed_group = Yajl::Parser.parse(updated_group, :symbolize_keys => true)
+      headers "Location" => "#{request.scheme}://#{request.host_with_port}/groups/#{parsed_group[:id]}"
+
+      updated_group
+    end
   end
 
 end

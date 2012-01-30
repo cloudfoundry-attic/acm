@@ -44,9 +44,8 @@ module ACM::Services
                   begin
                     user = ACM::Models::Subjects.filter(:immutable_id => member).first()
                     if(user.nil?)
-                      @logger.debug("Could not find user #{member}. Creating the user")
-                      user = ACM::Models::Subjects.new(:immutable_id => member, :type => :user.to_s)
-                      user.save
+                      @logger.error("Could not find user #{member}.")
+                      raise ACM::ObjectNotFound.new("User #{member}")
                     end
                     group.add_member(:user_id => user.id)
                   end
@@ -61,8 +60,8 @@ module ACM::Services
           if e.kind_of?(ACM::ACMError)
             raise e
           else
-            @logger.info("Failed to create a user #{e}")
-            @logger.debug("Failed to create a user #{e.backtrace.inspect}")
+            @logger.info("Failed to create a group #{e}")
+            @logger.debug("Failed to create a group #{e.backtrace.inspect}")
             raise ACM::SystemInternalError.new()
           end
         end
@@ -95,7 +94,7 @@ module ACM::Services
     # @params user_id - Id of the user to be added
     # @returns the modified group as json
     def add_user_to_group(group_id, user_id)
-      @logger.debug("find_group parameters #{group_id.inspect}")
+      @logger.debug("find_group parameters #{group_id.inspect} #{user_id}")
       group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
 
       if(group.nil?)
@@ -115,9 +114,8 @@ module ACM::Services
       end
 
       if (user.nil?)
-        @logger.debug("Could not find user #{user_id}. Creating the user")
-        user_json = @user_service.create_user(:id => user_id)
-        user = ACM::Models::Subjects.filter(:immutable_id => user_id, :type => :user.to_s).first()
+        @logger.error("Could not find user #{user_id}")
+        raise ACM::ObjectNotFound.new("User #{user_id}")
       end
 
       #Is the user already a member of the group?
@@ -133,6 +131,52 @@ module ACM::Services
       @logger.debug("Updated group #{group.inspect}")
       group.to_json
     end
+
+    # removes a user from a group
+    # @params group_id - Group id
+    # @params user_id - Id of the user to be added
+    # @returns the modified group as json
+    def remove_user_from_group(group_id, user_id)
+      @logger.debug("remove_user_from_group parameters #{group_id.inspect} #{user_id.inspect}")
+      group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
+
+      if(group.nil?)
+        @logger.error("Could not group user with id #{group_id.inspect}")
+        raise ACM::ObjectNotFound.new("#{group_id.inspect}")
+      else
+        @logger.debug("Found group #{group.inspect}")
+      end
+
+      user = nil
+      begin
+        user = ACM::Models::Subjects.filter(:immutable_id => user_id, :type => :user.to_s).first()
+        @logger.debug("Found user to be removed #{user.inspect}")
+      rescue => e
+        @logger.error("Internal error #{e.message}")
+        raise ACM::SystemInternalError.new()
+      end
+
+      if (user.nil?)
+        @logger.debug("Could not find user #{user_id}. Creating the user")
+        raise ACM::ObjectNotFound.new("User #{user_id}")
+      end
+
+      member = nil
+      begin
+        member = ACM::Models::Members.filter(:user_id => user.id).first()
+        @logger.debug("User is a member #{member.inspect}")
+      rescue => e
+        @logger.error("Internal error #{e.message}")
+        raise ACM::SystemInternalError.new()
+      end
+
+      group.remove_member(member)
+
+      group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
+      @logger.debug("Updated group #{group.inspect}")
+      group.to_json
+    end
+
 
     # adds a user to a group
     # @params group_id - Id of the group to be deleted

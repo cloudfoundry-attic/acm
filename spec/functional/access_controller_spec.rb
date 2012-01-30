@@ -24,13 +24,22 @@ describe ACM::Controller::ApiController do
       @permission_set_service.create_permission_set(:name => :app_space,
                                                     :permissions => [:read_appspace, :write_appspace, :delete_appspace],
                                                     :additional_info => "this is the permission set for the app space")
+      @user_service = ACM::Services::UserService.new()
       @user1 = SecureRandom.uuid
       @user2 = SecureRandom.uuid
       @user3 = SecureRandom.uuid
+      @user_service.create_user(:id => @user3)
       @user4 = SecureRandom.uuid
+      @user_service.create_user(:id => @user4)
       @user5 = SecureRandom.uuid
+      @user_service.create_user(:id => @user5)
       @user6 = SecureRandom.uuid
+      @user_service.create_user(:id => @user6)
       @user7 = SecureRandom.uuid
+      @user_service.create_user(:id => @user7)
+      @user8 = SecureRandom.uuid
+      @user_service.create_user(:id => @user8)
+
 
       @group1 = SecureRandom.uuid
       @group2 = SecureRandom.uuid

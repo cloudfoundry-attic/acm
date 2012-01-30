@@ -13,9 +13,13 @@ describe ACM::Services::GroupService do
     @group1 = SecureRandom.uuid
 
     @user1 = SecureRandom.uuid
+    @user_service.create_user(:id => @user1)
     @user2 = SecureRandom.uuid
+    @user_service.create_user(:id => @user2)
     @user3 = SecureRandom.uuid
+    @user_service.create_user(:id => @user3)
     @user4 = SecureRandom.uuid
+    @user_service.create_user(:id => @user4)
 
     @logger = ACM::Config.logger
   end
@@ -110,6 +114,7 @@ describe ACM::Services::GroupService do
       group = Yajl::Parser.parse(group_json, :symbolize_keys => true)
 
       new_user = SecureRandom.uuid
+      @user_service.create_user(:id => new_user)
       new_group_json = @group_service.add_user_to_group(group[:id], new_user)
       new_group = Yajl::Parser.parse(new_group_json, :symbolize_keys => true)
 
@@ -118,4 +123,31 @@ describe ACM::Services::GroupService do
 
   end
 
+  describe "removing a member from a group" do
+
+    it "should work with the remove_user_from_group api" do
+      group_json = @group_service.create_group(:id => @group1,
+                                              :additional_info => "Developer group",
+                                              :members => [@user1, @user2, @user3, @user4])
+      group = Yajl::Parser.parse(group_json, :symbolize_keys => true)
+
+      new_group_json = @group_service.remove_user_from_group(group[:id], @user4)
+      new_group = Yajl::Parser.parse(new_group_json, :symbolize_keys => true)
+
+      (new_group[:members].include? (@user4)).should be_false
+    end
+
+    it "should not be possible to remove a member that does not exist in the group" do
+      group_json = @group_service.create_group(:id => @group1,
+                                              :additional_info => "Developer group",
+                                              :members => [@user1, @user2, @user3, @user4])
+      group = Yajl::Parser.parse(group_json, :symbolize_keys => true)
+
+      new_user = SecureRandom.uuid
+      lambda {
+        new_group_json = @group_service.remove_user_from_group(group[:id], new_user)
+      }.should raise_error
+    end
+
+  end
 end

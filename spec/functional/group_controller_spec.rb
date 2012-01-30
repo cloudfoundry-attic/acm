@@ -57,14 +57,18 @@ describe ACM::Controller::ApiController do
   describe "when creating a new group" do
 
     before(:each) do
+      @user_service = ACM::Services::UserService.new()
       @user1 = SecureRandom.uuid
+      @user_service.create_user(:id => @user1)
       @user2 = SecureRandom.uuid
+      @user_service.create_user(:id => @user2)
       @user3 = SecureRandom.uuid
+      @user_service.create_user(:id => @user3)
       @user4 = SecureRandom.uuid
+      @user_service.create_user(:id => @user4)
 
       @group1 = SecureRandom.uuid
 
-      @user_service = ACM::Services::UserService.new()
       @group_service = ACM::Services::GroupService.new()
 
     end
@@ -171,14 +175,18 @@ describe ACM::Controller::ApiController do
   describe "when requesting a group" do
 
     before(:each) do
+      @user_service = ACM::Services::UserService.new()
       @user1 = SecureRandom.uuid
+      @user_service.create_user(:id => @user1)
       @user2 = SecureRandom.uuid
+      @user_service.create_user(:id => @user2)
       @user3 = SecureRandom.uuid
+      @user_service.create_user(:id => @user3)
       @user4 = SecureRandom.uuid
+      @user_service.create_user(:id => @user4)
 
       @group1 = SecureRandom.uuid
 
-      @user_service = ACM::Services::UserService.new()
       @group_service = ACM::Services::GroupService.new()
 
     end
@@ -226,10 +234,15 @@ describe ACM::Controller::ApiController do
 
   describe "when deleting a group" do
     before(:each) do
+      @user_service = ACM::Services::UserService.new()
       @user1 = SecureRandom.uuid
+      @user_service.create_user(:id => @user1)
       @user2 = SecureRandom.uuid
+      @user_service.create_user(:id => @user2)
       @user3 = SecureRandom.uuid
+      @user_service.create_user(:id => @user3)
       @user4 = SecureRandom.uuid
+      @user_service.create_user(:id => @user4)
 
       @group1 = SecureRandom.uuid
 
@@ -264,12 +277,18 @@ describe ACM::Controller::ApiController do
   describe "when adding a user to a group" do
 
     before(:each) do
+      @user_service = ACM::Services::UserService.new()
       @user1 = SecureRandom.uuid
+      @user_service.create_user(:id => @user1)
       @user2 = SecureRandom.uuid
+      @user_service.create_user(:id => @user2)
       @user3 = SecureRandom.uuid
+      @user_service.create_user(:id => @user3)
       @user4 = SecureRandom.uuid
       @user5 = SecureRandom.uuid
+      @user_service.create_user(:id => @user5)
       @user6 = SecureRandom.uuid
+      @user_service.create_user(:id => @user6)
 
       @group1 = SecureRandom.uuid
 
@@ -301,22 +320,21 @@ describe ACM::Controller::ApiController do
 
     end
 
-    it "should create a user that does not exist and return the updated group" do
+    it "should not create a user that does not exist and return the updated group" do
       basic_authorize "admin", "password"
 
       put "/groups/#{@group1}/users/#{@user4}", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("post /groups last response #{last_response.inspect}")
-      last_response.status.should eql(200)
+      last_response.status.should eql(404)
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
-      last_response.original_headers["Location"].should eql("http://example.org/groups/#{body[:id]}")
+      last_response.status.should eql(404)
 
-      body[:id].to_s.should eql(@group1_data[:id].to_s)
-      (body[:members].include? ("#{@user4}")).should be_true
-      body[:additionalInfo].should eql(@group1_data[:additionalInfo])
-      body[:meta][:created].should_not be_nil
-      body[:meta][:updated].should_not be_nil
-      body[:meta][:schema].should eql("urn:acm:schemas:1.0")
+      error = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
+
+      error[:code].should eql(1000)
+      error[:description].should include("not found")
     end
 
     it "should add the user to the group and return the updated group" do
