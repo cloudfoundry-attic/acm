@@ -370,6 +370,64 @@ describe ACM::Controller::ApiController do
       error[:description].should include("not found")
     end
 
+  end
+
+  describe "when updating a group" do
+
+    before(:each) do
+      @user_service = ACM::Services::UserService.new()
+      @user1 = SecureRandom.uuid
+      @user_service.create_user(:id => @user1)
+      @user2 = SecureRandom.uuid
+      @user_service.create_user(:id => @user2)
+      @user3 = SecureRandom.uuid
+      @user_service.create_user(:id => @user3)
+      @user4 = SecureRandom.uuid
+      @user5 = SecureRandom.uuid
+      @user_service.create_user(:id => @user5)
+      @user6 = SecureRandom.uuid
+      @user_service.create_user(:id => @user6)
+
+      @group1 = SecureRandom.uuid
+
+      @group_service = ACM::Services::GroupService.new()
+
+      @group1_data = {
+        :id => @group1,
+        :additional_info => "Developer group",
+        :members => [@user1, @user2, @user3]
+      }
+
+      basic_authorize "admin", "password"
+      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => @group1_data.to_json() }
+      @logger.debug("post /groups last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+
+    end
+
+    it "should be able to replace all the properties of the group" do
+      basic_authorize "admin", "password"
+      updated_group_data = {
+        :id => @group1,
+        :additional_info => "Updated Developer group",
+        :members => [@user5]
+      }
+
+      put "/groups/#{@group1}", {}, { "CONTENT_TYPE" => "application/json", :input => updated_group_data.to_json() }
+      @logger.debug("put /groups last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/groups/#{body[:id]}")
+
+      body[:id].to_s.should eql(@group1_data[:id].to_s)
+      body[:members].should eql ([@user5])
+      body[:additionalInfo].should eql(updated_group_data[:additionalInfo])
+      body[:meta][:created].should_not be_nil
+      body[:meta][:updated].should_not be_nil
+      body[:meta][:schema].should eql("urn:acm:schemas:1.0")
+
+    end
 
   end
 

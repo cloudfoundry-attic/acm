@@ -70,6 +70,64 @@ module ACM::Services
       group.to_json()
     end
 
+    def update_group(opts = {})
+      @logger.debug("update_group parameters #{opts.inspect}")
+
+      if(opts[:id].nil?)
+        @logger.error("Empty group id to update")
+        raise ACM::InvalidRequest.new("Empty group id")
+      end
+
+      group = ACM::Models::Subjects.filter(:immutable_id => opts[:id], :type => :group.to_s).first()
+
+      if(group.nil?)
+        @logger.error("Could not find group with id #{group_id.inspect}")
+        raise ACM::ObjectNotFound.new("#{group_id.inspect}")
+      else
+        @logger.debug("Found group #{group.inspect}")
+      end
+      
+      begin
+        ACM::Config.db.transaction do
+          group[:additional_info] = opts[:additional_info]
+          group.remove_all_members()
+          if(!opts[:members].nil?)
+            members = opts[:members]
+            if(members.kind_of?(Array))
+              members.each {|member|
+                if(!member.nil?)
+                  begin
+                    user = ACM::Models::Subjects.filter(:immutable_id => member).first()
+                    if(user.nil?)
+                      @logger.error("Could not find user #{member}.")
+                      raise ACM::ObjectNotFound.new("User #{member}")
+                    end
+                    group.add_member(:user_id => user.id)
+                  end
+                end
+              }
+            else
+              @logger.error("Failed to update the group. members must be an array")
+              raise ACM::InvalidRequest.new("Failed to update the group. members must be an array")
+            end
+          end
+
+          group.save
+        end
+      rescue => e
+        if e.kind_of?(ACM::ACMError)
+          raise e
+        else
+          @logger.info("Failed to update a group #{e}")
+          @logger.debug("Failed to update a group #{e.backtrace.inspect}")
+          raise ACM::SystemInternalError.new()
+        end
+      end
+
+      group = ACM::Models::Subjects.filter(:immutable_id => opts[:id], :type => :group.to_s).first()
+      group.to_json()
+    end
+
 
     # finds the group given the group id
     # @params group_id - Group id
@@ -79,7 +137,7 @@ module ACM::Services
       group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
 
       if(group.nil?)
-        @logger.error("Could not group user with id #{group_id.inspect}")
+        @logger.error("Could not find group with id #{group_id.inspect}")
         raise ACM::ObjectNotFound.new("#{group_id.inspect}")
       else
         @logger.debug("Found group #{group.inspect}")

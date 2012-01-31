@@ -150,4 +150,87 @@ describe ACM::Services::GroupService do
     end
 
   end
+
+
+  describe "updating a group" do 
+
+    before(:each) do
+      group_json = @group_service.create_group(:id => @group1,
+                                              :additional_info => "Developer group",
+                                              :members => [@user1, @user2, @user3, @user4])
+      group = Yajl::Parser.parse(group_json, :symbolize_keys => true)
+
+    end
+    
+    it "should be able to replace all the properties of an existing group" do 
+      new_group_json = @group_service.update_group(:id => @group1,
+                                                   :additional_info => "Updated Developer group",
+                                                   :members => [@user1])
+
+      updated_group = Yajl::Parser.parse(new_group_json, :symbolize_keys => true)
+      updated_group[:additional_info].should eql("Updated Developer group")
+      updated_group[:members].should eql([@user1])
+      updated_group[:id].should eql(@group1)
+   
+    end
+
+    it "should be able to replace the group with an empty one" do 
+      new_group_json = @group_service.update_group(:id => @group1)
+
+      updated_group = Yajl::Parser.parse(new_group_json, :symbolize_keys => true)
+      updated_group[:additional_info].should be_nil
+      updated_group[:members].should be_nil
+      updated_group[:id].should eql(@group1)
+
+    end
+
+    it "should be able to replace the group with nil members or other fields" do 
+      new_group_json = @group_service.update_group(:id => @group1,
+                                                   :additional_info => nil,
+                                                   :members => nil)
+
+
+      updated_group = Yajl::Parser.parse(new_group_json, :symbolize_keys => true)
+      updated_group[:additional_info].should be_nil
+      updated_group[:members].should be_nil
+      updated_group[:id].should eql(@group1)
+
+    end
+
+    it "should be able to replace the group with nil members or other fields" do 
+      new_group_json = @group_service.update_group(:id => @group1,
+                                                   :additional_info => "",
+                                                   :members => [])
+
+      updated_group = Yajl::Parser.parse(new_group_json, :symbolize_keys => true)
+      updated_group[:additional_info].should eql("")
+      updated_group[:members].should be_nil
+      updated_group[:id].should eql(@group1)
+
+    end
+
+    it "should be able to replace the group with nil members or other fields" do 
+      new_group_json = @group_service.update_group(:id => @group1,
+                                                   :additional_info => "",
+                                                   :members => [nil])
+
+      updated_group = Yajl::Parser.parse(new_group_json, :symbolize_keys => true)
+      updated_group[:additional_info].should eql("")
+      updated_group[:members].should be_nil
+      updated_group[:id].should eql(@group1)
+
+    end
+    
+    it "should raise an error for a group that does not exist" do 
+      lambda {
+        new_group = SecureRandom.uuid
+        new_group_json = @group_service.update_group(:id => new_group,
+                                                     :additional_info => "Updated Developer group",
+                                                     :members => [@user1])
+      }.should raise_error
+
+    end
+
+  end
+
 end
