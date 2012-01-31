@@ -20,8 +20,8 @@ describe ACM::Controller::ApiController do
 
       user_id = SecureRandom.uuid
 
-      get "/users/#{user_id}"
-      @logger.debug("get /users/#{user_id} last response #{last_response.inspect}")
+      post "/users/#{user_id}"
+      @logger.debug("post /users/#{user_id} last response #{last_response.inspect}")
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
