@@ -42,7 +42,7 @@ module ACM::Controller
       #parse the request
       id = request_json[:id.to_s]
       members = request_json[:members.to_s]
-      additional_info = request_json[:additionalInfo.to_s]
+      additional_info = request_json[:additional_info.to_s]
 
       group_json = @group_service.create_group(:id => id,
                                               :additional_info => additional_info,
@@ -81,7 +81,7 @@ module ACM::Controller
       #parse the request
       id = request_json[:id.to_s]
       members = request_json[:members.to_s]
-      additional_info = request_json[:additionalInfo.to_s]
+      additional_info = request_json[:additional_info.to_s]
 
       group_json = @group_service.update_group(:id => id,
                                                :additional_info => additional_info,

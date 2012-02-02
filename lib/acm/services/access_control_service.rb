@@ -9,6 +9,7 @@ module ACM::Services
   class AccessControlService < ACMService
 
     def check_access(object_id, subject_id, permissions)
+      @logger.debug("Request to check_access #{object_id} #{subject_id} #{permissions}")
 
       if(subject_id.nil?)
         @logger.debug("Subject is nil")
@@ -26,6 +27,7 @@ module ACM::Services
 
       #Find the object
       object = ACM::Models::Objects.filter(:immutable_id => object_id).first()
+      @logger.debug("Object #{object.inspect}")
 
       if(object.nil?)
         @logger.debug("Could not find the object #{object_id}")
@@ -39,32 +41,38 @@ module ACM::Services
         @logger.debug("Permissions did not match #{permission_ids.inspect} #{permissions.inspect} #{permission_ids.size()} #{permissions.size()}")
         raise ACM::ObjectNotFound.new("")
       end
+      @logger.debug("Permission Ids #{permission_ids.inspect}")
 
-      #Find the aces for the object and set of permissions
-      acl = ACM::Models::AccessControlEntries.filter(:object_id => object.id,
-                                                      :permission_id => permission_ids).
-                                                      all()
-      if(acl.nil? || acl.size() == 0)
-        @logger.debug("ACL did not match")
-        raise ACM::ObjectNotFound.new("")
-      end
+      #Find the aces for the object and each permission
+      permission_ids.each { |permission_id|
+        acl = ACM::Models::AccessControlEntries.filter(:object_id => object.id,
+                                                       :permission_id => permission_id).all()
+        if(acl.nil? || acl.size() == 0)
+          @logger.debug("ACL did not match")
+          raise ACM::ObjectNotFound.new("")
+        end
+        @logger.debug("ACL #{acl.inspect}")
 
-      acl.each { |ace| #Go through each ace
         found = false
+        acl.each { |ace| #Go through each ace
+          @logger.debug("Ace #{ace.inspect} Searching for #{subject_id}")
 
-        ace.subjects.each{|subject| #Search the subjects for each ace
-
+          subject = ace.subject #Search the subject for each ace
+          @logger.debug("Subject being checked #{subject.inspect}")
           if(subject.type == :user.to_s)
             #If the subject has not already been found and we have a match, return a true
             found = (found == false && subject.immutable_id.eql?(subject_id.to_s)) ? true : false
+            @logger.debug("Subject #{subject.inspect} found #{found}")
           else                              #If the subject is a group, find the members
             group_id = subject.immutable_id
             found = (found == false && group_id.eql?(subject_id.to_s)) ? true : false
+            @logger.debug("Subject #{subject.inspect} found #{found}")
 
             #If the group was not the subject being searched for, search the members
             if(!found)
               ACM::Models::Members.filter(:group_id => subject.id).all().each { |member|
                 found = (found == false && member.user.immutable_id.eql?(subject_id.to_s)) ? true : false
+                @logger.debug("Subject #{member.user.inspect} found #{found}")
                 if(found)
                   break
                 end
@@ -77,15 +85,11 @@ module ACM::Services
             break
           end
         }
-
-        @logger.debug("Ace #{ace.inspect} Searching for #{subject_id}")
-        if(!found)  #If an ace does not contain the subject, the operation fails
+        if(!found)  #If the acl does not contain the subject, the operation fails
           @logger.debug("No matching subjects for acl #{acl.inspect}")
           raise ACM::ObjectNotFound.new("")
         end
       }
-      #Every ace contained that subject
-
       @logger.info("Access OK")
     end
 

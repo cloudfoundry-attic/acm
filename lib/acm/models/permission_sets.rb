@@ -19,7 +19,7 @@ module ACM::Models
 
       permission_set_hash = {
         :name => self.name,
-        :additionalInfo => self.additional_info
+        :additional_info => self.additional_info
       }
 
       permission_set_hash[:permissions] = []

@@ -93,7 +93,7 @@ describe ACM::Controller::ApiController do
 
       body[:id].to_s.should eql(group_data[:id].to_s)
       body[:members].sort().should eql(group_data[:members].sort())
-      body[:additionalInfo].should eql(group_data[:additionalInfo])
+      body[:additional_info].should eql(group_data[:additional_info])
       body[:meta][:created].should_not be_nil
       body[:meta][:updated].should_not be_nil
       body[:meta][:schema].should eql("urn:acm:schemas:1.0")
@@ -163,7 +163,7 @@ describe ACM::Controller::ApiController do
 
       body[:id].to_s.should eql(group_data[:id].to_s)
       body[:members].should be_nil
-      body[:additionalInfo].should eql(group_data[:additionalInfo])
+      body[:additional_info].should eql(group_data[:additional_info])
       body[:meta][:created].should_not be_nil
       body[:meta][:updated].should_not be_nil
       body[:meta][:schema].should eql("urn:acm:schemas:1.0")
@@ -214,7 +214,7 @@ describe ACM::Controller::ApiController do
 
       body[:id].to_s.should eql(group_data[:id].to_s)
       body[:members].sort().should eql(group_data[:members].sort())
-      body[:additionalInfo].should eql(group_data[:additionalInfo])
+      body[:additional_info].should eql(group_data[:additional_info])
       body[:meta][:created].should_not be_nil
       body[:meta][:updated].should_not be_nil
       body[:meta][:schema].should eql("urn:acm:schemas:1.0")
@@ -349,7 +349,7 @@ describe ACM::Controller::ApiController do
 
       body[:id].to_s.should eql(@group1_data[:id].to_s)
       (body[:members].include? ("#{@user5}")).should be_true
-      body[:additionalInfo].should eql(@group1_data[:additionalInfo])
+      body[:additional_info].should eql(@group1_data[:additional_info])
       body[:meta][:created].should_not be_nil
       body[:meta][:updated].should_not be_nil
       body[:meta][:schema].should eql("urn:acm:schemas:1.0")
@@ -422,12 +422,36 @@ describe ACM::Controller::ApiController do
 
       body[:id].to_s.should eql(@group1_data[:id].to_s)
       body[:members].should eql ([@user5])
-      body[:additionalInfo].should eql(updated_group_data[:additionalInfo])
+      body[:additional_info].should eql(updated_group_data[:additional_info])
       body[:meta][:created].should_not be_nil
       body[:meta][:updated].should_not be_nil
       body[:meta][:schema].should eql("urn:acm:schemas:1.0")
 
     end
+
+    it "should be able to have an empty group" do
+      basic_authorize "admin", "password"
+      updated_group_data = {
+        :id => @group1,
+        :additional_info => "Updated Developer group"
+      }
+
+      put "/groups/#{@group1}", {}, { "CONTENT_TYPE" => "application/json", :input => updated_group_data.to_json() }
+      @logger.debug("put /groups last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/groups/#{body[:id]}")
+
+      body[:id].to_s.should eql(@group1_data[:id].to_s)
+      body[:members].should be_nil
+      body[:additional_info].should eql(updated_group_data[:additional_info])
+      body[:meta][:created].should_not be_nil
+      body[:meta][:updated].should_not be_nil
+      body[:meta][:schema].should eql("urn:acm:schemas:1.0")
+
+    end
+
 
   end
 

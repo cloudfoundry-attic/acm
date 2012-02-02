@@ -13,10 +13,7 @@ module ACM::Models
 
     one_to_one  :object, :key => :id, :class => "ACM::Models::Objects"
     one_to_many :members, :key => :group_id, :class => "ACM::Models::Members"
-    many_to_many :access_control_entries,
-                 :left_key => :subject_id, :right_key => :access_control_entry_id,
-                 :join_table => :ace_subject_map,
-                 :class => "ACM::Models::AccessControlEntries"
+    one_to_many :access_control_entries, :key => :subject_id, :class => "ACM::Models::AccessControlEntries"
 
     include ACM::Models::Common
 

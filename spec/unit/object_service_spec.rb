@@ -15,6 +15,10 @@ describe ACM::Services::ObjectService do
     @group_service = ACM::Services::GroupService.new()
     @permission_set_service = ACM::Services::PermissionSetService.new()
 
+    @permission_set_service.create_permission_set(:name => :advanced_appspace,
+                                                  :permissions => [:update_appspace, :read_appspace_logs, :destroy_appspace],
+                                                  :additional_info => "this is the permission set for the advanced app space")
+
     @permission_set_service.create_permission_set(:name => :app_space,
                                                   :permissions => [:read_appspace, :write_appspace, :delete_appspace],
                                                   :additional_info => "this is the permission set for the app space")
@@ -63,7 +67,7 @@ describe ACM::Services::ObjectService do
       object[:permission_sets].should be_nil
       object[:meta][:created].should_not be_nil
       object[:meta][:updated].should_not be_nil
-      object[:additionalInfo].should eql({:description => :staging_app_space}.to_json())
+      object[:additional_info].should eql({:description => :staging_app_space}.to_json())
 
     end
 
@@ -110,7 +114,9 @@ describe ACM::Services::ObjectService do
       @user2 = SecureRandom.uuid
       @user_service.create_user(:id => @user2)
       @user3 = SecureRandom.uuid
+      @user_service.create_user(:id => @user3)
       @user4 = SecureRandom.uuid
+      @user_service.create_user(:id => @user4)
 
       o_json = @object_service.create_object(:name => "www_staging",
                                             :additional_info => {:description => :staging_app_space}.to_json(),
@@ -424,7 +430,9 @@ describe ACM::Services::ObjectService do
       @logger = ACM::Config.logger
 
       @user1 = SecureRandom.uuid
+      @user_service.create_user(:id => @user1)
       @user2 = SecureRandom.uuid
+      @user_service.create_user(:id => @user2)
       @user3 = SecureRandom.uuid
       @user_service.create_user(:id => @user3)
       @user4 = SecureRandom.uuid
@@ -487,7 +495,9 @@ describe ACM::Services::ObjectService do
       @logger = ACM::Config.logger
 
       @user1 = SecureRandom.uuid
+      @user_service.create_user(:id => @user1)
       @user2 = SecureRandom.uuid
+      @user_service.create_user(:id => @user2)
       @user3 = SecureRandom.uuid
       @user_service.create_user(:id => @user3)
       @user4 = SecureRandom.uuid
@@ -557,5 +567,175 @@ describe ACM::Services::ObjectService do
     end
   end
 
+
+  describe "updating an entire object" do 
+
+    before (:each) do
+      @logger = ACM::Config.logger
+
+      @user1 = SecureRandom.uuid
+      @user_service.create_user(:id => @user1)
+      @user2 = SecureRandom.uuid
+      @user_service.create_user(:id => @user2)
+      @user3 = SecureRandom.uuid
+      @user_service.create_user(:id => @user3)
+      @user4 = SecureRandom.uuid
+      @user_service.create_user(:id => @user4)
+      @user5 = SecureRandom.uuid
+      @user_service.create_user(:id => @user5)
+      @user6 = SecureRandom.uuid
+      @user_service.create_user(:id => @user6)
+      @user7 = SecureRandom.uuid
+      @user_service.create_user(:id => @user7)
+
+
+      @group1 = SecureRandom.uuid
+      @group2 = SecureRandom.uuid
+
+      group_json = @group_service.create_group(:id => @group1,
+                                              :additional_info => "Developer group",
+                                              :members => [@user3, @user4])
+
+      group = Yajl::Parser.parse(group_json, :symbolize_keys => true)
+
+      group_json = @group_service.create_group(:id => @group2,
+                                              :additional_info => "Another developer group",
+                                              :members => [@user5, @user6, @user7])
+
+      group = Yajl::Parser.parse(group_json, :symbolize_keys => true)
+
+      o_json = @object_service.create_object(:name => "www_staging",
+                                      :additional_info => {:description => :staging_app_space}.to_json(),
+                                      :permission_sets => [:app_space],
+                                      :acl => {
+                                        :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}", "g-#{@group2}"],
+                                        :write_appspace => ["u-#{@user2}", "g-#{@group1}"],
+                                        :delete_appspace => ["u-#{@user4}"]
+                                      })
+      @object = Yajl::Parser.parse(o_json, :symbolize_keys => true)
+    end
+
+    it "should correctly replace the original object with all the attributes of the new object" do
+
+      o_json = @object_service.update_object(:id => @object[:id],
+                                             :name => "updated_www_staging",
+                                             :additional_info => {:description => :new_staging_app_space}.to_json(),
+                                             :permission_sets => [:advanced_appspace],
+                                             :acl => {
+                                               :update_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
+                                               :destroy_appspace => ["u-#{@user1}", "u-#{@user4}"]
+                                             })
+
+      updated_object = Yajl::Parser.parse(o_json, :symbolize_keys => true)
+      updated_object[:id].should eql(@object[:id])
+      updated_object[:name].should eql("updated_www_staging")
+      updated_object[:additional_info].should eql({:description => :new_staging_app_space}.to_json())
+      updated_object[:permission_sets].should eql([:advanced_appspace.to_s])
+      updated_object[:acl][:update_appspace].sort().should eql(["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"].sort())
+      updated_object[:acl][:destroy_appspace].sort().should eql(["u-#{@user1}", "u-#{@user4}"].sort())
+
+    end
+
+    it "should correctly replace the original object even if some attributes are removed" do
+
+      o_json = @object_service.update_object(:id => @object[:id],
+                                             :name => "updated_www_staging",
+                                             :additional_info => {:description => :new_staging_app_space}.to_json()
+                                             )
+
+      updated_object = Yajl::Parser.parse(o_json, :symbolize_keys => true)
+      updated_object[:id].should eql(@object[:id])
+      updated_object[:name].should eql("updated_www_staging")
+      updated_object[:additional_info].should eql({:description => :new_staging_app_space}.to_json())
+      updated_object[:permission_sets].should be_nil
+      updated_object[:acl].should eql({})
+
+    end
+
+    it "should be possible to clean out the object of all it's attributes" do
+
+      o_json = @object_service.update_object(:id => @object[:id])
+
+      updated_object = Yajl::Parser.parse(o_json, :symbolize_keys => true)
+      updated_object[:id].should eql(@object[:id])
+      updated_object[:name].should be_nil
+      updated_object[:additional_info].should be_nil
+      updated_object[:permission_sets].should be_nil
+      updated_object[:acl].should eql({})
+
+    end
+
+    it "should fail if the id is incorrect" do
+
+      lambda { 
+        o_json = @object_service.update_object(:id => "1234",
+                                               :name => "updated_www_staging",
+                                               :additional_info => {:description => :new_staging_app_space}.to_json(),
+                                               :permission_sets => [:advanced_appspace],
+                                               :acl => {
+                                                 :update_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
+                                                 :destroy_appspace => ["u-#{@user1}", "u-#{@user4}"]
+                                               })
+      }.should raise_error(ACM::ACMError)
+
+    end
+
+    it "should fail if the permission set is incorrect" do
+
+      lambda { 
+        o_json = @object_service.update_object(:id => @object[:id],
+                                               :name => "updated_www_staging",
+                                               :additional_info => {:description => :new_staging_app_space}.to_json(),
+                                               :acl => {
+                                                 :update_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
+                                                 :destroy_appspace => ["u-#{@user1}", "u-#{@user4}"]
+                                               })
+      }.should raise_error(ACM::ACMError)
+
+      lambda { 
+        o_json = @object_service.update_object(:id => @object[:id],
+                                               :name => "updated_www_staging",
+                                               :additional_info => {:description => :new_staging_app_space}.to_json(),
+                                               :permission_sets => [:unknown_permission_set],
+                                               :acl => {
+                                                 :update_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
+                                                 :destroy_appspace => ["u-#{@user1}", "u-#{@user4}"]
+                                               })
+      }.should raise_error(ACM::ACMError)
+
+
+    end
+
+    it "should fail if the permission is unknown or incorrect" do
+
+      lambda { 
+        o_json = @object_service.update_object(:id => @object[:id],
+                                             :name => "updated_www_staging",
+                                             :additional_info => {:description => :new_staging_app_space}.to_json(),
+                                             :permission_sets => [:advanced_appspace],
+                                             :acl => {
+                                               :new_permission => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
+                                               :destroy_appspace => ["u-#{@user1}", "u-#{@user4}"]
+                                             })
+      }.should raise_error(ACM::ACMError)
+
+    end
+
+    it "should fail if the acl is unknown or incorrect" do
+
+      lambda { 
+        o_json = @object_service.update_object(:id => @object[:id],
+                                             :name => "updated_www_staging",
+                                             :additional_info => {:description => :new_staging_app_space}.to_json(),
+                                             :permission_sets => [:advanced_appspace],
+                                             :acl => {
+                                               :destroy_appspace => ["u-#{SecureRandom.uuid}"]
+                                             })
+      }.should raise_error(ACM::ACMError)
+
+    end
+
+
+  end 
 end
 

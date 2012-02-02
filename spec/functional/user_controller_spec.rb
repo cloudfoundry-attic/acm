@@ -45,7 +45,9 @@ describe ACM::Controller::ApiController do
 
       @user_service = ACM::Services::UserService.new()
       @user1 = SecureRandom.uuid
+      @user_service.create_user(:id => @user1)
       @user2 = SecureRandom.uuid
+      @user_service.create_user(:id => @user2)
       @user3 = SecureRandom.uuid
       @user_service.create_user(:id => @user3)
       @user4 = SecureRandom.uuid
@@ -171,8 +173,9 @@ describe ACM::Controller::ApiController do
     it "should raise an error if the user id cannot be found" do
       basic_authorize "admin", "password"
 
-      get "/users/#{@user2}"
-      @logger.debug("get /users/#{@user2} last response #{last_response.inspect}")
+      new_user = SecureRandom.uuid
+      get "/users/#{new_user}"
+      @logger.debug("get /users/#{new_user} last response #{last_response.inspect}")
       last_response.status.should eql(404)
 
     end

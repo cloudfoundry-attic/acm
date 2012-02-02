@@ -20,7 +20,7 @@ describe ACM::Controller::ApiController do
 
       permission_set_data = {
         :name => "app_space",
-        :additionalInfo => "{component => cloud_controller}",
+        :additional_info => "{component => cloud_controller}",
         :permissions => [:read_appspace.to_s, :write_appspace.to_s, :delete_appspace.to_s]
       }
 
@@ -35,7 +35,7 @@ describe ACM::Controller::ApiController do
 
       body[:name].to_s.should eql(permission_set_data[:name].to_s)
       body[:permissions].sort().should eql(permission_set_data[:permissions].sort())
-      body[:additionalInfo].should eql(permission_set_data[:additionalInfo])
+      body[:additional_info].should eql(permission_set_data[:additional_info])
 
       body[:meta][:created].should_not be_nil
       body[:meta][:updated].should_not be_nil
@@ -60,7 +60,7 @@ describe ACM::Controller::ApiController do
 
       body[:name].to_s.should eql(permission_set_data[:name].to_s)
       body[:permissions].size().should eql(0)
-      body[:additionalInfo].should eql(permission_set_data[:additionalInfo])
+      body[:additional_info].should eql(permission_set_data[:additional_info])
 
       body[:meta][:created].should_not be_nil
       body[:meta][:updated].should_not be_nil
@@ -137,7 +137,7 @@ describe ACM::Controller::ApiController do
 
       permission_set_data = {
         :name => "www_staging",
-        :additionalInfo => "{component => cloud_controller}",
+        :additional_info => "{component => cloud_controller}",
         :permissions => [:read_appspace, :write_appspace, :delete_appspace]
       }
 

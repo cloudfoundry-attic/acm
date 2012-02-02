@@ -61,7 +61,7 @@ describe ACM::Services::PermissionSetService do
 
       ps[:name].should eql("app_space")
       ps[:permissions].sort().should eql(["read_appspace", "update_appspace", "delete_appspace"].sort())
-      ps[:additionalInfo].should eql("this is the permission set for the app space")
+      ps[:additional_info].should eql("this is the permission set for the app space")
       ps[:meta][:created].should_not be_nil
       ps[:meta][:updated].should_not be_nil
     end

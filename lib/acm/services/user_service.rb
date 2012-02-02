@@ -79,7 +79,6 @@ module ACM::Services
       if(!output[:groups].nil? && output[:groups].size() > 0)
         #find the aces for the group
         group_aces = ACM::Models::AccessControlEntries.
-                      join_table(:inner, :ace_subject_map, :access_control_entry_id => :id).
                       join_table(:inner, :subjects, :id => :subject_id).
                       filter(:immutable_id => output[:groups]).select(:access_control_entries__object_id).all()
 

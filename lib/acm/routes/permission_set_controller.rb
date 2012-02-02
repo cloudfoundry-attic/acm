@@ -36,7 +36,7 @@ module ACM::Controller
       #parse the request
       name = request_json[:name.to_s]
       permissions = request_json[:permissions.to_s]
-      additional_info = request_json[:additionalInfo.to_s]
+      additional_info = request_json[:additional_info.to_s]
 
       if(!permissions.nil? && !permissions.kind_of?(Array))
         @logger.error("Invalid request. Permissions must be an arrary")

@@ -340,7 +340,7 @@ Attributes
 Property                Type           Description
 ======================= ============== ===================================
 name                    string         name of this permission set. Must be unique across the ACM.
-additionalInfo          object         optional - additional information this object.
+additional_info         object         optional - additional information this object.
 permissionSet           Array[String]  Set of object permissions for this type.
 meta                    object         Meta information about this entity.
 ======================= ============== ===================================
@@ -462,8 +462,8 @@ Property                Type            Description
 id                      string          immutable identifier (not to be included in a request). 
                                         It is returned in the response.
 permission sets         Array[String]   names of permission sets allowed in this object. Currently,
-										the API only supports a single permission set.
-additionalInfo          object          optional - additional information this object.
+										                    the API only supports a single permission set.
+additional_info         object          optional - additional information this object.
 acl                     object          map of object permissions => set of users.
 meta                    object          meta information about this entity.
 ======================= ==============  ===================================
@@ -473,7 +473,7 @@ Example::
     {
        "permissionSets":["app_space"],
        "id":"54947df8-0e9e-4471-a2f9-9af509fb5889",
-       "additionalInfo": {"org":"vmware", "name":"www_staging"},
+       "additional_info": {"org":"vmware", "name":"www_staging"},
        "acl": {
              "read_app": ["3749285", "4a9a8c60-0cb2-11e1-be50-0800200c9a66"],
              "update_app": ["3749285", "4a9a8c60-0cb2-11e1-be50-0800200c9a66"],
@@ -738,7 +738,7 @@ For example::
           "app_space"
        ],
        "id":"11c32e98-e9e4-43ca-8ac4-164ecbcb71b1",
-       "additionalInfo":"{component => cloud_controller}",
+       "additional_info":"{component => cloud_controller}",
        "acl":{
           "read_appspace":[
              "g-d0f42b1e-6d5b-4ea3-a15b-59c7320ec477",
@@ -796,7 +796,7 @@ For example::
           "app_space"
        ],
        "id":"11c32e98-e9e4-43ca-8ac4-164ecbcb71b1",
-       "additionalInfo":"{component => cloud_controller}",
+       "additional_info":"{component => cloud_controller}",
        "acl":{
           "read_appspace":[
              "g-d0f42b1e-6d5b-4ea3-a15b-59c7320ec477",
@@ -851,7 +851,7 @@ Property                Type            Description
 id                      string          immutable identifier (ignored if included in a request). 
                                         It is returned in the response.
 name                    string          name of this group
-additionalInfo          object          additional information for this user group
+additional_info         object          additional information for this user group
 members                 Array[string]   set of user ids of members of this group
 meta                    object          meta information about this entity
 ======================= ==============  ===================================
@@ -860,7 +860,7 @@ Example::
 
     {
        "id":"54947df8-0e9e-4471-a2f9-9af509fb5889",
-       "additionalInfo": {"org":"vmware", "name":"www-developers"},
+       "additional_info": {"org":"vmware", "name":"www-developers"},
        "members": [123268, 245424, 335111, 930290, 123055],
        "meta":{
           "updated":1273740902,
@@ -1132,7 +1132,7 @@ First get the whole object so we can inspect it and verify that the user is refe
     {
        "permissionSets":["app_space"],
        "id":"54947df8-0e9e-4471-a2f9-9af509fb5889",
-       "additionalInfo": {
+       "additional_info": {
           "org":"vmware", "name":"www_staging",
        },
        "acl":{
@@ -1220,7 +1220,7 @@ Now PUT the change including only the "acl" object:
    {
       "permission sets":["app_space"],
        "id":"54947df8-0e9e-4471-a2f9-9af509fb5889",
-       "additionalInfo": {
+       "additional_info": {
           "org":"vmware", "name":"www_staging",
        },
       "acl":{
@@ -1291,7 +1291,7 @@ Delete a Permission from an Object's ACL
    {
      "permissionSets":["app_space"],
      "id":"54947df8-0e9e-4471-a2f9-9af509fb5889",
-     "additionalInfo":{
+     "additional_info":{
         "org":"vmware", "name":"www_staging",
      },
      "acl":{

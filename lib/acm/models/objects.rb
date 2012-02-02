@@ -28,50 +28,57 @@ module ACM::Models
     end
 
     def to_json
-      @logger.debug("Object Id #{self.id}")
-      #Get the names out of the permission sets
-      object_types = (self.permission_sets.nil? || self.permission_sets.size == 0) ?
-                          nil :
-                          self.permission_sets.map{|permission_set| permission_set.name}
-      output_object = {
-        :name => self.name,
-        :permission_sets => object_types,
-        :id => self.immutable_id,
-        :additionalInfo => self.additional_info,
-      }
+      begin
 
-      output_object[:acl] = {}
-      access_control_entries.each { |access_control_entry|
-        @logger.debug("Access Control entry #{access_control_entry.inspect}")
-        perimission_name = access_control_entry.permission.name
-        @logger.debug("Permission name #{perimission_name.inspect}")
-        subjects = access_control_entry.subjects
-        @logger.debug("Subjects #{subjects.inspect}")
-        subject_list = []
-        subjects.each{|subject|
+        @logger.debug("Object Id #{self.id}")
+        #Get the names out of the permission sets
+        object_types = (self.permission_sets.nil? || self.permission_sets.size == 0) ?
+                            nil :
+                            self.permission_sets.map{|permission_set| permission_set.name}
+        output_object = {
+          :name => self.name,
+          :permission_sets => object_types,
+          :id => self.immutable_id,
+          :additional_info => self.additional_info,
+        }
+
+        output_object[:acl] = {}
+        access_control_entries.each { |access_control_entry|
+          @logger.debug("Access Control entry #{access_control_entry.inspect}")
+          permission = access_control_entry.permission
+          permission_name = permission.name
+          permission_id = permission.id
+          @logger.debug("Permission name #{permission_name.inspect}")
+          subject = access_control_entry.subject
+          @logger.debug("Subject #{subject.inspect}")
+          subject_immutable_id = nil
           if(subject.type.to_sym == :user)
-            subject_list.insert(0, "u-#{subject.immutable_id}")
+            subject_immutable_id = "u-#{subject.immutable_id}"
           else
-            subject_list.insert(0, "g-#{subject.immutable_id}")
+            subject_immutable_id = "g-#{subject.immutable_id}"
           end
+
+          output_object[:acl][permission_name].nil? ? 
+                      output_object[:acl][permission_name] = [subject_immutable_id] : 
+                      output_object[:acl][permission_name].insert(0, subject_immutable_id)
         }
 
-        if(subject_list.size() > 0)
-          output_object[:acl][perimission_name] = subject_list
-        end
-      }
+        @logger.debug("ACL hash for object #{self.id} is #{output_object[:acl].inspect}")
 
-      @logger.debug("ACL hash for object #{self.id} is #{output_object[:acl].inspect}")
+        output_object.update(
+          :meta => {
+            :created => self.created_at,
+            :updated => self.last_updated_at,
+            :schema => latest_schema
+          }
+        )
 
-      output_object.update(
-        :meta => {
-          :created => self.created_at,
-          :updated => self.last_updated_at,
-          :schema => latest_schema
-        }
-      )
+        output_object.to_json()
 
-      output_object.to_json()
+      rescue => e
+        @logger.error("Failure in object.to_json #{e.inspect}")
+        throw e
+      end
     end
   end
 end

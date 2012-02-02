@@ -26,7 +26,9 @@ describe ACM::Controller::ApiController do
                                                     :additional_info => "this is the permission set for the app space")
       @user_service = ACM::Services::UserService.new()
       @user1 = SecureRandom.uuid
+      @user_service.create_user(:id => @user1)
       @user2 = SecureRandom.uuid
+      @user_service.create_user(:id => @user2)
       @user3 = SecureRandom.uuid
       @user_service.create_user(:id => @user3)
       @user4 = SecureRandom.uuid
@@ -69,7 +71,7 @@ describe ACM::Controller::ApiController do
       object_data = {
         :name => "www_staging",
         :permission_sets => ["app_space"],
-        :additionalInfo => "{component => cloud_controller}",
+        :additional_info => "{component => cloud_controller}",
         :acl => {
           :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}", "g-#{@group2}"],
           :write_appspace => ["u-#{@user2}", "g-#{@group1}"],
