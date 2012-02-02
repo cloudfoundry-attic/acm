@@ -23,4 +23,5 @@ group :test do
   gem "rspec"
   gem "sqlite3"
   gem "simplecov", :platforms => :ruby_19
+  gem "ci_reporter"
 end
