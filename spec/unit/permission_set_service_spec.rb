@@ -99,7 +99,7 @@ describe ACM::Services::PermissionSetService do
       ps = Yajl::Parser.parse(ps_json, :symbolize_keys => true)
 
       lambda {
-        @permission_set_service.read_permission_set(:bosh_director)
+        @permission_set_service.read_permission_set(:unknown_permission_set)
       }.should raise_error(ACM::ACMError)
 
     end

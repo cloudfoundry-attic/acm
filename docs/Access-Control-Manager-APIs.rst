@@ -307,10 +307,10 @@ Error code ranges
 
 .. DO: I don't have a strong opinion. Advantages for error numbers are
 .. 1) it's clear they are error codes -- not for display and should not be localized. 
-.. 2) it's what CC and BOSH do.
+.. 2) it's what existing components do.
 .. Advantages for strings:
 .. 1) much easier debugging
-.. 2) it's that OAuth2 does -- though OAuth2 has already had some difficulty
+.. 2) it's what OAuth2 does -- though OAuth2 has already had some difficulty
 .. preventing people from directly displaying or attempting to add
 .. localization tags to the errors. 
 .. All in all, I think I'd prefer strings, but I'll let Joel argue this one.
