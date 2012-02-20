@@ -68,6 +68,36 @@ describe ACM::Services::PermissionSetService do
 
   end
 
+  describe "updating a permission set" do
+    before(:each) do
+      @permission_set_service = ACM::Services::PermissionSetService.new()
+
+      @logger = ACM::Config.logger
+
+      @ps_json = @permission_set_service.create_permission_set(:name => :app_space,
+                                                              :permissions => [:read_appspace, :update_appspace, :delete_appspace],
+                                                              :additional_info => "this is the permission set for the app space"
+      )
+
+      @ps = Yajl::Parser.parse(ps_json, :symbolize_keys => true)
+
+    end
+
+    it "should update a permission set that is not referenced by any objects and return the updated json" do
+
+      updated_ps = @permission_set_service.update_permission_set(:name => @ps[:name]
+                                                                  :permissions => [:view_appspace, :modify_appspace, :destroy_appspace],
+                                                                  :additional_info => "v2 of this appspace"
+                                                                 )
+
+      updated_ps[:name].should eql(@ps[:name])
+    end
+
+    it "should update a permission set that has references to objects and return the updated json" do
+    end
+
+  end
+
   describe "reading a permission set" do
 
     before(:each) do

@@ -8,6 +8,10 @@ module ACM::Services
 
     end
 
+    def get_option(map, key)
+      map[key].nil? ? nil : map[key]
+    end
+
   end
 
 end
