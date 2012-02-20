@@ -56,7 +56,7 @@ module ACM::Services
       permissions = get_option(opts, :permissions)
       additional_info = get_option(opts, :additional_info)
 
-      ps = ACM::Models::PermissionSets.find(:name => name.to_s).first().first()
+      ps = ACM::Models::PermissionSets.find(:name => name.to_s)
 
       begin
         ACM::Config.db.transaction do
