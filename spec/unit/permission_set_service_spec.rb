@@ -79,22 +79,12 @@ describe ACM::Services::PermissionSetService do
                                                               :additional_info => "this is the permission set for the app space"
       )
 
-      @ps = Yajl::Parser.parse(ps_json, :symbolize_keys => true)
+      @ps = Yajl::Parser.parse(@ps_json, :symbolize_keys => true)
 
     end
 
-    it "should update a permission set that is not referenced by any objects and return the updated json" do
-
-      updated_ps = @permission_set_service.update_permission_set(:name => @ps[:name]
-                                                                  :permissions => [:view_appspace, :modify_appspace, :destroy_appspace],
-                                                                  :additional_info => "v2 of this appspace"
-                                                                 )
-
-      updated_ps[:name].should eql(@ps[:name])
-    end
-
-    it "should update a permission set that has references to objects and return the updated json" do
-    end
+    it "should update a permission set that is not referenced by any objects and return the updated json"
+    it "should update a permission set that has references to objects and return the updated json" 
 
   end
 
