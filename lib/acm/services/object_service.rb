@@ -223,10 +223,6 @@ module ACM::Services
       subject
     end
 
-    def get_option(map, key)
-      map[key].nil? ? nil : map[key]
-    end
-
     def add_subjects_to_ace(obj_id, permissions, subject_id)
 
       if(subject_id.nil?)

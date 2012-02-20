@@ -9,6 +9,8 @@ Sequel.migration do
       time :created_at, :null => false
       time :last_updated_at, :null => false
 
+      index [:immutable_id], :unique => true
+
     end
 
     create_table :permission_sets do
@@ -25,6 +27,7 @@ Sequel.migration do
       primary_key :id
       foreign_key :object_id, :objects
       foreign_key :permission_set_id, :permission_sets
+
     end
 
     create_table :permissions do
@@ -46,7 +49,10 @@ Sequel.migration do
       time :created_at, :null => false
       time :last_updated_at, :null => false
 
-      unique [:object_id, :permission_id, :subject_id]
+      index [:object_id, :permission_id, :subject_id], :unique => true
+      index [:object_id, :permission_id]
+      index [:object_id]
+      index [:subject_id]
     end
     
     create_table :subjects do
@@ -58,6 +64,9 @@ Sequel.migration do
 
       time :created_at, :null => false
       time :last_updated_at, :null => false
+
+      index [:immutable_id, :type]
+      index [:immutable_id], :unique => true
     end
 
     create_table :members do
@@ -68,7 +77,8 @@ Sequel.migration do
       time :created_at, :null => false
       time :last_updated_at, :null => false
 
-      unique [:group_id, :user_id]
+      index [:group_id, :user_id], :unique => true
+      index [:group_id]
     end
 
   end
