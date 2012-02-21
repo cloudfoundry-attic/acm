@@ -389,6 +389,85 @@ module ACM::Services
       object.to_json
     end
 
+    def remove_subjects_from_ace(obj_id, permissions, subject_id)
+
+      user_json = @user_service.find_user(subject_id)
+      if(user_json.nil?)
+        @logger.error("Failed to find the subject #{subject_id}")
+        raise ACM::ObjectNotFound.new("Subject #{subject_id}")
+      else
+        @logger.debug("Found subject #{user_json.inspect}")
+      end
+      subject = Yajl::Parser.parse(user_json, :symbolize_keys => true)
+
+      object = nil
+      if(permissions.respond_to?(:each))
+        ACM::Config.db.transaction do
+          permissions.each { |permission|
+            object = remove_permission(obj_id, permission, subject[:id])
+          }
+        end
+      else
+        object = remove_permission(obj_id, permissions, subject[:id])
+      end
+
+      object
+    end
+
+    def remove_permission(obj_id, permission, user_id)
+      @logger.debug("removing permission #{permission} on object #{obj_id} from user #{user_id}")
+
+      #TODO: Get this done in a single update query
+      #Find the object
+      object = ACM::Models::Objects.filter(:immutable_id => obj_id.to_s).first()
+      @logger.debug("requested object #{object.inspect}")
+      if(object.nil?)
+        @logger.error("Could not find object #{obj_id.to_s}")
+        raise ACM::ObjectNotFound.new("Object #{obj_id}")
+      end
+
+      #Find the requested permission only if it belongs to a permission set that is related to that object
+      requested_permission = ACM::Models::Permissions.join(:permission_sets, :id => :permission_set_id)
+                                                    .join(:object_permission_set_map, :permission_set_id => :id)
+                                                    .filter(:object_permission_set_map__object_id => object.id)
+                                                    .filter(:permissions__name => permission.to_s)
+                                                    .select(:permissions__id, :permissions__name)
+                                                    .first()
+      @logger.debug("requested permission #{requested_permission.inspect}")
+
+      if(requested_permission.nil?)
+        @logger.error("Failed to remove permission #{permission} on object #{obj_id} for user #{user_id}. Could not find permission #{permission}")
+        raise ACM::InvalidRequest.new("Failed to remove permission #{permission} on object #{obj_id} for user #{user_id}")
+      end
+
+      #find the subject
+      subject = ACM::Models::Subjects.filter(:immutable_id => user_id.to_s).first()
+      @logger.debug("requested subject #{subject.inspect}")
+      if(subject.nil?)
+        @logger.error("Could not find subject #{user_id.to_s}")
+        raise ACM::InvalidRequest.new("Could not find subject #{user_id.to_s}")
+      end
+
+      ACM::Config.db.transaction do
+        ace_to_be_deleted = object.access_control_entries.select{|ace| ace.permission_id == requested_permission.id && ace.subject_id == subject.id}.first()
+        
+        @logger.debug("ace_to_be_deleted #{ace_to_be_deleted.inspect}")
+
+        if(ace_to_be_deleted.nil?)
+          @logger.error("Could not find an access control entry for that object and permission matching the subject requested")
+          raise ACM::InvalidRequest.new("Could not find an access control entry for the object #{object.name} and permission #{requested_permission.name}")
+        else
+          ace_to_be_deleted.destroy()
+        end
+
+        @logger.debug("ace count for object #{object.id} are #{ACM::Models::AccessControlEntries.filter(:object_id => object.id).count().inspect}")
+      end
+      
+      object = ACM::Models::Objects.filter(:id => object.id).first()
+      object.to_json
+    end
+
+
     def read_object(obj_id)
       @logger.debug("read_object parameters #{obj_id.inspect}")
       object = ACM::Models::Objects.filter(:immutable_id => obj_id).first()
