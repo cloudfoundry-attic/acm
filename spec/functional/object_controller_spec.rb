@@ -827,6 +827,7 @@ describe ACM::Controller::ApiController do
       updated_object[:additional_info].should eql(@object[:additional_info])
     end
 
+
     it "should return an error when trying to remove a non-existent permission" do
       basic_authorize "admin", "password"
 

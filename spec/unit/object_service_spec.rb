@@ -578,7 +578,6 @@ describe ACM::Services::ObjectService do
     end
   end
 
-
   describe "updating an entire object" do 
 
     before (:each) do

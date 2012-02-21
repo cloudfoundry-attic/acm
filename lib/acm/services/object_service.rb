@@ -467,7 +467,6 @@ module ACM::Services
       object.to_json
     end
 
-
     def read_object(obj_id)
       @logger.debug("read_object parameters #{obj_id.inspect}")
       object = ACM::Models::Objects.filter(:immutable_id => obj_id).first()
