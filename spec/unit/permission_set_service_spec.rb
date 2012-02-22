@@ -1,3 +1,14 @@
+# Cloud Foundry 2012.02.03 Beta
+# Copyright (c) [2009-2012] VMware, Inc. All Rights Reserved. 
+# 
+# This product is licensed to you under the Apache License, Version 2.0 (the "License").  
+# You may not use this product except in compliance with the License.  
+# 
+# This product includes a number of subcomponents with
+# separate copyright notices and license terms. Your use of these
+# subcomponents is subject to the terms and conditions of the 
+# subcomponent's license, as noted in the LICENSE file. 
+
 require File.expand_path("../../spec_helper", __FILE__)
 
 require 'acm/services/permission_set_service'
@@ -65,6 +76,26 @@ describe ACM::Services::PermissionSetService do
       ps[:meta][:created].should_not be_nil
       ps[:meta][:updated].should_not be_nil
     end
+
+  end
+
+  describe "updating a permission set" do
+    before(:each) do
+      @permission_set_service = ACM::Services::PermissionSetService.new()
+
+      @logger = ACM::Config.logger
+
+      @ps_json = @permission_set_service.create_permission_set(:name => :app_space,
+                                                              :permissions => [:read_appspace, :update_appspace, :delete_appspace],
+                                                              :additional_info => "this is the permission set for the app space"
+      )
+
+      @ps = Yajl::Parser.parse(@ps_json, :symbolize_keys => true)
+
+    end
+
+    it "should update a permission set that is not referenced by any objects and return the updated json"
+    it "should update a permission set that has references to objects and return the updated json" 
 
   end
 
