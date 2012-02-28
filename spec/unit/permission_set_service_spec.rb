@@ -92,10 +92,134 @@ describe ACM::Services::PermissionSetService do
 
       @ps = Yajl::Parser.parse(@ps_json, :symbolize_keys => true)
 
+      @object_service = ACM::Services::ObjectService.new()
+      @user_service = ACM::Services::UserService.new()
+ 
+      @user1 = SecureRandom.uuid
+      @user_service.create_user(:id => @user1)
+      @user2 = SecureRandom.uuid
+      @user_service.create_user(:id => @user2)
+      @user3 = SecureRandom.uuid
+      @user_service.create_user(:id => @user3)
+      @user4 = SecureRandom.uuid
+      @user_service.create_user(:id => @user4)
+
     end
 
-    it "should update a permission set that is not referenced by any objects and return the updated json"
-    it "should update a permission set that has references to objects and return the updated json" 
+    it "should update a permission set that is not referenced by any objects and return the updated json" do
+      updated_ps = Yajl::Parser.parse(@permission_set_service.update_permission_set(:name => :app_space), :symbolize_keys => true)
+      
+      updated_ps[:name].should eql(@ps[:name])
+      updated_ps[:additional_info].should be_nil
+      updated_ps[:permissions].size().should eql(0)
+       
+      updated_ps = Yajl::Parser.parse(@permission_set_service.update_permission_set(:name => :app_space,
+                                                                 :additional_info => "yadayadayada",
+                                                                 :permissions => [:read_appspace, :update_appspace]), :symbolize_keys => true)
+                                                                    
+      updated_ps[:name].should eql(@ps[:name])
+      updated_ps[:additional_info].should eql("yadayadayada")
+      updated_ps[:permissions].sort().should eql(["read_appspace", "update_appspace"].sort())
+      
+      updated_ps = Yajl::Parser.parse(@permission_set_service.update_permission_set(:name => :app_space,
+                                                                 :additional_info => "yadayadayada",
+                                                                 :permissions => [:read_appspace, :update_appspace, :new_permission]), :symbolize_keys => true)
+                                                                    
+      updated_ps[:name].should eql(@ps[:name])
+      updated_ps[:additional_info].should eql("yadayadayada")
+      updated_ps[:permissions].sort().should eql(["read_appspace", "update_appspace", "new_permission"].sort())
+
+      updated_ps = Yajl::Parser.parse(@permission_set_service.update_permission_set(:name => :app_space,
+                                                                 :additional_info => "yadayadayada",
+                                                                 :permissions => [:new_permission]), :symbolize_keys => true)
+                                                                    
+      updated_ps[:name].should eql(@ps[:name])
+      updated_ps[:additional_info].should eql("yadayadayada")
+      updated_ps[:permissions].sort().should eql(["new_permission"].sort())
+    end
+
+    it "should fail to update a permission set removing permissions that are tied in an object" do
+      new_object = @object_service.create_object(:name => "www_staging",
+                                                :additional_info => {:description => :staging_app_space}.to_json(),
+                                                :permission_sets => [:app_space],
+                                                :acl => {
+                                                    :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
+                                                    :update_appspace => ["u-#{@user1}", "u-#{@user3}", "u-#{@user4}"]
+                                                })
+
+      lambda {
+        updated_ps = Yajl::Parser.parse(@permission_set_service.update_permission_set(:name => :app_space), :symbolize_keys => true) 
+      }.should raise_error
+
+      lambda {
+        updated_ps = Yajl::Parser.parse(@permission_set_service.update_permission_set(:name => :app_space,
+                                                                                      :permissions => [:new_permission],
+                                                                                     ), :symbolize_keys => true) 
+      }.should raise_error
+      
+      lambda {
+       updated_ps = Yajl::Parser.parse(@permission_set_service.update_permission_set(:name => :app_space,
+                                                                                      :permissions => [:read_appspace, :new_permission],
+                                                                                     ), :symbolize_keys => true) 
+      }.should raise_error
+     
+    end
+
+    it "should be able to assign existing permissions to new permission sets" do
+      object = Yajl::Parser.parse(@object_service.create_object(:name => "www_staging",
+                                                :additional_info => {:description => :staging_app_space}.to_json(),
+                                                :permission_sets => [:app_space],
+                                                :acl => {
+                                                    :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
+                                                    :update_appspace => ["u-#{@user1}", "u-#{@user3}", "u-#{@user4}"]
+                                                }), :symbolize_keys => true)
+
+      new_ps = Yajl::Parser.parse(@permission_set_service.create_permission_set(:name => :collab_space), :symbolize_keys => true)
+
+      updated_object = object
+      updated_object[:permission_sets].unshift(new_ps[:name])
+      final_object = Yajl::Parser.parse(@object_service.update_object(updated_object), :symbolize_keys => true)
+
+      updated_ps = @permission_set_service.update_permission_set(:name => new_ps[:name],
+                                                                 :permissions => [:update_appspace],
+                                                                 :additional_info => "this is the permission set for the app space")
+
+      final_object[:permission_sets].should eql([@ps[:name], new_ps[:name]].sort())
+      final_object[:acl].each { |permission, users|
+        object[:acl][permission].sort().should eql(final_object[:acl][permission].sort())
+      }
+
+    end
+
+    it "should be possible to rename a permission set" do
+      object = Yajl::Parser.parse(@object_service.create_object(:name => "www_staging",
+                                                :additional_info => {:description => :staging_app_space}.to_json(),
+                                                :permission_sets => [:app_space],
+                                                :acl => {
+                                                    :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
+                                                    :update_appspace => ["u-#{@user1}", "u-#{@user3}", "u-#{@user4}"]
+                                                }), :symbolize_keys => true)
+
+      new_ps = Yajl::Parser.parse(@permission_set_service.create_permission_set(:name => :collab_space), :symbolize_keys => true)
+
+      updated_object = object
+      updated_object[:permission_sets].unshift(new_ps[:name])
+      @object_service.update_object(updated_object)
+
+      updated_ps = @permission_set_service.update_permission_set(:name => new_ps[:name],
+                                                                 :permissions => @ps[:permissions],
+                                                                 :additional_info => @ps[:additional_info])
+
+      updated_object[:permission_sets] = [new_ps[:name]]
+      final_object = Yajl::Parser.parse(@object_service.update_object(updated_object), :symbolize_keys => true)
+
+      final_object[:permission_sets].should eql([new_ps[:name]])
+      final_object[:acl].each { |permission, users|
+        object[:acl][permission].sort().should eql(final_object[:acl][permission].sort())
+      }
+
+
+    end
 
   end
 

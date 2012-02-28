@@ -64,24 +64,41 @@ module ACM::Services
         raise ACM::InvalidRequest.new("Missing name for permission set")
       end
 
-      permissions = get_option(opts, :permissions)
+      requested_permissions = get_option(opts, :permissions)
       additional_info = get_option(opts, :additional_info)
 
       ps = ACM::Models::PermissionSets.find(:name => name.to_s)
 
       begin
         ACM::Config.db.transaction do
-          ps.save
 
-          ps.permissions.each { |existing_permission|
-            existing_permission.destroy()
-          }
-
-          if(!permissions.nil?)
-            permissions.each { |permission|
-              ACM::Models::Permissions.new(:permission_set_id => ps.id, :name => permission.to_s).save
+          ps.additional_info = additional_info
+          
+          unless requested_permissions.nil?
+            #Go through the requested permissions and add them to the permission set
+            requested_permissions.each { |requested_permission|
+              required_permission = ACM::Models::Permissions.find(:name => requested_permission.to_s)
+              
+              if required_permission.nil?
+                ACM::Models::Permissions.new(:permission_set_id => ps.id, :name => requested_permission.to_s).save
+              else
+                # Un-assign permissions from an existing set and assign it to the new set
+                required_permission.permission_set_id = ps.id
+                required_permission.save
+              end
             }
           end
+
+          ps.save
+
+          # Remove the permissions that are not requested
+          ps.permissions.each { |existing_permission|
+            if requested_permissions.nil? || !requested_permissions.to_s.include?(existing_permission.name.to_s)
+              existing_permission.destroy()
+            end
+          }
+
+          ps.save
         end
       rescue => e
         @logger.error("Failed to update the permission set#{e}")
@@ -96,6 +113,7 @@ module ACM::Services
 
       @logger.debug("Updated permission set is #{ps.inspect}")
 
+      ps = ACM::Models::PermissionSets.find(:name => name.to_s)
       ps.to_json
     end
 
