@@ -1,3 +1,6 @@
+#!/usr/bin/env ruby
+#
+
 # Cloud Foundry 2012.02.03 Beta
 # Copyright (c) [2009-2012] VMware, Inc. All Rights Reserved. 
 # 
@@ -9,8 +12,6 @@
 # subcomponents is subject to the terms and conditions of the 
 # subcomponent's license, as noted in the LICENSE file. 
 
-#!/usr/bin/env ruby
-#
 ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../../Gemfile", __FILE__)
 
 require "rubygems"
