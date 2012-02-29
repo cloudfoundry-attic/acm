@@ -25,3 +25,5 @@ group :test do
   gem "simplecov", :platforms => :ruby_19
   gem "ci_reporter"
 end
+
+gem "vcap_logging"

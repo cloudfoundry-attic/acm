@@ -9,7 +9,7 @@
 # subcomponents is subject to the terms and conditions of the 
 # subcomponent's license, as noted in the LICENSE file. 
 
-require "logger"
+require "vcap/logging"
 require "securerandom"
 require "sequel"
 
@@ -51,10 +51,8 @@ module ACM
 
         @default_schema_version = "urn:acm:schemas:1.0"
 
-        @log_file = config["logging"]["file"] || STDOUT
-        @logger = Logger.new(@log_file, "daily")
-        @logger.level = Logger.const_get(config["logging"]["level"].upcase)
-        @logger.formatter = ThreadFormatter.new
+        VCAP::Logging.setup_from_config(config["logging"])
+        @logger = VCAP::Logging.logger("acm")
 
         Dir.chdir(File.expand_path("..", __FILE__))
         @revision = `(git show-ref --head --hash=8 2> /dev/null || echo 00000000) | head -n1`.strip
@@ -83,7 +81,7 @@ module ACM
         @basic_auth = {:user => config["basic_auth"]["user"], :password => config["basic_auth"]["password"]}
 
         puts("Configuration complete")
-        @logger.debug("ACM running #{@revision}")
+        @logger.info("ACM running #{@revision}")
         if(!@log_file.nil?)
           puts("Logs are at #{@log_file}")
         end
