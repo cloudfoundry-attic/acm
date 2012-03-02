@@ -19,7 +19,7 @@ module ACM::Services
       @logger.debug("create permission_set parameters #{opts}")
 
       name = get_option(opts, :name)
-      if(name.nil?)
+      if name.nil?
         @logger.error("Failed to create a permission set. No name provided")
         raise ACM::InvalidRequest.new("Missing name for permission set")
       end
@@ -33,7 +33,7 @@ module ACM::Services
         ACM::Config.db.transaction do
           ps.save
 
-          if(!permissions.nil?)
+          unless permissions.nil?
             permissions.each { |permission|
               ACM::Models::Permissions.new(:permission_set_id => ps.id, :name => permission.to_s).save
             }
@@ -59,7 +59,7 @@ module ACM::Services
       @logger.debug("update permission_set parameters #{opts}")
 
       name = get_option(opts, :name)
-      if(name.nil?)
+      if name.nil?
         @logger.error("Failed to update a permission set. No name provided")
         raise ACM::InvalidRequest.new("Missing name for permission set")
       end
@@ -121,7 +121,7 @@ module ACM::Services
       @logger.debug("read_permission_set parameters #{name.inspect}")
       permission_set = ACM::Models::PermissionSets.filter(:name => name.to_s).first()
 
-      if(permission_set.nil?)
+      if permission_set.nil?
         @logger.error("Could not find permission set with id #{name.inspect}")
         raise ACM::ObjectNotFound.new("#{name.inspect}")
       else
@@ -135,14 +135,14 @@ module ACM::Services
       @logger.debug("read_permission_set parameters #{permission_set_name}, #{permission}")
       permission_set = ACM::Models::PermissionSets.filter(:name => name.to_s).first()
 
-      if(permission_set.nil?)
+      if permission_set.nil?
         @logger.error("Could not find permission set with id #{name.inspect}")
         raise ACM::ObjectNotFound.new("#{name.inspect}")
       else
         @logger.debug("Found permission set #{permission_set.inspect}")
       end
       
-      if(!permission_set.permissions.include? permission)
+      unless permission_set.permissions.include? permission
         #Find which set includes that permission
 
         #Remove the permission from that set

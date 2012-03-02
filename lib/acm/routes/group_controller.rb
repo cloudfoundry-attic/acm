@@ -41,7 +41,7 @@ module ACM::Controller
       end
       @logger.debug("request is #{request_json.inspect}")
 
-      if(request_json.nil?)
+      if request_json.nil?
         @logger.error("Invalid request")
         raise ACM::InvalidRequest.new("Request is empty")
       end
@@ -58,7 +58,7 @@ module ACM::Controller
       #Set the Location response header
       group = Yajl::Parser.parse(group_json, :symbolize_keys => true)
       request_url = request.url
-      if(request_url.end_with? ["/"])
+      if request_url.end_with? ["/"]
         request_url.chop()
       end
       headers "Location" => "#{request_url}/#{group[:id]}"
@@ -78,7 +78,7 @@ module ACM::Controller
       end
       @logger.debug("request is #{request_json.inspect}")
 
-      if(request_json.nil?)
+      if request_json.nil?
         @logger.error("Invalid request")
         raise ACM::InvalidRequest.new("Request is empty")
       end
@@ -95,7 +95,7 @@ module ACM::Controller
       #Set the Location response header
       group = Yajl::Parser.parse(group_json, :symbolize_keys => true)
       request_url = request.url
-      if(request_url.end_with? ["/"])
+      if request_url.end_with? ["/"]
         request_url.chop()
       end
       headers "Location" => "#{request_url}"

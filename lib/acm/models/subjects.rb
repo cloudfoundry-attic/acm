@@ -34,7 +34,7 @@ module ACM::Models
     end
 
     def set_immutable_id
-      if(self.immutable_id.nil?)
+      if self.immutable_id.nil?
         self.immutable_id = SecureRandom.uuid()
       end
       @logger.debug("Immutable id for subject #{self.type} is #{self.immutable_id}")
@@ -49,14 +49,14 @@ module ACM::Models
         :additional_info => self.additional_info
       }
 
-      if(self.type == :group.to_s)
+      if self.type == :group.to_s
         members = self.members
         output_members = []
         members.each { |member|
           @logger.debug("Member #{member.inspect} user #{member.user.inspect}")
           output_members.insert(0, member.user.immutable_id)
         }
-        if(output_members.size() > 0)
+        if output_members.size() > 0
           output_group[:members] = output_members
         end
       end

@@ -26,7 +26,7 @@ module ACM::Services
 
       begin
         existing_user = ACM::Models::Subjects.filter(:immutable_id => user.immutable_id).first()
-        if(existing_user.nil?)
+        if existing_user.nil?
           user.save
         else
           @logger.error("User id #{existing_user.immutable_id} already used")
@@ -50,7 +50,7 @@ module ACM::Services
       @logger.debug("find_user parameters #{user_id.inspect}")
       user = ACM::Models::Subjects.filter(:immutable_id => user_id, :type => :user.to_s).first()
 
-      if(user.nil?)
+      if user.nil?
         @logger.error("Could not find user with id #{user_id.inspect}")
         raise ACM::ObjectNotFound.new("#{user_id.inspect}")
       else
@@ -64,7 +64,7 @@ module ACM::Services
       @logger.debug("find_user parameters #{user_id.inspect}")
       user = ACM::Models::Subjects.filter(:immutable_id => user_id, :type => :user.to_s).first()
 
-      if(user.nil?)
+      if user.nil?
         @logger.error("Could not find user with id #{user_id.inspect}")
         raise ACM::ObjectNotFound.new("#{user_id.inspect}")
       else
@@ -79,7 +79,7 @@ module ACM::Services
                         filter(:user_id => user[:id]).distinct.select(:immutable_id).all()
       @logger.debug("Groups for user #{user.immutable_id} are #{groups.inspect}")
 
-      if(!groups.nil? && groups.size > 0)
+      if !groups.nil? && groups.size > 0
         output[:groups] = groups.map {|group| group[:immutable_id]}
       end
 
@@ -87,20 +87,20 @@ module ACM::Services
 
       #Find the objects that reference the group
       group_objects = []
-      if(!output[:groups].nil? && output[:groups].size() > 0)
+      if !output[:groups].nil? && output[:groups].size() > 0
         #find the aces for the group
         group_aces = ACM::Models::AccessControlEntries.
                       join_table(:inner, :subjects, :id => :subject_id).
                       filter(:immutable_id => output[:groups]).select(:access_control_entries__object_id).all()
 
-        if(!group_aces.nil? && group_aces.size > 0)
+        if !group_aces.nil? && group_aces.size > 0
           group_aces = group_aces.map{|group_ace| group_ace[:object_id]}
         end
 
         @logger.debug("Aces for the group are #{group_aces.inspect}")
         group_aces.each { |ace_id|
           object_immutable_id = ACM::Models::Objects.filter(:id => ace_id).select(:immutable_id).first()
-          if(!object_immutable_id.nil? && !group_objects.include?(object_immutable_id[:immutable_id]))
+          if !object_immutable_id.nil? && !group_objects.include?(object_immutable_id[:immutable_id])
             group_objects.insert(0, object_immutable_id[:immutable_id])
           end
         }
@@ -113,10 +113,10 @@ module ACM::Services
       user_aces = user.access_control_entries
       user_aces = user_aces
       @logger.debug("Aces for the user are #{user_aces.inspect}")
-      if(!user_aces.nil?)
+      unless user_aces.nil?
         user_aces.each { |ace|
           object = ACM::Models::Objects.filter(:id => ace[:object_id]).select(:immutable_id).first()
-          if(!object.nil? && !user_objects.include?(object[:immutable_id]))
+          if !object.nil? && !user_objects.include?(object[:immutable_id])
             user_objects.insert(0, object[:immutable_id])
           end
         }
@@ -128,7 +128,7 @@ module ACM::Services
       @logger.debug("Group objects are #{group_objects.inspect}")
       output_objects = output_objects | group_objects
 
-      if(output_objects.size() > 0)
+      if output_objects.size() > 0
         output[:objects] = output_objects
       end
 

@@ -20,7 +20,7 @@ module ACM::Controller
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
 
       object_id = params[:object_id]
-      if(params[:id].nil? || params[:p].nil?)
+      if params[:id].nil? || params[:p].nil?
         @logger.error("check_access empty subject or permissions")
         raise ACM::InvalidRequest.new("Could not find subject or permissions in the request")
       end

@@ -35,7 +35,7 @@ module ACM::Controller
       end
       @logger.debug("request is #{request_json.inspect}")
 
-      if(request_json.nil?)
+      if request_json.nil?
         @logger.error("Invalid request")
         raise ACM::InvalidRequest.new("Request is empty")
       end
@@ -45,7 +45,7 @@ module ACM::Controller
       permissions = request_json[:permissions.to_s]
       additional_info = request_json[:additional_info.to_s]
 
-      if(!permissions.nil? && !permissions.kind_of?(Array))
+      if !permissions.nil? && !permissions.kind_of?(Array)
         @logger.error("Invalid request. Permissions must be an arrary")
         raise ACM::InvalidRequest.new("Permissions in the input must be an array")
       end
@@ -57,7 +57,7 @@ module ACM::Controller
       #Set the Location response header
       ps = Yajl::Parser.parse(ps_json, :symbolize_keys => true)
       request_url = request.url
-      if(request_url.end_with? ["/"])
+      if request_url.end_with? ["/"]
         request_url.chop()
       end
       headers "Location" => "#{request_url}/#{ps[:name]}"

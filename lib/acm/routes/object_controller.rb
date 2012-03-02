@@ -50,7 +50,7 @@ module ACM::Controller
       end
       @logger.debug("request is #{request_json.inspect}")
 
-      if(request_json.nil?)
+      if request_json.nil?
         @logger.error("Invalid request")
         raise ACM::InvalidRequest.new("Request is empty")
       end
@@ -69,7 +69,7 @@ module ACM::Controller
       #Set the Location response header
       object = Yajl::Parser.parse(object_json, :symbolize_keys => true)
       request_url = request.url
-      if(request_url.end_with? ["/"])
+      if request_url.end_with? ["/"]
         request_url.chop()
       end
       headers "Location" => "#{request_url}/#{object[:id]}"
@@ -80,7 +80,7 @@ module ACM::Controller
     put '/objects/:object_id' do
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
 
-      if(params[:object_id].nil?)
+      if params[:object_id].nil?
         @logger.error("Empty object id")
         raise ACM::InvalidRequest.new("Empty object id")
       end
@@ -90,7 +90,7 @@ module ACM::Controller
       additional_info = nil
       acl = nil
 
-      if(!request.body.nil? && request.body.size > 0)
+      if !request.body.nil? && request.body.size > 0
         request_json = nil
         begin
           request_json = Yajl::Parser.new.parse(request.body)
@@ -116,7 +116,7 @@ module ACM::Controller
       #Set the Location response header
       object = Yajl::Parser.parse(object_json, :symbolize_keys => true)
       request_url = request.url
-      if(request_url.end_with? ["/"])
+      if request_url.end_with? ["/"]
         request_url.chop()
       end
       headers "Location" => "#{request_url}"
@@ -153,7 +153,7 @@ module ACM::Controller
       @logger.debug("Permissions requested to be removed are #{permissions_request.inspect}")
 
       subject = params[:id]
-      if(subject.start_with?("u-") || subject.start_with?("g-"))
+      if subject.start_with?("u-") || subject.start_with?("g-")
         subject = subject[2..subject.length]
         @logger.debug("Stripping subject of prefix #{subject}")
       end

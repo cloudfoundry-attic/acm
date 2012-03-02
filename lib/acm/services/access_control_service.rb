@@ -22,16 +22,16 @@ module ACM::Services
     def check_access(object_id, subject_id, permissions)
       @logger.debug("Request to check_access #{object_id} #{subject_id} #{permissions}")
 
-      if(subject_id.nil?)
+      if subject_id.nil?
         @logger.debug("Subject is nil")
         raise ACM::ObjectNotFound.new("")
       end
 
-      if(permissions.nil? || permissions.size() == 0)
+      if permissions.nil? || permissions.size() == 0
         @logger.debug("No permissions")
         raise ACM::ObjectNotFound.new("")
       else
-        if(!permissions.kind_of?(Array)) #The code below only works with arrays
+        unless permissions.kind_of?(Array) #The code below only works with arrays
           permissions = [permissions]
         end
       end
@@ -40,7 +40,7 @@ module ACM::Services
       object = ACM::Models::Objects.filter(:immutable_id => object_id).first()
       @logger.debug("Object #{object.inspect}")
 
-      if(object.nil?)
+      if object.nil?
         @logger.debug("Could not find the object #{object_id}")
         raise ACM::ObjectNotFound.new("")
       end
@@ -48,7 +48,7 @@ module ACM::Services
       #Find the permission entities that need to be checked
       permission_ids = ACM::Models::Permissions.filter(:name => permissions).all().map{|p| p.id}
       #All the permissions must exist. That's why the size of the input must match the size of the permissions query
-      if(permission_ids.nil? || permission_ids.size() == 0 || permission_ids.size() < permissions.size())
+      if permission_ids.nil? || permission_ids.size() == 0 || permission_ids.size() < permissions.size()
         @logger.debug("Permissions did not match #{permission_ids.inspect} #{permissions.inspect} #{permission_ids.size()} #{permissions.size()}")
         raise ACM::ObjectNotFound.new("")
       end
@@ -58,7 +58,7 @@ module ACM::Services
       permission_ids.each { |permission_id|
         acl = ACM::Models::AccessControlEntries.filter(:object_id => object.id,
                                                        :permission_id => permission_id).all()
-        if(acl.nil? || acl.size() == 0)
+        if acl.nil? || acl.size() == 0
           @logger.debug("ACL did not match")
           raise ACM::ObjectNotFound.new("")
         end
@@ -70,7 +70,7 @@ module ACM::Services
 
           subject = ace.subject #Search the subject for each ace
           @logger.debug("Subject being checked #{subject.inspect}")
-          if(subject.type == :user.to_s)
+          if subject.type == :user.to_s
             #If the subject has not already been found and we have a match, return a true
             found = (found == false && subject.immutable_id.eql?(subject_id.to_s)) ? true : false
             @logger.debug("Subject #{subject.inspect} found #{found}")
@@ -80,11 +80,11 @@ module ACM::Services
             @logger.debug("Subject #{subject.inspect} found #{found}")
 
             #If the group was not the subject being searched for, search the members
-            if(!found)
+            unless found
               ACM::Models::Members.filter(:group_id => subject.id).all().each { |member|
                 found = (found == false && member.user.immutable_id.eql?(subject_id.to_s)) ? true : false
                 @logger.debug("Subject #{member.user.inspect} found #{found}")
-                if(found)
+                if found
                   break
                 end
               }
@@ -92,11 +92,11 @@ module ACM::Services
           end
 
           #Don't go any further in this search if the subject has already been found
-          if(found)
+          if found
             break
           end
         }
-        if(!found)  #If the acl does not contain the subject, the operation fails
+        unless found  #If the acl does not contain the subject, the operation fails
           @logger.debug("No matching subjects for acl #{acl.inspect}")
           raise ACM::ObjectNotFound.new("")
         end

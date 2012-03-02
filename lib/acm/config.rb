@@ -87,7 +87,7 @@ module ACM
 
         puts("Configuration complete")
         @logger.info("ACM running #{@revision}")
-        if(!@log_file.nil?)
+        unless @log_file.nil?
           puts("Logs are at #{@log_file}")
         end
       end

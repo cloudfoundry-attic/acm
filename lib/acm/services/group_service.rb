@@ -40,21 +40,21 @@ module ACM::Services
       ACM::Config.db.transaction do
         begin
           existing_group = ACM::Models::Subjects.filter(:immutable_id => group.immutable_id).first()
-          if(existing_group.nil?)
+          if existing_group.nil?
             group.save
           else
             @logger.error("Group id #{existing_group.immutable_id} already used")
             raise ACM::InvalidRequest.new("Group id #{existing_group.immutable_id} already used")
           end
 
-          if(!opts[:members].nil?)
+          unless opts[:members].nil?
             members = opts[:members]
-            if(members.kind_of?(Array))
+            if members.kind_of?(Array)
               members.each {|member|
-                if(!member.nil?)
+                unless member.nil?
                   begin
                     user = ACM::Models::Subjects.filter(:immutable_id => member).first()
-                    if(user.nil?)
+                    if user.nil?
                       @logger.error("Could not find user #{member}.")
                       raise ACM::ObjectNotFound.new("User #{member}")
                     end
@@ -84,14 +84,14 @@ module ACM::Services
     def update_group(opts = {})
       @logger.debug("update_group parameters #{opts.inspect}")
 
-      if(opts[:id].nil?)
+      if opts[:id].nil?
         @logger.error("Empty group id to update")
         raise ACM::InvalidRequest.new("Empty group id")
       end
 
       group = ACM::Models::Subjects.filter(:immutable_id => opts[:id], :type => :group.to_s).first()
 
-      if(group.nil?)
+      if group.nil?
         @logger.error("Could not find group with id #{group_id.inspect}")
         raise ACM::ObjectNotFound.new("#{group_id.inspect}")
       else
@@ -102,14 +102,14 @@ module ACM::Services
         ACM::Config.db.transaction do
           group[:additional_info] = opts[:additional_info]
           group.remove_all_members()
-          if(!opts[:members].nil?)
+          unless opts[:members].nil?
             members = opts[:members]
-            if(members.kind_of?(Array))
+            if members.kind_of?(Array)
               members.each {|member|
-                if(!member.nil?)
+                unless member.nil?
                   begin
                     user = ACM::Models::Subjects.filter(:immutable_id => member).first()
-                    if(user.nil?)
+                    if user.nil?
                       @logger.error("Could not find user #{member}.")
                       raise ACM::ObjectNotFound.new("User #{member}")
                     end
@@ -147,7 +147,7 @@ module ACM::Services
       @logger.debug("find_group parameters #{group_id.inspect}")
       group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
 
-      if(group.nil?)
+      if group.nil?
         @logger.error("Could not find group with id #{group_id.inspect}")
         raise ACM::ObjectNotFound.new("#{group_id.inspect}")
       else
@@ -166,7 +166,7 @@ module ACM::Services
       @logger.debug("find_group parameters #{group_id.inspect} #{user_id}")
       group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
 
-      if(group.nil?)
+      if group.nil?
         @logger.error("Could not group user with id #{group_id.inspect}")
         raise ACM::ObjectNotFound.new("#{group_id.inspect}")
       else
@@ -190,7 +190,7 @@ module ACM::Services
       #Is the user already a member of the group?
       group_members = group.members_dataset.filter(:user_id => user.id).all()
       @logger.debug("Existing group members #{group_members.inspect}")
-      if(group_members.nil? || group_members.size() == 0)
+      if group_members.nil? || group_members.size() == 0
         user = ACM::Models::Subjects.filter(:immutable_id => user_id, :type => :user.to_s).first()
         @logger.debug("new user #{user.id} group #{group.id}")
         group.add_member(:user_id => user.id)
@@ -209,7 +209,7 @@ module ACM::Services
       @logger.debug("remove_user_from_group parameters #{group_id.inspect} #{user_id.inspect}")
       group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
 
-      if(group.nil?)
+      if group.nil?
         @logger.error("Could not group user with id #{group_id.inspect}")
         raise ACM::ObjectNotFound.new("#{group_id.inspect}")
       else
@@ -254,7 +254,7 @@ module ACM::Services
       @logger.debug("delete parameters #{group_id.inspect}")
       group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
 
-      if(group.nil?)
+      if group.nil?
         @logger.error("Could not find group with id #{group_id.inspect}")
         raise ACM::ObjectNotFound.new("#{group_id.inspect}")
       else

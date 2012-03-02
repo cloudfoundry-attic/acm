@@ -63,7 +63,7 @@ module ACM::Models
           subject = access_control_entry.subject
           @logger.debug("Subject #{subject.inspect}")
           subject_immutable_id = nil
-          if(subject.type.to_sym == :user)
+          if subject.type.to_sym == :user
             subject_immutable_id = "u-#{subject.immutable_id}"
           else
             subject_immutable_id = "g-#{subject.immutable_id}"
