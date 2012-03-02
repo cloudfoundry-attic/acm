@@ -51,6 +51,20 @@ Sequel.migration do
 
     end
 
+    create_table :subjects do
+      primary_key :id
+      String :immutable_id, :null => false, :unique => true
+      String :type, :null => false
+      foreign_key :object_id, :objects
+      text :additional_info
+
+      time :created_at, :null => false
+      time :last_updated_at, :null => false
+
+      index [:immutable_id, :type]
+      index [:immutable_id], :unique => true
+    end
+
     create_table :access_control_entries do
       primary_key :id
       foreign_key :object_id, :objects
@@ -66,20 +80,6 @@ Sequel.migration do
       index [:subject_id]
     end
     
-    create_table :subjects do
-      primary_key :id
-      String :immutable_id, :null => false, :unique => true
-      String :type, :null => false
-      foreign_key :object_id, :objects
-      text :additional_info
-
-      time :created_at, :null => false
-      time :last_updated_at, :null => false
-
-      index [:immutable_id, :type]
-      index [:immutable_id], :unique => true
-    end
-
     create_table :members do
       primary_key :id
       foreign_key :group_id, :subjects
@@ -96,12 +96,12 @@ Sequel.migration do
 
   down do
     drop_table :members
-    drop_table :subjects
     drop_table :access_control_entries
-    drop_table :object_permission_set_map
+    drop_table :subjects
     drop_table :permissions
-    drop_table :objects
+    drop_table :object_permission_set_map
     drop_table :permission_sets
+    drop_table :objects
 
   end
 end
