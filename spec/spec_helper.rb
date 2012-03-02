@@ -20,15 +20,9 @@ require "rspec"
 
 ENV["RACK_ENV"] = "test"
 
-require "logger"
-if ENV['DEBUG']
-  logger = Logger.new(STDOUT)
-else
-  path = File.expand_path("../spec.log", __FILE__)
-  log_file = File.open(path, "w")
-  log_file.sync = true
-  logger = Logger.new(log_file)
-end
+require "vcap/logging"
+VCAP::Logging.setup_from_config({"level" => "debug", "file" => "spec.log"})
+logger = VCAP::Logging.logger("acm tests")
 
 require "acm/config"
 
@@ -37,7 +31,6 @@ ACM::Config.patch_sqlite
 migrate_dir = File.expand_path("../../db/migrations", __FILE__)
 Sequel.extension :migration
 db = Sequel.sqlite(:database => nil, :max_connections => 32, :pool_timeout => 10)
-db.loggers << logger
 Sequel::Model.db = db
 Sequel::Migrator.apply(db, migrate_dir, nil)
 
@@ -59,9 +52,6 @@ acm_tmp_dir = Dir.mktmpdir("acm_tmp_dir")
 
 ENV["TMPDIR"] = acm_tmp_dir
 
-logger.formatter = ThreadFormatter.new
-
-
 def spec_asset(filename)
   File.read(File.expand_path("../assets/#{filename}", __FILE__))
 end
@@ -81,6 +71,8 @@ Rspec.configure do |rspec_config|
     FileUtils.mkdir_p(acm_dir)
     ACM::Config.logger = logger
     ACM::Config.db = db
+    db.logger = logger
+    db.sql_log_level = :debug
     ACM::Config.basic_auth = { :user => :admin.to_s, :password => :password.to_s }
     ACM::Config.default_schema_version = "urn:acm:schemas:1.0"
 

@@ -13,7 +13,6 @@ require "vcap/logging"
 require "securerandom"
 require "sequel"
 
-require "acm/thread_formatter"
 require "acm/utils"
 
 
@@ -25,6 +24,7 @@ module ACM
       #Configuration options that can be accessed throughout the app
       CONFIG_OPTIONS = [
         :logger,
+        :log_level,
         :log_file,
         :db,
         :name,
@@ -53,6 +53,7 @@ module ACM
 
         VCAP::Logging.setup_from_config(config["logging"])
         @logger = VCAP::Logging.logger("acm")
+        @log_level = VCAP::Logging.default_log_level
 
         Dir.chdir(File.expand_path("..", __FILE__))
         @revision = `(git show-ref --head --hash=8 2> /dev/null || echo 00000000) | head -n1`.strip
@@ -68,8 +69,12 @@ module ACM
 
         @db = Sequel.connect(config["db"]["database"], connection_options)
 
-        @db.logger = @logger
-        @db.sql_log_level = config["logging"]["level"].downcase.to_sym
+        if config["logging"] && config["logging"]["level"] == "debug"
+          @db.logger = @logger
+          @db.sql_log_level = :debug
+        else
+          @db.logger = nil
+        end
 
         #Run the db migrations if they have not already been run
         Sequel.extension :migration

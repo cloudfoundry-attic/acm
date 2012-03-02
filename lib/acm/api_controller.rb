@@ -42,7 +42,7 @@ module ACM::Controller
       @permission_set_service = ACM::Services::PermissionSetService.new()
       @access_control_service = ACM::Services::AccessControlService.new()
 
-      @logger.debug("ACM ApiController is up")
+      @logger.info("ACM ApiController is up")
     end
 
     configure do

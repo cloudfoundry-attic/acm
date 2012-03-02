@@ -17,24 +17,20 @@ module ACM::Controller
 
     get '/groups/:group_id' do
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
-      @logger.debug("GET request for /groups/#{params[:group_id]}")
 
       response = @group_service.find_group(params[:group_id])
-      @logger.debug("Response is #{response.inspect}")
 
       response
     end
 
     delete '/groups/:group_id' do
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
-      @logger.debug("DELETE request for /groups/#{params[:group_id]}")
 
       @group_service.delete_group(params[:group_id])
     end
 
     post '/groups' do
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
-      @logger.debug("POST request for /groups")
 
       request_json = nil
       begin
@@ -59,7 +55,6 @@ module ACM::Controller
                                               :additional_info => additional_info,
                                               :members => members)
 
-      @logger.debug("Response is #{group_json.inspect}")
       #Set the Location response header
       group = Yajl::Parser.parse(group_json, :symbolize_keys => true)
       request_url = request.url
@@ -73,7 +68,6 @@ module ACM::Controller
 
     put '/groups/:group_id' do 
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
-      @logger.debug("PUT request for /groups")
 
       request_json = nil
       begin
@@ -98,7 +92,6 @@ module ACM::Controller
                                                :additional_info => additional_info,
                                                :members => members)
 
-      @logger.debug("Response is #{group_json.inspect}")
       #Set the Location response header
       group = Yajl::Parser.parse(group_json, :symbolize_keys => true)
       request_url = request.url
@@ -113,7 +106,6 @@ module ACM::Controller
 
     put '/groups/:group_id/members/:user_id' do
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
-      @logger.debug("PUT request for /groups/#{params[:group_id]}/members/#{params[:user_id]}")
 
       updated_group = @group_service.add_user_to_group(params[:group_id], params[:user_id])
 
@@ -126,7 +118,6 @@ module ACM::Controller
 
     delete '/groups/:group_id/members/:user_id' do
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
-      @logger.debug("DELETE request for /groups/#{params[:group_id]}/members/#{params[:user_id]}")
 
       updated_group = @group_service.remove_user_from_group(params[:group_id], params[:user_id])
 

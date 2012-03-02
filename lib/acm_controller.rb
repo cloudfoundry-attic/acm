@@ -9,8 +9,6 @@
 # subcomponents is subject to the terms and conditions of the 
 # subcomponent's license, as noted in the LICENSE file. 
 
-require 'acm/rack_monkey_patch'
-
 require "acm/config"
 require "acm/api_controller"
 
@@ -44,17 +42,24 @@ module ACM::Controller
 
       @logger.debug("Request env #{env.inspect}")
       request = Rack::Request.new(env)
-      @logger.debug("Incoming request #{request.request_method} #{request.url}")
+      log_request(request)
 
       start_time = Time.now
       status, headers, body = @app.call(env)
-      end_time = Time.now
-      @logger.debug("Done request #{request.request_method} #{request.url}" +
-                    " Elapsed time #{((end_time - start_time) * 1000.0).to_i}ms")
       headers["Date"] = end_time.rfc822 # As thin doesn't inject date
 
-      @logger.debug("Sending response Status: #{status} Headers: #{headers} Body: #{body}")
+      @logger.info("Sending response Status: #{status} Headers: #{headers} Body: #{body}")
+      end_time = Time.now
+      @logger.info("Elapsed time #{((end_time - start_time) * 1000.0).to_i}ms")
       [ status, headers, body ]
+    end
+
+    def log_request(request)
+      method = request.request_method
+      url = request.url
+      params = request.params if request.params
+      body_size = "body size #{request.body.size}" if request.body
+      @logger.info("Incoming request #{method} #{url} #{params} #{body_size}")
     end
 
   end

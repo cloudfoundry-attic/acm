@@ -18,34 +18,28 @@ module ACM::Controller
 
     get '/objects/:object_id' do
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
-      @logger.debug("GET request for /objects/#{params[:object_id]}")
 
       response = @object_service.read_object(params[:object_id])
-      @logger.debug("Response is #{response.inspect}")
 
       response
     end
 
     get '/objects/:object_id/users' do
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
-      @logger.debug("GET request for /objects/#{params[:object_id]}/users")
 
       response = @object_service.get_users_for_object(params[:object_id])
-      @logger.debug("Response is #{response.inspect}")
 
       response.to_json
     end
 
     delete '/objects/:object_id' do
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
-      @logger.debug("DELETE request for /objects/#{params[:object_id]}")
 
       @object_service.delete_object(params[:object_id])
     end
 
     post '/objects' do
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
-      @logger.debug("POST request for /objects")
 
       request_json = nil
       begin
@@ -72,8 +66,6 @@ module ACM::Controller
                                                 :permission_sets => permission_sets,
                                                 :acl => acl)
 
-      @logger.debug("Response is #{object_json.inspect}")
-
       #Set the Location response header
       object = Yajl::Parser.parse(object_json, :symbolize_keys => true)
       request_url = request.url
@@ -87,7 +79,6 @@ module ACM::Controller
 
     put '/objects/:object_id' do
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
-      @logger.debug("PUT request for /objects/#{params[:object_id]}")
 
       if(params[:object_id].nil?)
         @logger.error("Empty object id")
@@ -122,8 +113,6 @@ module ACM::Controller
                                                   :permission_sets => permission_sets,
                                                   :acl => acl)
 
-      @logger.debug("Response is #{object_json.inspect}")
-
       #Set the Location response header
       object = Yajl::Parser.parse(object_json, :symbolize_keys => true)
       request_url = request.url
@@ -140,7 +129,6 @@ module ACM::Controller
     put '/objects/:object_id/acl' do
       # PUT /objects/*object_id*/acl?id=*subject*&p=*permission1*,*permission2*
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
-      @logger.debug("PUT request for /objects/#{params[:object_id]}/acl Params are #{params.inspect}")
 
       permissions_request = params[:p].split(',')
       @logger.debug("Permissions requested #{permissions_request.inspect}")
@@ -160,7 +148,6 @@ module ACM::Controller
     delete '/objects/:object_id/acl' do 
       # DELETE /objects/*object_id*/acl?id=*subject*&p=*permission1*,*permission2*
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
-      @logger.debug("DELETE request for /objects/#{params[:object_id]}/acl Params are #{params.inspect}")
 
       permissions_request = params[:p].split(',')
       @logger.debug("Permissions requested to be removed are #{permissions_request.inspect}")
