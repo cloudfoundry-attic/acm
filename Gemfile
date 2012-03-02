@@ -26,4 +26,5 @@ group :test do
   gem "ci_reporter"
 end
 
+gem 'vcap_common', :require => ['vcap/common', 'vcap/component']
 gem "vcap_logging"
