@@ -861,7 +861,26 @@ describe ACM::Controller::ApiController do
       updated_object[:id].should eql(@object[:id])
       updated_object[:permission_sets].should eql(@object[:permission_sets])
       updated_object[:additional_info].should eql(@object[:additional_info])
-    end
+   end
+
+   it "should return an object with an updated ace even if the user already has permissions to the object" do
+      basic_authorize "admin", "password"
+
+      put "/objects/#{@object[:id]}/acl?id=u-#{@user4}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("put /objects/#{@object[:id]}/acl?id=u-#{@user4}&p=read_appspace last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
+
+      (updated_object[:acl][:read_appspace].include? ("u-#{@user4}")).should be_true
+      updated_object[:id].should eql(@object[:id])
+      updated_object[:permission_sets].should eql(@object[:permission_sets])
+      updated_object[:additional_info].should eql(@object[:additional_info])
+   end
+
 
    it "should return an object with an updated ace for a set of permissions that exists on the object" do
       basic_authorize "admin", "password"
