@@ -112,7 +112,12 @@ module ACM::Services
           # Remove the permissions that are not requested
           ps.permissions.each { |existing_permission|
             if requested_permissions.nil? || !requested_permissions.to_s.include?(existing_permission.name.to_s)
-              existing_permission.destroy()
+              begin
+                existing_permission.destroy()
+              rescue => e
+                @logger.error("Failed to remove permission #{existing_permission}. May be referenced elsewhere")
+                raise ACM::InvalidRequest.new("Failed to remove permission #{existing_permission}")
+              end
             end
           }
 
@@ -129,10 +134,50 @@ module ACM::Services
         end
       end
 
+      ps = ACM::Models::PermissionSets.find(:name => name.to_s)
       @logger.debug("Updated permission set is #{ps.inspect}")
 
-      ps = ACM::Models::PermissionSets.find(:name => name.to_s)
       ps.to_json
+    end
+
+    def delete_permission_set(opts = {})
+      @logger.debug("delete permission_set parameters #{opts}")
+
+      name = get_option(opts, :name)
+      if name.nil?
+        @logger.error("Failed to delete permission set. No name provided")
+        raise ACM::InvalidRequest.new("Missing name for permission set")
+      end
+
+      ps = ACM::Models::PermissionSets.find(:name => name.to_s)
+      if ps.nil?
+        @logger.error("Could not find permission set with name #{name}")
+        raise ACM::ObjectNotFound.new(name)
+      end
+
+      begin
+        ACM::Config.db.transaction do
+
+          # Remove the permissions that are not requested
+          ps.permissions.each { |existing_permission|
+              existing_permission.destroy()
+          }
+
+          ps.save
+          ps.destroy
+        end
+      rescue => e
+        @logger.error("Failed to delete the permission set#{e}")
+        @logger.debug("Failed to delete the permission set #{e.backtrace.inspect}")
+        if (e.kind_of?(ACM::ACMError))
+          raise e
+        else
+          @logger.error("Unknown error #{e}")
+          raise ACM::SystemInternalError.new(e)
+        end
+      end
+
+      nil
     end
 
     def read_permission_set(name)

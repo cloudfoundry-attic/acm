@@ -277,6 +277,97 @@ describe ACM::Controller::ApiController do
       body[:meta][:schema].should eql("urn:acm:schemas:1.0")
     end
 
+    it "should be able to update the permission set to remove all assigned permissions if a permission is not being referenced by an object" do
+      basic_authorize "admin", "password"
+
+      object_data = {
+        :name => "www_staging",
+        :permission_sets => ["app_space"],
+        :id => "54947df8-0e9e-4471-a2f9-9af509fb5889",
+        :additional_info => "{component => cloud_controller}",
+        :meta => {
+          :updated => 1273740902,
+          :created => 1273726800,
+          :schema => "urn:acm:schemas:1.0"
+        }
+      }
+
+      post "/objects", {}, { "CONTENT_TYPE" => "application/json", :input => object_data.to_json() }
+      @logger.debug("post /objects last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+
+      permission_set_data = {
+        :name => "app_space"
+      }
+
+      put "/permission_sets/#{permission_set_data[:name]}", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
+      @logger.debug("put /permission_sets/#{permission_set_data[:name]} last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/permission_sets/#{body[:name]}")
+
+      body[:name].to_s.should eql(permission_set_data[:name].to_s)
+      body[:permissions].size().should eql(0)
+      body[:additional_info].should eql(permission_set_data[:additional_info])
+
+      body[:meta][:created].should_not be_nil
+      body[:meta][:updated].should_not be_nil
+      body[:meta][:schema].should eql("urn:acm:schemas:1.0")
+    end
+
+    it "should not be able to update the permission set to remove all assigned permissions if a permission is being referenced by an object" do
+      basic_authorize "admin", "password"
+
+      @user_service = ACM::Services::UserService.new()
+      @user1 = SecureRandom.uuid
+      @user_service.create_user(:id => @user1)
+      @user2 = SecureRandom.uuid
+      @user_service.create_user(:id => @user2)
+      @user3 = SecureRandom.uuid
+      @user4 = SecureRandom.uuid
+      @user_service.create_user(:id => @user4)
+      @user5 = SecureRandom.uuid
+      @user_service.create_user(:id => @user5)
+      @user6 = SecureRandom.uuid
+      @user_service.create_user(:id => @user6)
+
+
+      object_data = {
+        :name => "www_staging",
+        :additional_info => {:description => :staging_app_space}.to_json(),
+        :permission_sets => [:app_space.to_s],
+        :acl => {
+            :read_appspace => ["u-#{@user1}", "u-#{@user6}"],
+            :delete_appspace => ["u-#{@user2}", "u-#{@user5}"]
+        }
+      }
+
+      post "/objects", {}, { "CONTENT_TYPE" => "application/json", :input => object_data.to_json() }
+      @logger.debug("post /objects last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+
+      permission_set_data = {
+        :name => "app_space"
+      }
+
+      put "/permission_sets/#{permission_set_data[:name]}", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
+      @logger.debug("put /permission_sets/#{permission_set_data[:name]} last response #{last_response.inspect}")
+      last_response.status.should eql(400)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
+
+      body[:code].should eql(1001)
+      body[:description].should include("Invalid request")
+    end
+
+
+
     it "should be able to update the permission set to remove any assigned permissions" do
       basic_authorize "admin", "password"
 
@@ -384,6 +475,7 @@ describe ACM::Controller::ApiController do
       body[:code].should eql(1000)
       body[:description].should include("not found")
     end
+
 
   end
 end
