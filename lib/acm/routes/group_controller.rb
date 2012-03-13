@@ -18,9 +18,7 @@ module ACM::Controller
     get '/groups/:group_id' do
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
 
-      response = @group_service.find_group(params[:group_id])
-
-      response
+      @group_service.find_group(params[:group_id])
     end
 
     delete '/groups/:group_id' do

@@ -19,17 +19,13 @@ module ACM::Controller
     get '/objects/:object_id' do
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
 
-      response = @object_service.read_object(params[:object_id])
-
-      response
+      @object_service.read_object(params[:object_id])
     end
 
     get '/objects/:object_id/users' do
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
 
-      response = @object_service.get_users_for_object(params[:object_id])
-
-      response.to_json
+      @object_service.get_users_for_object(params[:object_id])
     end
 
     delete '/objects/:object_id' do

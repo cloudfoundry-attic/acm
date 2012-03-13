@@ -543,7 +543,7 @@ module ACM::Services
         }
       end
 
-      user_permission_entries
+      user_permission_entries.to_json
     end
 
   end
