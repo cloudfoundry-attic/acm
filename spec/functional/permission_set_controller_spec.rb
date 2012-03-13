@@ -207,4 +207,183 @@ describe ACM::Controller::ApiController do
     end
 
   end
+
+  describe "when updating a permission set" do
+    before(:each) do
+      @logger = ACM::Config.logger
+      basic_authorize "admin", "password"
+
+      permission_set_data = {
+        :name => "app_space",
+        :additional_info => "{component => cloud_controller}",
+        :permissions => [:read_appspace.to_s, :write_appspace.to_s, :delete_appspace.to_s]
+      }
+
+      post "/permission_sets", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
+      @logger.debug("post /permission_sets last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+
+    end
+
+    it "should update all the parameters correctly" do
+      basic_authorize "admin", "password"
+
+      permission_set_data = {
+        :name => "app_space",
+        :additional_info => "{component => [cloud_controller, uaa]}",
+        :permissions => [:get_appspace.to_s, :update_appspace.to_s, :clobber_appspace.to_s]
+      }
+
+      put "/permission_sets/#{permission_set_data[:name]}", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
+      @logger.debug("put /permission_sets/#{permission_set_data[:name]} last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/permission_sets/#{body[:name]}")
+
+      body[:name].to_s.should eql(permission_set_data[:name].to_s)
+      body[:permissions].sort().should eql(permission_set_data[:permissions].sort())
+      body[:additional_info].should eql(permission_set_data[:additional_info])
+
+      body[:meta][:created].should_not be_nil
+      body[:meta][:updated].should_not be_nil
+      body[:meta][:schema].should eql("urn:acm:schemas:1.0")
+    end
+
+    it "should be able to update the permission set to remove all assigned permissions" do
+      basic_authorize "admin", "password"
+
+      permission_set_data = {
+        :name => "app_space"
+      }
+
+      put "/permission_sets/#{permission_set_data[:name]}", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
+      @logger.debug("put /permission_sets/#{permission_set_data[:name]} last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/permission_sets/#{body[:name]}")
+
+      body[:name].to_s.should eql(permission_set_data[:name].to_s)
+      body[:permissions].size().should eql(0)
+      body[:additional_info].should eql(permission_set_data[:additional_info])
+
+      body[:meta][:created].should_not be_nil
+      body[:meta][:updated].should_not be_nil
+      body[:meta][:schema].should eql("urn:acm:schemas:1.0")
+    end
+
+    it "should be able to update the permission set to remove any assigned permissions" do
+      basic_authorize "admin", "password"
+
+      permission_set_data = {
+        :name => "app_space",
+        :additional_info => "{component => [cloud_controller, uaa]}",
+        :permissions => [:read_appspace.to_s, :write_appspace.to_s]
+      }
+
+      put "/permission_sets/#{permission_set_data[:name]}", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
+      @logger.debug("put /permission_sets/#{permission_set_data[:name]} last response #{last_response.inspect}")
+      last_response.status.should eql(200)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should eql("http://example.org/permission_sets/#{body[:name]}")
+
+      body[:name].to_s.should eql(permission_set_data[:name].to_s)
+      body[:permissions].size().should eql(2)
+      body[:additional_info].should eql(permission_set_data[:additional_info])
+
+      body[:meta][:created].should_not be_nil
+      body[:meta][:updated].should_not be_nil
+      body[:meta][:schema].should eql("urn:acm:schemas:1.0")
+    end
+
+
+    it "should not be possible to update a permission set without a name" do
+      basic_authorize "admin", "password"
+
+      permission_set_data = {
+        :name => nil
+      }
+
+      put "/permission_sets/#{permission_set_data[:name]}", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
+      @logger.debug("put /permission_sets/#{permission_set_data[:name]} last response #{last_response.inspect}")
+      last_response.status.should eql(404)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
+
+      body[:code].should eql(1000)
+      body[:description].should include("not found")
+    end
+
+    it "should not be possible to update a permission set that does not exist" do
+      basic_authorize "admin", "password"
+
+      permission_set_data = {
+        :name => "new_app_space",
+        :additional_info => "{component => [cloud_controller, uaa]}",
+        :permissions => [:get_appspace.to_s, :update_appspace.to_s, :clobber_appspace.to_s]
+      }
+
+      put "/permission_sets/#{permission_set_data[:name]}", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
+      @logger.debug("put /permission_sets last response #{last_response.inspect}")
+      last_response.status.should eql(404)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
+
+      body[:code].should eql(1000)
+      body[:description].should include("not found")
+    end
+
+
+    it "should not be possible to update a permission set with invalid json" do
+      basic_authorize "admin", "password"
+
+      permission_set_data = {
+        :name => "app_space",
+        :permissions => "read"
+      }
+
+      put "/permission_sets/#{permission_set_data[:name]}", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
+      @logger.debug("put /permission_sets last response #{last_response.inspect}")
+      last_response.status.should eql(400)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
+
+      body[:code].should eql(1001)
+      body[:description].should include("Invalid request")
+    end
+
+    it "should not be possible to update a permission set empty input" do
+      basic_authorize "admin", "password"
+
+      put "/permission_sets", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("put /permission_sets last response #{last_response.inspect}")
+      last_response.status.should eql(404)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      last_response.original_headers["Location"].should be_nil
+
+      body[:code].should eql(1000)
+      body[:description].should include("not found")
+    end
+
+  end
 end

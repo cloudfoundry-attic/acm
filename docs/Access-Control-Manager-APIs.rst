@@ -364,7 +364,7 @@ Example::
     }
     
 
-Create Permission Set: POST /permissions
+Create Permission Set: POST /permission_sets
 ------------------------------------------------------------------------------------
 
 Creates a permission set
@@ -384,7 +384,7 @@ another permission set and is referenced in this update, the permission will be 
 previous assignment and added to the updated permission set.
 
 
-Update Permission Set: PUT /permissions/*name*
+Update Permission Set: PUT /permission_sets/*name*
 ------------------------------------------------------------------------------------
 
 Complete update of a permission set.
@@ -410,7 +410,7 @@ If a permission is already assigned to another permission set and is referenced 
 permission will be removed from it's previous assignment and added to the updated permission set.
 
 
-Get Permission Set: GET /permissions/*name*
+Get Permission Set: GET /permission_sets/*name*
 ------------------------------------------------------------------------------------
 
 Gets the json representation of a permission set.
@@ -428,7 +428,7 @@ Response Codes   | 200 - Operation was successful
 
 To request specific versions of the permission set schema, see "Versioning of Resource Representations".
 
-Delete Permission Set: DELETE /permissions/*name*
+Delete Permission Set: DELETE /permission_sets/*name*
 --------------------------------------------------------------------------------------
 
 Deletes a permission set.

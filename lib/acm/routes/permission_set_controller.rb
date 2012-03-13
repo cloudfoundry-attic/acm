@@ -18,9 +18,7 @@ module ACM::Controller
     get '/permission_sets/:name' do
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
 
-      response = @permission_set_service.read_permission_set(params[:name])
-
-      response
+      @permission_set_service.read_permission_set(params[:name])
     end
 
     post '/permission_sets' do
@@ -63,6 +61,48 @@ module ACM::Controller
       headers "Location" => "#{request_url}/#{ps[:name]}"
 
       ps_json
+    end
+
+    put '/permission_sets/:name' do
+      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+
+      request_json = nil
+      begin
+        request_json = Yajl::Parser.new.parse(request.body)
+      rescue => e
+        @logger.error("Invalid request #{e.message}")
+        raise ACM::InvalidRequest.new("Invalid character in json request")
+      end
+      @logger.debug("request is #{request_json.inspect}")
+
+      if request_json.nil?
+        @logger.error("Invalid request")
+        raise ACM::InvalidRequest.new("Request is empty")
+      end
+
+      #parse the request
+      name = params[:name]
+      permissions = request_json[:permissions.to_s]
+      additional_info = request_json[:additional_info.to_s]
+
+      if !permissions.nil? && !permissions.kind_of?(Array)
+        @logger.error("Invalid request. Permissions must be an arrary")
+        raise ACM::InvalidRequest.new("Permissions in the input must be an array")
+      end
+
+      ps_json = @permission_set_service.update_permission_set(:name => name,
+                                                              :additional_info => additional_info,
+                                                              :permissions => permissions)
+
+      headers "Location" => "#{request.scheme}://#{request.host_with_port}/permission_sets/#{name}"
+
+      ps_json
+    end
+
+    delete '/permission_sets/:name' do
+      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+
+      @permission_set_service.delete_permission_set(params[:name])
     end
 
   end

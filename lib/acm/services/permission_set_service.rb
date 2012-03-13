@@ -55,6 +55,20 @@ module ACM::Services
       ps.to_json
     end
 
+    # Full update to the permission set
+    # Method does a full replacement of the permission set
+    # If a permission requested is new, a new permission will be created
+    # If the permission exists but is assigned to another permission set,
+    # it will be unassigned from that permission set and assigned to this
+    # one.
+    # If the permission is being referenced in an object, it must be
+    # un-assigned before removal from the set.
+    # Input
+    #   opts - Hash
+    #     :name - string permission set name
+    #     :permissions - array of permissions
+    #     :additional_info - string additional user defined information
+    # 
     def update_permission_set(opts = {})
       @logger.debug("update permission_set parameters #{opts}")
 
@@ -68,6 +82,10 @@ module ACM::Services
       additional_info = get_option(opts, :additional_info)
 
       ps = ACM::Models::PermissionSets.find(:name => name.to_s)
+      if ps.nil?
+        @logger.error("Could not find permission set with name #{name}")
+        raise ACM::ObjectNotFound.new(name)
+      end
 
       begin
         ACM::Config.db.transaction do
