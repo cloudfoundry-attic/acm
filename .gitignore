@@ -3,3 +3,4 @@ cov/
 *.sw*
 .bundle
 spec/spec.log
+spec.log
