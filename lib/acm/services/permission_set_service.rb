@@ -140,16 +140,15 @@ module ACM::Services
       ps.to_json
     end
 
-    def delete_permission_set(opts = {})
-      @logger.debug("delete permission_set parameters #{opts}")
+    def delete_permission_set(name)
+      @logger.debug("delete permission_set #{name}")
 
-      name = get_option(opts, :name)
       if name.nil?
         @logger.error("Failed to delete permission set. No name provided")
         raise ACM::InvalidRequest.new("Missing name for permission set")
       end
 
-      ps = ACM::Models::PermissionSets.find(:name => name.to_s)
+      ps = ACM::Models::PermissionSets.find(:name => name)
       if ps.nil?
         @logger.error("Could not find permission set with name #{name}")
         raise ACM::ObjectNotFound.new(name)
@@ -160,7 +159,12 @@ module ACM::Services
 
           # Remove the permissions that are not requested
           ps.permissions.each { |existing_permission|
+            begin
               existing_permission.destroy()
+            rescue => e
+              @logger.error("Failed to remove permission #{existing_permission.name}. May be referenced elsewhere")
+              raise ACM::InvalidRequest.new("Failed to remove permission #{existing_permission.name}")
+            end
           }
 
           ps.save

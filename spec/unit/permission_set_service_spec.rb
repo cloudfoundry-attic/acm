@@ -261,4 +261,74 @@ describe ACM::Services::PermissionSetService do
 
   end
 
+  describe "deleting a permission set" do
+    before(:each) do
+      @permission_set_service = ACM::Services::PermissionSetService.new()
+
+      @logger = ACM::Config.logger
+
+      @ps1 = Yajl::Parser.parse(@permission_set_service.create_permission_set(:name => :app_space,
+                                                              :permissions => [:read_appspace, :update_appspace, :delete_appspace],
+                                                              :additional_info => "this is the permission set for the app space"))
+
+      @ps2 = Yajl::Parser.parse(@permission_set_service.create_permission_set(:name => :collab_space))
+
+
+      @object_service = ACM::Services::ObjectService.new()
+      @user_service = ACM::Services::UserService.new()
+ 
+      @user1 = SecureRandom.uuid
+      @user_service.create_user(:id => @user1)
+      @user2 = SecureRandom.uuid
+      @user_service.create_user(:id => @user2)
+      @user3 = SecureRandom.uuid
+      @user_service.create_user(:id => @user3)
+      @user4 = SecureRandom.uuid
+      @user_service.create_user(:id => @user4)
+
+    end
+
+    it "should delete a permission set that is not referenced by any objects" do
+      updated_ps = @permission_set_service.delete_permission_set("app_space")
+      
+      updated_ps.should be_nil
+
+      updated_ps = @permission_set_service.delete_permission_set("collab_space")
+      
+      updated_ps.should be_nil
+       
+    end
+
+    it "should fail to delete a permission set with existing permissions that are tied to an object" do
+      new_object = @object_service.create_object(:name => "www_staging",
+                                                :additional_info => {:description => :staging_app_space}.to_json(),
+                                                :permission_sets => [:app_space],
+                                                :acl => {
+                                                    :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
+                                                    :update_appspace => ["u-#{@user1}", "u-#{@user3}", "u-#{@user4}"]
+                                                })
+
+      lambda {
+        @permission_set_service.delete_permission_set("app_space")
+      }.should raise_error
+
+    end
+
+    # Just to make sure everything is really cleaned up
+    it "should be possible to recreate a deleted permission set" do
+      updated_ps = @permission_set_service.delete_permission_set("app_space")
+      
+      updated_ps.should be_nil
+
+      ps_json = Yajl::Parser.parse(@permission_set_service.create_permission_set(:name => :app_space,
+                                                              :permissions => [:read_appspace, :update_appspace, :delete_appspace],
+                                                              :additional_info => "this is the permission set for the app space"))
+
+      ps_json.should eql(@ps1)
+
+    end
+
+
+  end
+
 end
