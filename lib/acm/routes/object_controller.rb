@@ -149,7 +149,7 @@ module ACM::Controller
       @logger.debug("Permissions requested to be removed are #{permissions_request.inspect}")
 
       subject = params[:id]
-      if subject.start_with?("u-") || subject.start_with?("g-")
+      if subject.start_with?("g-")
         subject = subject[2..subject.length]
         @logger.debug("Stripping subject of prefix #{subject}")
       end

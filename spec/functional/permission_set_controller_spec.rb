@@ -340,8 +340,8 @@ describe ACM::Controller::ApiController do
         :additional_info => {:description => :staging_app_space}.to_json(),
         :permission_sets => [:app_space.to_s],
         :acl => {
-            :read_appspace => ["u-#{@user1}", "u-#{@user6}"],
-            :delete_appspace => ["u-#{@user2}", "u-#{@user5}"]
+            :read_appspace => ["#{@user1}", "#{@user6}"],
+            :delete_appspace => ["#{@user2}", "#{@user5}"]
         }
       }
 
@@ -527,8 +527,8 @@ describe ACM::Controller::ApiController do
         :additional_info => {:description => :staging_app_space}.to_json(),
         :permission_sets => [:app_space.to_s],
         :acl => {
-            :read_appspace => ["u-#{@user1}", "u-#{@user6}"],
-            :delete_appspace => ["u-#{@user2}", "u-#{@user5}"]
+            :read_appspace => ["#{@user1}", "#{@user6}"],
+            :delete_appspace => ["#{@user2}", "#{@user5}"]
         }
       }
 

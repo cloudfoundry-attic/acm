@@ -73,7 +73,7 @@ module ACM::Services
                     #TODO: icky code. should allow a set of permissions to be accepted... later
                     add_permission(o.immutable_id, permission, subject[:id])
                   rescue => e
-                    @logger.error("Failed to add permission #{permission.inspect} on object #{o.immutable_id} for user #{user_id} #{e.backtrace}")
+                    @logger.error("Failed to add permission #{permission.inspect} on object #{o.immutable_id} for user #{user_id} #{e.message} #{e.backtrace}")
                     raise ACM::InvalidRequest.new("Failed to add permission #{permission} on object #{o.immutable_id} for user #{user_id}")
                   end
                 }
@@ -195,24 +195,8 @@ module ACM::Services
 
     def get_subject(subject_id)
       subject = nil
-      if subject_id.index("u-") == 0
-        #search for the user. if the user does not exist create it
-        subject_id = subject_id.sub(/(u-)/, '')
-        user_json = nil
-        begin
-          user_json = @user_service.find_user(subject_id)
-        rescue => e
-          if e.kind_of?(ACM::ObjectNotFound)
-            @logger.error("Could not find user #{subject_id}.")
-            raise e
-          else
-            @logger.error("Internal error #{e.message}")
-            raise ACM::SystemInternalError.new()
-          end
-        end
 
-        subject = Yajl::Parser.parse(user_json, :symbolize_keys => true)
-      elsif subject_id.index("g-") == 0
+      if subject_id.index("g-") == 0
         #search for the group. If the group does not exist, error out
         group_id = subject_id.sub(/(g-)/, '')
         group_json = nil
@@ -229,8 +213,25 @@ module ACM::Services
         end
 
         subject = Yajl::Parser.parse(group_json, :symbolize_keys => true)
+      else
+        #search for the user. if the user does not exist create it
+        user_json = nil
+        begin
+          user_json = @user_service.find_user(subject_id)
+        rescue => e
+          if e.kind_of?(ACM::ObjectNotFound)
+            @logger.error("Could not find user #{subject_id}.")
+            raise e
+          else
+            @logger.error("Internal error #{e.message}")
+            raise ACM::SystemInternalError.new()
+          end
+        end
+
+        subject = Yajl::Parser.parse(user_json, :symbolize_keys => true)
       end
 
+      @logger.debug("Found subject #{subject.inspect}")
       subject
     end
 
@@ -284,11 +285,14 @@ module ACM::Services
       end
 
       #find the subject
-      subject = ACM::Models::Subjects.filter(:immutable_id => user_id.to_s).first()
+      if user_id.to_s.index("g-") == 0
+        user_id = user_id.to_s.sub(/(g-)/, '')
+      end
+      subject = ACM::Models::Subjects.filter(:immutable_id => user_id).first()
       @logger.debug("requested subject #{subject.inspect}")
       if subject.nil?
-        @logger.error("Could not find subject #{user_id.to_s}")
-        raise ACM::InvalidRequest.new("Could not find subject #{user_id.to_s}")
+        @logger.error("Could not find subject #{user_id}")
+        raise ACM::InvalidRequest.new("Could not find subject #{user_id}")
       end
 
       ACM::Config.db.transaction do
@@ -312,6 +316,9 @@ module ACM::Services
     end
 
     def remove_subjects_from_ace(obj_id, permissions, subject_id)
+      if user_id.to_s.index("g-") == 0
+        user_id = user_id.to_s.sub(/(g-)/, '')
+      end
 
       user_json = @user_service.find_user(subject_id)
       if user_json.nil?
@@ -363,11 +370,14 @@ module ACM::Services
       end
 
       #find the subject
-      subject = ACM::Models::Subjects.filter(:immutable_id => user_id.to_s).first()
+      if user_id.to_s.index("g-") == 0
+        user_id = user_id.to_s.sub(/(g-)/, '')
+      end
+      subject = ACM::Models::Subjects.filter(:immutable_id => user_id).first()
       @logger.debug("requested subject #{subject.inspect}")
       if subject.nil?
-        @logger.error("Could not find subject #{user_id.to_s}")
-        raise ACM::InvalidRequest.new("Could not find subject #{user_id.to_s}")
+        @logger.error("Could not find subject #{user_id}")
+        raise ACM::InvalidRequest.new("Could not find subject #{user_id}")
       end
 
       ACM::Config.db.transaction do
@@ -441,6 +451,9 @@ module ACM::Services
       end
 
       #find the subject
+      if user_id.to_s.index("g-") == 0
+        user_id = user_id.to_s.sub(/(g-)/, '')
+      end
       subject = ACM::Models::Subjects.filter(:immutable_id => user_id.to_s).first()
       @logger.debug("requested subject #{subject.inspect}")
       if subject.nil?

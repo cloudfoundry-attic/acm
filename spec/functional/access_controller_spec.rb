@@ -60,12 +60,12 @@ describe ACM::Controller::ApiController do
       basic_authorize "admin", "password"
 
       group_data = {
-        :id => @group1,
+        :id => "g-#{@group1}",
         :additional_info => "Developer group",
         :members => [@user3, @user4]
       }
 
-      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
+      post "/groups/#{group_data[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(200)
 
@@ -75,7 +75,7 @@ describe ACM::Controller::ApiController do
         :members => [@user5, @user6, @user7]
       }
 
-      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
+      post "/groups/#{group_data[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(200)
 
@@ -84,9 +84,9 @@ describe ACM::Controller::ApiController do
         :permission_sets => ["app_space"],
         :additional_info => "{component => cloud_controller}",
         :acl => {
-          :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}", "g-#{@group2}"],
-          :write_appspace => ["u-#{@user2}", "g-#{@group1}"],
-          :delete_appspace => ["u-#{@user4}"]
+          :read_appspace => ["#{@user1}", "#{@user2}", "#{@user3}", "#{@user4}", "g-#{@group2}"],
+          :write_appspace => ["#{@user2}", "g-#{@group1}"],
+          :delete_appspace => ["#{@user4}"]
          }
       }
 

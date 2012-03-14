@@ -27,7 +27,7 @@ module ACM::Controller
       @group_service.delete_group(params[:group_id])
     end
 
-    post '/groups' do
+    post '/groups/:group_id' do
       content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
 
       request_json = nil
@@ -45,7 +45,7 @@ module ACM::Controller
       end
 
       #parse the request
-      id = request_json[:id.to_s]
+      id = params[:group_id]
       members = request_json[:members.to_s]
       additional_info = request_json[:additional_info.to_s]
 
@@ -59,7 +59,11 @@ module ACM::Controller
       if request_url.end_with? ["/"]
         request_url.chop()
       end
-      headers "Location" => "#{request_url}/#{group[:id]}"
+      if params[:group_id].nil?
+        headers "Location" => "#{request_url}/#{group[:id]}"
+      else
+        headers "Location" => "#{request_url}"
+      end
 
       group_json
     end
@@ -82,7 +86,7 @@ module ACM::Controller
       end
 
       #parse the request
-      id = request_json[:id.to_s]
+      id = params[:group_id]
       members = request_json[:members.to_s]
       additional_info = request_json[:additional_info.to_s]
 
@@ -99,7 +103,6 @@ module ACM::Controller
       headers "Location" => "#{request_url}"
 
       group_json
-
     end
 
     put '/groups/:group_id/members/:user_id' do

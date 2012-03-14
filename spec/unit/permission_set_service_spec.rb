@@ -143,8 +143,8 @@ describe ACM::Services::PermissionSetService do
                                                 :additional_info => {:description => :staging_app_space}.to_json(),
                                                 :permission_sets => [:app_space],
                                                 :acl => {
-                                                    :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
-                                                    :update_appspace => ["u-#{@user1}", "u-#{@user3}", "u-#{@user4}"]
+                                                    :read_appspace => ["#{@user1}", "#{@user2}", "#{@user3}", "#{@user4}"],
+                                                    :update_appspace => ["#{@user1}", "#{@user3}", "#{@user4}"]
                                                 })
 
       lambda {
@@ -170,8 +170,8 @@ describe ACM::Services::PermissionSetService do
                                                 :additional_info => {:description => :staging_app_space}.to_json(),
                                                 :permission_sets => [:app_space],
                                                 :acl => {
-                                                    :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
-                                                    :update_appspace => ["u-#{@user1}", "u-#{@user3}", "u-#{@user4}"]
+                                                    :read_appspace => ["#{@user1}", "#{@user2}", "#{@user3}", "#{@user4}"],
+                                                    :update_appspace => ["#{@user1}", "#{@user3}", "#{@user4}"]
                                                 }), :symbolize_keys => true)
 
       new_ps = Yajl::Parser.parse(@permission_set_service.create_permission_set(:name => :collab_space), :symbolize_keys => true)
@@ -196,8 +196,8 @@ describe ACM::Services::PermissionSetService do
                                                 :additional_info => {:description => :staging_app_space}.to_json(),
                                                 :permission_sets => [:app_space],
                                                 :acl => {
-                                                    :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
-                                                    :update_appspace => ["u-#{@user1}", "u-#{@user3}", "u-#{@user4}"]
+                                                    :read_appspace => ["#{@user1}", "#{@user2}", "#{@user3}", "#{@user4}"],
+                                                    :update_appspace => ["#{@user1}", "#{@user3}", "#{@user4}"]
                                                 }), :symbolize_keys => true)
 
       new_ps = Yajl::Parser.parse(@permission_set_service.create_permission_set(:name => :collab_space), :symbolize_keys => true)
@@ -304,8 +304,8 @@ describe ACM::Services::PermissionSetService do
                                                 :additional_info => {:description => :staging_app_space}.to_json(),
                                                 :permission_sets => [:app_space],
                                                 :acl => {
-                                                    :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
-                                                    :update_appspace => ["u-#{@user1}", "u-#{@user3}", "u-#{@user4}"]
+                                                    :read_appspace => ["#{@user1}", "#{@user2}", "#{@user3}", "#{@user4}"],
+                                                    :update_appspace => ["#{@user1}", "#{@user3}", "#{@user4}"]
                                                 })
 
       lambda {

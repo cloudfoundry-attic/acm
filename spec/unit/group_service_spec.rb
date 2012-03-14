@@ -39,11 +39,11 @@ describe ACM::Services::GroupService do
 
     it "should create an empty group given a unique id" do
 
-      group_json = @group_service.create_group(:id => @group1, :additional_info => "Developer group")
+      group_json = @group_service.create_group(:id => "g-#{@group1}", :additional_info => "Developer group")
 
       group = Yajl::Parser.parse(group_json, :symbolize_keys => true)
 
-      group[:id].should eql(@group1)
+      group[:id].should eql("g-#{@group1}")
       group[:members].should be_nil
       group[:additional_info].should eql("Developer group")
 
@@ -54,13 +54,13 @@ describe ACM::Services::GroupService do
 
     it "should create a group correctly given a unique id and a set of members" do
 
-      group_json = @group_service.create_group(:id => @group1,
+      group_json = @group_service.create_group(:id => "g-#{@group1}",
                                               :additional_info => "Developer group",
                                               :members => [@user1, @user2, @user3, @user4])
 
       group = Yajl::Parser.parse(group_json, :symbolize_keys => true)
 
-      group[:id].should eql(@group1)
+      group[:id].should eql("g-#{@group1}")
       group[:members].sort().should eql([@user1, @user2, @user3, @user4].sort())
       group[:additional_info].should eql("Developer group")
 
@@ -86,12 +86,12 @@ describe ACM::Services::GroupService do
 
     it "should not be possible to create a group with an existing name" do
 
-      group_json = @group_service.create_group(:id => @group1,
+      group_json = @group_service.create_group(:id => "g-#{@group1}",
                                               :additional_info => "Developer group",
                                               :members => [@user1, @user2, @user3, @user4])
 
       lambda {
-        group_json = @group_service.create_group(:id => @group1)
+        group_json = @group_service.create_group(:id => "g-#{@group1}")
       }.should raise_error(ACM::InvalidRequest)
 
     end
@@ -102,7 +102,7 @@ describe ACM::Services::GroupService do
 
     it "should return the group requested" do
 
-      group_json = @group_service.create_group(:id => @group1,
+      group_json = @group_service.create_group(:id => "g-#{@group1}",
                                               :additional_info => "Developer group",
                                               :members => [@user1, @user2, @user3, @user4])
       group = Yajl::Parser.parse(group_json, :symbolize_keys => true)
@@ -119,7 +119,7 @@ describe ACM::Services::GroupService do
   describe "adding a member to a group" do
 
     it "should add a member to a group" do
-      group_json = @group_service.create_group(:id => @group1,
+      group_json = @group_service.create_group(:id => "g-#{@group1}",
                                               :additional_info => "Developer group",
                                               :members => [@user1, @user2, @user3, @user4])
       group = Yajl::Parser.parse(group_json, :symbolize_keys => true)
@@ -137,7 +137,7 @@ describe ACM::Services::GroupService do
   describe "removing a member from a group" do
 
     it "should work with the remove_user_from_group api" do
-      group_json = @group_service.create_group(:id => @group1,
+      group_json = @group_service.create_group(:id => "g-#{@group1}",
                                               :additional_info => "Developer group",
                                               :members => [@user1, @user2, @user3, @user4])
       group = Yajl::Parser.parse(group_json, :symbolize_keys => true)
@@ -149,7 +149,7 @@ describe ACM::Services::GroupService do
     end
 
     it "should not be possible to remove a member that does not exist in the group" do
-      group_json = @group_service.create_group(:id => @group1,
+      group_json = @group_service.create_group(:id => "g-#{@group1}",
                                               :additional_info => "Developer group",
                                               :members => [@user1, @user2, @user3, @user4])
       group = Yajl::Parser.parse(group_json, :symbolize_keys => true)
@@ -166,7 +166,7 @@ describe ACM::Services::GroupService do
   describe "updating a group" do 
 
     before(:each) do
-      group_json = @group_service.create_group(:id => @group1,
+      group_json = @group_service.create_group(:id => "g-#{@group1}",
                                               :additional_info => "Developer group",
                                               :members => [@user1, @user2, @user3, @user4])
       group = Yajl::Parser.parse(group_json, :symbolize_keys => true)
@@ -174,29 +174,29 @@ describe ACM::Services::GroupService do
     end
     
     it "should be able to replace all the properties of an existing group" do 
-      new_group_json = @group_service.update_group(:id => @group1,
+      new_group_json = @group_service.update_group(:id => "g-#{@group1}",
                                                    :additional_info => "Updated Developer group",
                                                    :members => [@user1])
 
       updated_group = Yajl::Parser.parse(new_group_json, :symbolize_keys => true)
       updated_group[:additional_info].should eql("Updated Developer group")
       updated_group[:members].should eql([@user1])
-      updated_group[:id].should eql(@group1)
+      updated_group[:id].should eql("g-#{@group1}")
    
     end
 
     it "should be able to replace the group with an empty one" do 
-      new_group_json = @group_service.update_group(:id => @group1)
+      new_group_json = @group_service.update_group(:id => "g-#{@group1}")
 
       updated_group = Yajl::Parser.parse(new_group_json, :symbolize_keys => true)
       updated_group[:additional_info].should be_nil
       updated_group[:members].should be_nil
-      updated_group[:id].should eql(@group1)
+      updated_group[:id].should eql("g-#{@group1}")
 
     end
 
     it "should be able to replace the group with nil members or other fields" do 
-      new_group_json = @group_service.update_group(:id => @group1,
+      new_group_json = @group_service.update_group(:id => "g-#{@group1}",
                                                    :additional_info => nil,
                                                    :members => nil)
 
@@ -204,31 +204,31 @@ describe ACM::Services::GroupService do
       updated_group = Yajl::Parser.parse(new_group_json, :symbolize_keys => true)
       updated_group[:additional_info].should be_nil
       updated_group[:members].should be_nil
-      updated_group[:id].should eql(@group1)
+      updated_group[:id].should eql("g-#{@group1}")
 
     end
 
     it "should be able to replace the group with nil members or other fields" do 
-      new_group_json = @group_service.update_group(:id => @group1,
+      new_group_json = @group_service.update_group(:id => "g-#{@group1}",
                                                    :additional_info => "",
                                                    :members => [])
 
       updated_group = Yajl::Parser.parse(new_group_json, :symbolize_keys => true)
       updated_group[:additional_info].should eql("")
       updated_group[:members].should be_nil
-      updated_group[:id].should eql(@group1)
+      updated_group[:id].should eql("g-#{@group1}")
 
     end
 
     it "should be able to replace the group with nil members or other fields" do 
-      new_group_json = @group_service.update_group(:id => @group1,
+      new_group_json = @group_service.update_group(:id => "g-#{@group1}",
                                                    :additional_info => "",
                                                    :members => [nil])
 
       updated_group = Yajl::Parser.parse(new_group_json, :symbolize_keys => true)
       updated_group[:additional_info].should eql("")
       updated_group[:members].should be_nil
-      updated_group[:id].should eql(@group1)
+      updated_group[:id].should eql("g-#{@group1}")
 
     end
     

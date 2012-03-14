@@ -174,7 +174,7 @@ describe ACM::Controller::ApiController do
       @user_service.create_user(:id => @user6)
 
       @group1 = SecureRandom.uuid
-      @group_service.create_group(:id => @group1, :members => [@user1])
+      @group_service.create_group(:id => "g-#{@group1}", :members => [@user1])
       @group2 = SecureRandom.uuid
       @group_service.create_group(:id => @group2)
       @group3 = SecureRandom.uuid
@@ -187,9 +187,9 @@ describe ACM::Controller::ApiController do
         :additional_info => {:description => :staging_app_space}.to_json(),
         :permission_sets => [:app_space.to_s],
         :acl => {
-            :read_appspace => ["g-#{@group1}", "g-#{@group2}", "g-#{@group4}", "u-#{@user1}", "u-#{@user6}"],
+            :read_appspace => ["g-#{@group1}", "g-#{@group2}", "g-#{@group4}", "#{@user1}", "#{@user6}"],
             :write_appspace => ["g-#{@group1}", "g-#{@group3}", "g-#{@group4}"],
-            :delete_appspace => ["u-#{@user2}", "u-#{@user5}", "g-#{@group3}"]
+            :delete_appspace => ["#{@user2}", "#{@user5}", "g-#{@group3}"]
         }
       }
 
@@ -207,13 +207,13 @@ describe ACM::Controller::ApiController do
       sorted_acls.should eql([:read_appspace, :write_appspace, :delete_appspace].sort())
 
       sorted_users = body[:acl][:read_appspace].sort()
-      sorted_users.should eql(["g-#{@group1}", "g-#{@group2}", "g-#{@group4}", "u-#{@user1}", "u-#{@user6}"].sort())
+      sorted_users.should eql(["g-#{@group1}", "g-#{@group2}", "g-#{@group4}", "#{@user1}", "#{@user6}"].sort())
 
       sorted_users = body[:acl][:write_appspace].sort()
       sorted_users.should eql(["g-#{@group1}", "g-#{@group3}", "g-#{@group4}"].sort())
 
       sorted_users = body[:acl][:delete_appspace].sort()
-      sorted_users.should eql(["u-#{@user2}", "u-#{@user5}", "g-#{@group3}"].sort())
+      sorted_users.should eql(["#{@user2}", "#{@user5}", "g-#{@group3}"].sort())
 
       body[:name].to_s.should eql(object_data[:name].to_s)
       body[:permission_sets].should eql(object_data[:permission_sets])
@@ -232,9 +232,9 @@ describe ACM::Controller::ApiController do
         :permission_sets => ["app_space"],
         :additional_info => "{component => cloud_controller}",
         :acl => {
-          :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
-          :write_appspace => ["u-#{@user2}", "u-#{@user3}"],
-          :delete_appspace => ["u-#{@user4}"]
+          :read_appspace => ["#{@user1}", "#{@user2}", "#{@user3}", "#{@user4}"],
+          :write_appspace => ["#{@user2}", "#{@user3}"],
+          :delete_appspace => ["#{@user4}"]
          }
       }
 
@@ -252,13 +252,13 @@ describe ACM::Controller::ApiController do
       sorted_acls.should eql([:read_appspace, :write_appspace, :delete_appspace].sort())
 
       sorted_users = body[:acl][:read_appspace].sort()
-      sorted_users.should eql(["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"].sort())
+      sorted_users.should eql(["#{@user1}", "#{@user2}", "#{@user3}", "#{@user4}"].sort())
 
       sorted_users = body[:acl][:write_appspace].sort()
-      sorted_users.should eql(["u-#{@user2}", "u-#{@user3}"].sort())
+      sorted_users.should eql(["#{@user2}", "#{@user3}"].sort())
 
       sorted_users = body[:acl][:delete_appspace].sort()
-      sorted_users.should eql(["u-#{@user4}"].sort())
+      sorted_users.should eql(["#{@user4}"].sort())
 
       body[:name].to_s.should eql(object_data[:name].to_s)
       body[:permission_sets].should eql(object_data[:permission_sets])
@@ -276,9 +276,9 @@ describe ACM::Controller::ApiController do
         :name => "www_staging",
         :additional_info => "{component => cloud_controller}",
         :acl => {
-          :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
-          :write_appspace => ["u-#{@user2}", "u-#{@user3}"],
-          :delete_appspace => ["u-#{@user4}"]
+          :read_appspace => ["#{@user1}", "#{@user2}", "#{@user3}", "#{@user4}"],
+          :write_appspace => ["#{@user2}", "#{@user3}"],
+          :delete_appspace => ["#{@user4}"]
          }
       }
 
@@ -304,9 +304,9 @@ describe ACM::Controller::ApiController do
         :permission_sets => ["app_space"],
         :additional_info => "{component => cloud_controller}",
         :acl => {
-          :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
-          :write_appspace => ["u-#{@user2}", "u-#{@user3}"],
-          :update_appspace => ["u-#{@user4}"]
+          :read_appspace => ["#{@user1}", "#{@user2}", "#{@user3}", "#{@user4}"],
+          :write_appspace => ["#{@user2}", "#{@user3}"],
+          :update_appspace => ["#{@user4}"]
          }
       }
 
@@ -358,9 +358,9 @@ describe ACM::Controller::ApiController do
         :permission_sets => ["app_space"],
         :additional_info => "{component => cloud_controller}",
         :acl => {
-          :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
-          :write_appspace => ["u-#{@user2}", "u-#{@user3}"],
-          :delete_appspace => ["u-#{@user4}"]
+          :read_appspace => ["#{@user1}", "#{@user2}", "#{@user3}", "#{@user4}"],
+          :write_appspace => ["#{@user2}", "#{@user3}"],
+          :delete_appspace => ["#{@user4}"]
          }
       }
 
@@ -452,9 +452,9 @@ describe ACM::Controller::ApiController do
         :permission_sets => ["app_space"],
         :additional_info => "{component => cloud_controller}",
         :acl => {
-          :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
-          :write_appspace => ["u-#{@user2}", "u-#{@user3}"],
-          :delete_appspace => ["u-#{@user4}"]
+          :read_appspace => ["#{@user1}", "#{@user2}", "#{@user3}", "#{@user4}"],
+          :write_appspace => ["#{@user2}", "#{@user3}"],
+          :delete_appspace => ["#{@user4}"]
          }
       }
 
@@ -490,9 +490,9 @@ describe ACM::Controller::ApiController do
         :permission_sets => ["app_space"],
         :additional_info => "{component => cloud_controller}",
         :acl => {
-          :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
-          :write_appspace => ["u-#{@user2}", "u-#{@user3}"],
-          :delete_appspace => ["u-#{@user4}"]
+          :read_appspace => ["#{@user1}", "#{@user2}", "#{@user3}", "#{@user4}"],
+          :write_appspace => ["#{@user2}", "#{@user3}"],
+          :delete_appspace => ["#{@user4}"]
          }
       }
 
@@ -510,13 +510,13 @@ describe ACM::Controller::ApiController do
       sorted_acls.should eql([:read_appspace, :write_appspace, :delete_appspace].sort())
 
       sorted_users = body[:acl][:read_appspace].sort()
-      sorted_users.should eql(["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"].sort())
+      sorted_users.should eql(["#{@user1}", "#{@user2}", "#{@user3}", "#{@user4}"].sort())
 
       sorted_users = body[:acl][:write_appspace].sort()
-      sorted_users.should eql(["u-#{@user2}", "u-#{@user3}"].sort())
+      sorted_users.should eql(["#{@user2}", "#{@user3}"].sort())
 
       sorted_users = body[:acl][:delete_appspace].sort()
-      sorted_users.should eql(["u-#{@user4}"].sort())
+      sorted_users.should eql(["#{@user4}"].sort())
 
       body[:name].to_s.should eql(object_data[:name].to_s)
       body[:permission_sets].should eql(object_data[:permission_sets])
@@ -591,12 +591,12 @@ describe ACM::Controller::ApiController do
       basic_authorize "admin", "password"
 
       group_data = {
-        :id => @group1,
+        :id => "g-#{@group1}",
         :additional_info => "Developer group",
         :members => [@user3, @user4]
       }
 
-      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
+      post "/groups/#{group_data[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(200)
 
@@ -606,7 +606,7 @@ describe ACM::Controller::ApiController do
         :members => [@user5, @user6, @user7]
       }
 
-      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
+      post "/groups/#{group_data[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(200)
 
@@ -615,9 +615,9 @@ describe ACM::Controller::ApiController do
         :permission_sets => ["app_space"],
         :additional_info => "{component => cloud_controller}",
         :acl => {
-          :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}", "g-#{@group2}"],
-          :write_appspace => ["u-#{@user2}", "g-#{@group1}"],
-          :delete_appspace => ["u-#{@user4}"]
+          :read_appspace => ["#{@user1}", "#{@user2}", "#{@user3}", "#{@user4}", "g-#{@group2}"],
+          :write_appspace => ["#{@user2}", "g-#{@group1}"],
+          :delete_appspace => ["#{@user4}"]
          }
       }
 
@@ -682,12 +682,12 @@ describe ACM::Controller::ApiController do
       basic_authorize "admin", "password"
 
       group_data = {
-        :id => @group1,
+        :id => "g-#{@group1}",
         :additional_info => "Developer group",
         :members => [@user3, @user4]
       }
 
-      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
+      post "/groups/#{group_data[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(200)
 
@@ -697,7 +697,7 @@ describe ACM::Controller::ApiController do
         :members => [@user5, @user6, @user7]
       }
 
-      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
+      post "/groups/#{group_data[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(200)
 
@@ -706,8 +706,8 @@ describe ACM::Controller::ApiController do
         :permission_sets => ["app_space"],
         :additional_info => "{component => cloud_controller}",
         :acl => {
-          :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}", "g-#{@group2}"],
-        :write_appspace => ["u-#{@user2}", "g-#{@group1}"]
+          :read_appspace => ["#{@user1}", "#{@user2}", "#{@user3}", "#{@user4}", "g-#{@group2}"],
+        :write_appspace => ["#{@user2}", "g-#{@group1}"]
          }
       }
 
@@ -721,8 +721,8 @@ describe ACM::Controller::ApiController do
     it "should return an object with a new ace for a permission that does not exist in the object" do
       basic_authorize "admin", "password"
 
-      put "/objects/#{@object[:id]}/acl?id=u-#{@user4}&p=delete_appspace", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("put /objects/#{@object[:id]}/acl?id=u-#{@user4}&p=delete_appspace last response #{last_response.inspect}")
+      put "/objects/#{@object[:id]}/acl?id=#{@user4}&p=delete_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("put /objects/#{@object[:id]}/acl?id=#{@user4}&p=delete_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
@@ -730,7 +730,7 @@ describe ACM::Controller::ApiController do
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
 
-      (updated_object[:acl][:delete_appspace].include? ("u-#{@user4}")).should be_true
+      (updated_object[:acl][:delete_appspace].include? ("#{@user4}")).should be_true
       updated_object[:id].should eql(@object[:id])
       updated_object[:permission_sets].should eql(@object[:permission_sets])
       updated_object[:additional_info].should eql(@object[:additional_info])
@@ -739,8 +739,8 @@ describe ACM::Controller::ApiController do
     it "should return an object with a new ace for a set of permissions that do not exist in the object" do
       basic_authorize "admin", "password"
 
-      delete "/objects/#{@object[:id]}/acl?id=u-#{@user2}&p=read_appspace,write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("delete /objects/#{@object[:id]}/acl?id=u-#{@user2}&p=read_appspace,write_appspace last response #{last_response.inspect}")
+      delete "/objects/#{@object[:id]}/acl?id=#{@user2}&p=read_appspace,write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("delete /objects/#{@object[:id]}/acl?id=#{@user2}&p=read_appspace,write_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
@@ -748,8 +748,8 @@ describe ACM::Controller::ApiController do
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
 
-      (updated_object[:acl][:read_appspace].include? ("u-#{@user2}")).should_not be_true
-      (updated_object[:acl][:write_appspace].include? ("u-#{@user2}")).should_not be_true
+      (updated_object[:acl][:read_appspace].include? ("#{@user2}")).should_not be_true
+      (updated_object[:acl][:write_appspace].include? ("#{@user2}")).should_not be_true
       updated_object[:id].should eql(@object[:id])
       updated_object[:permission_sets].should eql(@object[:permission_sets])
       updated_object[:additionalInfo].should eql(@object[:additionalInfo])
@@ -758,8 +758,8 @@ describe ACM::Controller::ApiController do
    it "should remove an ace for a subject when a permission has been deleted" do
       basic_authorize "admin", "password"
 
-      delete "/objects/#{@object[:id]}/acl?id=u-#{@user1}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("delete /objects/#{@object[:id]}/acl?id=u-#{@user1}&p=read_appspace last response #{last_response.inspect}")
+      delete "/objects/#{@object[:id]}/acl?id=#{@user1}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("delete /objects/#{@object[:id]}/acl?id=#{@user1}&p=read_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
@@ -767,7 +767,7 @@ describe ACM::Controller::ApiController do
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
 
-      (updated_object[:acl][:read_appspace].include? ("u-#{@user1}")).should_not be_true
+      (updated_object[:acl][:read_appspace].include? ("#{@user1}")).should_not be_true
       updated_object[:id].should eql(@object[:id])
       updated_object[:permission_sets].should eql(@object[:permission_sets])
       updated_object[:additionalInfo].should eql(@object[:additionalInfo])
@@ -776,8 +776,8 @@ describe ACM::Controller::ApiController do
     it "should remove the required aces for a subject when a set of permission has been deleted" do
       basic_authorize "admin", "password"
 
-      delete "/objects/#{@object[:id]}/acl?id=u-#{@user1}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("delete /objects/#{@object[:id]}/acl?id=u-#{@user1}&p=read_appspace last response #{last_response.inspect}")
+      delete "/objects/#{@object[:id]}/acl?id=#{@user1}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("delete /objects/#{@object[:id]}/acl?id=#{@user1}&p=read_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
@@ -785,7 +785,7 @@ describe ACM::Controller::ApiController do
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
 
-      (updated_object[:acl][:read_appspace].include? ("u-#{@user1}")).should_not be_true
+      (updated_object[:acl][:read_appspace].include? ("#{@user1}")).should_not be_true
       updated_object[:id].should eql(@object[:id])
       updated_object[:permission_sets].should eql(@object[:permission_sets])
       updated_object[:additional_info].should eql(@object[:additional_info])
@@ -794,8 +794,8 @@ describe ACM::Controller::ApiController do
    it "should remove an ace for a subject when a permission has been deleted" do
       basic_authorize "admin", "password"
 
-      delete "/objects/#{@object[:id]}/acl?id=u-#{@user1}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("delete /objects/#{@object[:id]}/acl?id=u-#{@user1}&p=read_appspace last response #{last_response.inspect}")
+      delete "/objects/#{@object[:id]}/acl?id=#{@user1}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("delete /objects/#{@object[:id]}/acl?id=#{@user1}&p=read_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
@@ -803,7 +803,7 @@ describe ACM::Controller::ApiController do
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
 
-      (updated_object[:acl][:read_appspace].include? ("u-#{@user1}")).should_not be_true
+      (updated_object[:acl][:read_appspace].include? ("#{@user1}")).should_not be_true
       updated_object[:id].should eql(@object[:id])
       updated_object[:permission_sets].should eql(@object[:permission_sets])
       updated_object[:additional_info].should eql(@object[:additional_info])
@@ -812,8 +812,8 @@ describe ACM::Controller::ApiController do
     it "should remove the required aces for a subject when a set of permission has been deleted" do
       basic_authorize "admin", "password"
 
-      delete "/objects/#{@object[:id]}/acl?id=u-#{@user1}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("delete /objects/#{@object[:id]}/acl?id=u-#{@user1}&p=read_appspace last response #{last_response.inspect}")
+      delete "/objects/#{@object[:id]}/acl?id=#{@user1}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("delete /objects/#{@object[:id]}/acl?id=#{@user1}&p=read_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
@@ -821,7 +821,7 @@ describe ACM::Controller::ApiController do
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
 
-      (updated_object[:acl][:read_appspace].include? ("u-#{@user1}")).should_not be_true
+      (updated_object[:acl][:read_appspace].include? ("#{@user1}")).should_not be_true
       updated_object[:id].should eql(@object[:id])
       updated_object[:permission_sets].should eql(@object[:permission_sets])
       updated_object[:additional_info].should eql(@object[:additional_info])
@@ -831,8 +831,8 @@ describe ACM::Controller::ApiController do
     it "should return an error when trying to remove a non-existent permission" do
       basic_authorize "admin", "password"
 
-      delete "/objects/#{@object[:id]}/acl?id=u-#{@user4}&p=delete_appspace,add_app_to_appspace,remove_app_from_appspace", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("delete /objects/#{@object[:id]}/acl?id=u-#{@user4}&p=delete_appspace,add_app_to_appspace,remove_app_from_appspace last response #{last_response.inspect}")
+      delete "/objects/#{@object[:id]}/acl?id=#{@user4}&p=delete_appspace,add_app_to_appspace,remove_app_from_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("delete /objects/#{@object[:id]}/acl?id=#{@user4}&p=delete_appspace,add_app_to_appspace,remove_app_from_appspace last response #{last_response.inspect}")
 
       last_response.status.should eql(400)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
@@ -848,8 +848,8 @@ describe ACM::Controller::ApiController do
    it "should return an object with an updated ace for a permission that exists in the object" do
       basic_authorize "admin", "password"
 
-      put "/objects/#{@object[:id]}/acl?id=u-#{@user4}&p=write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("put /objects/#{@object[:id]}/acl?id=u-#{@user4}&p=write_appspace last response #{last_response.inspect}")
+      put "/objects/#{@object[:id]}/acl?id=#{@user4}&p=write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("put /objects/#{@object[:id]}/acl?id=#{@user4}&p=write_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
@@ -857,7 +857,7 @@ describe ACM::Controller::ApiController do
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
 
-      (updated_object[:acl][:write_appspace].include? ("u-#{@user4}")).should be_true
+      (updated_object[:acl][:write_appspace].include? ("#{@user4}")).should be_true
       updated_object[:id].should eql(@object[:id])
       updated_object[:permission_sets].should eql(@object[:permission_sets])
       updated_object[:additional_info].should eql(@object[:additional_info])
@@ -866,8 +866,8 @@ describe ACM::Controller::ApiController do
    it "should return an object with an updated ace even if the user already has permissions to the object" do
       basic_authorize "admin", "password"
 
-      put "/objects/#{@object[:id]}/acl?id=u-#{@user4}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("put /objects/#{@object[:id]}/acl?id=u-#{@user4}&p=read_appspace last response #{last_response.inspect}")
+      put "/objects/#{@object[:id]}/acl?id=#{@user4}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("put /objects/#{@object[:id]}/acl?id=#{@user4}&p=read_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
@@ -875,7 +875,7 @@ describe ACM::Controller::ApiController do
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
 
-      (updated_object[:acl][:read_appspace].include? ("u-#{@user4}")).should be_true
+      (updated_object[:acl][:read_appspace].include? ("#{@user4}")).should be_true
       updated_object[:id].should eql(@object[:id])
       updated_object[:permission_sets].should eql(@object[:permission_sets])
       updated_object[:additional_info].should eql(@object[:additional_info])
@@ -885,8 +885,8 @@ describe ACM::Controller::ApiController do
    it "should return an object with an updated ace for a set of permissions that exists on the object" do
       basic_authorize "admin", "password"
 
-      put "/objects/#{@object[:id]}/acl?id=u-#{@user7}&p=read_appspace,write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("put /objects/#{@object[:id]}/acl?id=u-#{@user7}&p=read_appspace,write_appspace last response #{last_response.inspect}")
+      put "/objects/#{@object[:id]}/acl?id=#{@user7}&p=read_appspace,write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("put /objects/#{@object[:id]}/acl?id=#{@user7}&p=read_appspace,write_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
@@ -894,8 +894,8 @@ describe ACM::Controller::ApiController do
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
 
-      (updated_object[:acl][:write_appspace].include? ("u-#{@user7}")).should be_true
-      (updated_object[:acl][:read_appspace].include? ("u-#{@user7}")).should be_true
+      (updated_object[:acl][:write_appspace].include? ("#{@user7}")).should be_true
+      (updated_object[:acl][:read_appspace].include? ("#{@user7}")).should be_true
       updated_object[:id].should eql(@object[:id])
       updated_object[:permission_sets].should eql(@object[:permission_sets])
       updated_object[:additional_info].should eql(@object[:additional_info])
@@ -905,8 +905,8 @@ describe ACM::Controller::ApiController do
     it "should not return the same user twice in the ace if it already exists" do
       basic_authorize "admin", "password"
 
-      put "/objects/#{@object[:id]}/acl?id=u-#{@user1}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("put /objects/#{@object[:id]}/acl?id=u-#{@user1}&p=read_appspace last response #{last_response.inspect}")
+      put "/objects/#{@object[:id]}/acl?id=#{@user1}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("put /objects/#{@object[:id]}/acl?id=#{@user1}&p=read_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
@@ -914,7 +914,7 @@ describe ACM::Controller::ApiController do
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
 
-      (updated_object[:acl][:read_appspace].include? ("u-#{@user1}")).should be_true
+      (updated_object[:acl][:read_appspace].include? ("#{@user1}")).should be_true
       updated_object[:acl][:read_appspace].size().should eql(@object[:acl][:read_appspace].size())
       updated_object[:id].should eql(@object[:id])
       updated_object[:permission_sets].should eql(@object[:permission_sets])
@@ -924,8 +924,8 @@ describe ACM::Controller::ApiController do
     it "should return an error for a permission that is not in the permission set" do
       basic_authorize "admin", "password"
 
-      put "/objects/#{@object[:id]}/acl?id=u-#{@user1}&p=clobber_appspace", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("put /objects/#{@object[:id]}/acl?id=u-#{@user1}&p=clobber_appspace last response #{last_response.inspect}")
+      put "/objects/#{@object[:id]}/acl?id=#{@user1}&p=clobber_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("put /objects/#{@object[:id]}/acl?id=#{@user1}&p=clobber_appspace last response #{last_response.inspect}")
       last_response.status.should eql(400)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
@@ -940,8 +940,8 @@ describe ACM::Controller::ApiController do
     it "should return an error if a single permission is not in the permission set" do
       basic_authorize "admin", "password"
 
-      put "/objects/#{@object[:id]}/acl?id=u-#{@user1}&p=read_appspace,clobber_appspace", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("put /objects/#{@object[:id]}/acl?id=u-#{@user1}&p=read_appspace,clobber_appspace last response #{last_response.inspect}")
+      put "/objects/#{@object[:id]}/acl?id=#{@user1}&p=read_appspace,clobber_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("put /objects/#{@object[:id]}/acl?id=#{@user1}&p=read_appspace,clobber_appspace last response #{last_response.inspect}")
       last_response.status.should eql(400)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
@@ -958,8 +958,8 @@ describe ACM::Controller::ApiController do
       basic_authorize "admin", "password"
 
       new_object_id = SecureRandom.uuid
-      put "/objects/#{new_object_id}/acl?id=u-#{@user1}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("put /objects/#{new_object_id}/acl?id=u-#{@user1}&p=read_appspace last response #{last_response.inspect}")
+      put "/objects/#{new_object_id}/acl?id=#{@user1}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("put /objects/#{new_object_id}/acl?id=#{@user1}&p=read_appspace last response #{last_response.inspect}")
       last_response.status.should eql(404)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
       last_response.original_headers["Content-Length"].should_not eql("0")
@@ -975,8 +975,8 @@ describe ACM::Controller::ApiController do
       basic_authorize "admin", "password"
 
       new_user = SecureRandom.uuid
-      put "/objects/#{@object[:id]}/acl?id=u-#{new_user}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
-      @logger.debug("put /objects/#{@object[:id]}/acl?id=u-#{new_user}&p=read_appspace last response #{last_response.inspect}")
+      put "/objects/#{@object[:id]}/acl?id=#{new_user}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
+      @logger.debug("put /objects/#{@object[:id]}/acl?id=#{new_user}&p=read_appspace last response #{last_response.inspect}")
       last_response.status.should eql(404)
       last_response.original_headers["Location"].should be_nil
 
@@ -1079,7 +1079,7 @@ describe ACM::Controller::ApiController do
       @group3 = SecureRandom.uuid
       @group4 = SecureRandom.uuid
 
-      @group_service.create_group(:id => @group1, :members => [@user1])
+      @group_service.create_group(:id => "g-#{@group1}", :members => [@user1])
       @group_service.create_group(:id => @group2, :members => [@user1, @user3])
       @group_service.create_group(:id => @group3, :members => [@user2, @user5])
       @group_service.create_group(:id => @group4, :members => [@user3, @user6, @user1])
@@ -1091,9 +1091,9 @@ describe ACM::Controller::ApiController do
         :permission_sets => ["app_space"],
         :additional_info => "{component => cloud_controller}",
         :acl => {
-            :read_appspace => ["g-#{@group1}", "u-#{@user1}", "u-#{@user6}"],
+            :read_appspace => ["g-#{@group1}", "#{@user1}", "#{@user6}"],
             :write_appspace => ["g-#{@group1}", "g-#{@group4}"],
-            :delete_appspace => ["u-#{@user2}"]
+            :delete_appspace => ["#{@user2}"]
         }
       }
 
@@ -1112,8 +1112,8 @@ describe ACM::Controller::ApiController do
         :permission_sets => ["advanced_app_space"],
         :additional_info => "{component => cloud_controller}",
         :acl => {
-            :read_appspace_log => ["g-#{@group1}", "u-#{@user1}", "u-#{@user6}"],
-            :destroy_appspace => ["g-#{@group1}", "g-#{@group4}", "u-#{@user2}"]
+            :read_appspace_log => ["g-#{@group1}", "#{@user1}", "#{@user6}"],
+            :destroy_appspace => ["g-#{@group1}", "g-#{@group4}", "#{@user2}"]
         }
       }
 
@@ -1130,8 +1130,8 @@ describe ACM::Controller::ApiController do
       body[:permission_sets].should eql(updated_object_data[:permission_sets])
       body[:additional_info].should eql(updated_object_data[:additional_info])
       body[:id].should eql(@object[:id])
-      body[:acl][:read_appspace_log].sort().should eql(["g-#{@group1}", "u-#{@user1}", "u-#{@user6}"].sort())
-      body[:acl][:destroy_appspace].sort().should eql(["g-#{@group1}", "g-#{@group4}", "u-#{@user2}"].sort())
+      body[:acl][:read_appspace_log].sort().should eql(["g-#{@group1}", "#{@user1}", "#{@user6}"].sort())
+      body[:acl][:destroy_appspace].sort().should eql(["g-#{@group1}", "g-#{@group4}", "#{@user2}"].sort())
       body[:meta][:created].should_not be_nil
       body[:meta][:updated].should_not be_nil
       body[:meta][:created].should eql(@object[:meta][:created])
@@ -1175,9 +1175,9 @@ describe ACM::Controller::ApiController do
         :additional_info => {:description => :staging_app_space}.to_json(),
         :permission_sets => [:app_space.to_s],
         :acl => {
-            :write_appspace => ["g-#{@group1}", "g-#{@group2}", "g-#{@group4}", "u-#{@user1}", "u-#{@user6}"],
+            :write_appspace => ["g-#{@group1}", "g-#{@group2}", "g-#{@group4}", "#{@user1}", "#{@user6}"],
             :read_appspace => ["g-#{@group1}", "g-#{@group3}", "g-#{@group4}"],
-            :delete_appspace => ["u-#{@user2}", "g-#{@group3}"]
+            :delete_appspace => ["#{@user2}", "g-#{@group3}"]
         }
       }
 
@@ -1195,13 +1195,13 @@ describe ACM::Controller::ApiController do
       sorted_acls.should eql([:read_appspace, :write_appspace, :delete_appspace].sort())
 
       sorted_users = body[:acl][:write_appspace].sort()
-      sorted_users.should eql(["g-#{@group1}", "g-#{@group2}", "g-#{@group4}", "u-#{@user1}", "u-#{@user6}"].sort())
+      sorted_users.should eql(["g-#{@group1}", "g-#{@group2}", "g-#{@group4}", "#{@user1}", "#{@user6}"].sort())
 
       sorted_users = body[:acl][:read_appspace].sort()
       sorted_users.should eql(["g-#{@group1}", "g-#{@group3}", "g-#{@group4}"].sort())
 
       sorted_users = body[:acl][:delete_appspace].sort()
-      sorted_users.should eql(["u-#{@user2}", "g-#{@group3}"].sort())
+      sorted_users.should eql(["#{@user2}", "g-#{@group3}"].sort())
 
       body[:name].to_s.should eql(updated_object_data[:name].to_s)
       body[:permission_sets].should eql(updated_object_data[:permission_sets])
@@ -1246,9 +1246,9 @@ describe ACM::Controller::ApiController do
         :name => "www_staging",
         :additional_info => "{component => cloud_controller}",
         :acl => {
-          :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
-          :write_appspace => ["u-#{@user2}", "u-#{@user3}"],
-          :delete_appspace => ["u-#{@user4}"]
+          :read_appspace => ["#{@user1}", "#{@user2}", "#{@user3}", "#{@user4}"],
+          :write_appspace => ["#{@user2}", "#{@user3}"],
+          :delete_appspace => ["#{@user4}"]
          }
       }
 
@@ -1272,9 +1272,9 @@ describe ACM::Controller::ApiController do
         :name => "www_staging",
         :additional_info => "{component => cloud_controller}",
         :acl => {
-          :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
-          :write_appspace => ["u-#{@user2}", "u-#{@user3}"],
-          :delete_appspace => ["u-#{@user4}"]
+          :read_appspace => ["#{@user1}", "#{@user2}", "#{@user3}", "#{@user4}"],
+          :write_appspace => ["#{@user2}", "#{@user3}"],
+          :delete_appspace => ["#{@user4}"]
          }
       }
 
@@ -1299,9 +1299,9 @@ describe ACM::Controller::ApiController do
         :permission_sets => ["app_space"],
         :additional_info => "{component => cloud_controller}",
         :acl => {
-          :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
-          :write_appspace => ["u-#{@user2}", "u-#{@user3}"],
-          :update_appspace => ["u-#{@user4}"]
+          :read_appspace => ["#{@user1}", "#{@user2}", "#{@user3}", "#{@user4}"],
+          :write_appspace => ["#{@user2}", "#{@user3}"],
+          :update_appspace => ["#{@user4}"]
          }
       }
 
@@ -1326,9 +1326,9 @@ describe ACM::Controller::ApiController do
         :permission_sets => ["app_space"],
         :additional_info => "{component => cloud_controller}",
         :acl => {
-          :read_appspace => ["u-#{@user1}", "u-#{@user2}", "u-#{@user3}", "u-#{@user4}"],
-          :write_appspace => ["u-#{@user2}", "u-#{@user3}"],
-          :update_appspace => ["u-#{@user4}"]
+          :read_appspace => ["#{@user1}", "#{@user2}", "#{@user3}", "#{@user4}"],
+          :write_appspace => ["#{@user2}", "#{@user3}"],
+          :update_appspace => ["#{@user4}"]
          }
       }
 

@@ -42,12 +42,15 @@ module ACM::Services
         end
       end
 
+      @logger.debug("User #{user.inspect} created")
       user.to_json()
-
     end
 
     def find_user(user_id)
       @logger.debug("find_user parameters #{user_id.inspect}")
+      if user_id.to_s.index("g-") == 0
+        user_id = user_id.to_s.sub(/(g-)/, '')
+      end
       user = ACM::Models::Subjects.filter(:immutable_id => user_id, :type => :user.to_s).first()
 
       if user.nil?
@@ -62,6 +65,9 @@ module ACM::Services
 
     def get_user_info(user_id)
       @logger.debug("find_user parameters #{user_id.inspect}")
+      if user_id.to_s.index("g-") == 0
+        user_id = user_id.to_s.sub(/(g-)/, '')
+      end
       user = ACM::Models::Subjects.filter(:immutable_id => user_id, :type => :user.to_s).first()
 
       if user.nil?

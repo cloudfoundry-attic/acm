@@ -41,10 +41,10 @@ module ACM::Models
     end
 
     def to_json
-      @logger.debug("Group Id #{self.id}")
+      @logger.debug("Subject Id #{self.id}")
 
       output_group = {
-        :id => self.immutable_id,
+        :id => self.type == "user" ? self.immutable_id : "g-#{self.immutable_id}",
         :type => self.type,
         :additional_info => self.additional_info
       }
@@ -69,7 +69,7 @@ module ACM::Models
         }
       )
 
-      @logger.debug("Group #{self.id} is #{output_group.inspect}")
+      @logger.debug("Subject #{self.id} is #{output_group.inspect}")
       output_group.to_json()
     end
 

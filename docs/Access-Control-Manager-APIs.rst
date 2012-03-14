@@ -448,6 +448,228 @@ If the permission set to be deleted is referenced by an object, it cannot be del
 reference ceases to exist. 
 
 
+Operations on Users/Groups
+==================================
+
+User/Group Schema
+----------------------------------
+
+Attributes
+
+======================= ============== ===================================
+Property                Type           Description
+======================= ============== ===================================
+id                      string         identifier for this user.
+type                    string         indicates whether this is a user or a group
+additional_info         string         additional information about this user/group
+members                 Array[string]  optional - members if this is a group
+meta                    object         Meta information about this entity.
+======================= ============== ===================================
+
+Example::
+
+    {
+       "id":"ab959740-6e1d-11e1-b0c4-0800200c9a66",
+       "type":"user",
+       "additional_info":"Name: John Doe",
+       "meta":{
+          "updated":1273740902,
+          "created":1273726800,
+          "schema":"urn:acm:schemas:1.0"
+       }
+    }
+
+
+    
+    {
+       "id":"g-1cf380a0-6e1e-11e1-b0c4-0800200c9a66",
+       "type":"group",
+       "additional_info":"Name: Developers",
+       "members":["ab959740-6e1d-11e1-b0c4-0800200c9a66",
+                  "2fb80d81-7a7e-43f4-9b35-de7ccf7ba394",
+                  "51234b9f-2017-498b-bbb5-566db19b98ec"
+       ],
+       "meta":{
+          "updated":1273740902,
+          "created":1273726800,
+          "schema":"urn:acm:schemas:1.0"
+       }
+    }
+    
+
+Create User: POST /users/*user_id*
+------------------------------------------------------------------------------------
+
+Creates a user
+
+===============  ===================================
+HTTP Method      POST
+URI              /users/*user_id*
+Request Format   Refer to the `User/Group Schema`_
+Response Format  Refer to the `User/Group Schema`_ 
+Response Codes   | 200 - Operation was successful
+                 | 400 - Bad request
+                 | 401 - Not authorized
+===============  ===================================
+
+The user id provided must be unique. If no user id is provided, the ACM will 
+generate a random user id for that user.
+
+
+Get User: GET /users/*user_id*
+------------------------------------------------------------------------------------
+
+Gets the json representation of a user
+
+===============  ===================================
+HTTP Method      GET
+URI              /users/*user_id*
+Request Format   N/A
+Response Format  Refer to the `User/Group Schema`_ 
+Response Codes   | 200 - Operation was successful
+                 | 400 - Bad request
+                 | 401 - Not authorized
+                 | 404 - Not found
+===============  ===================================
+
+
+Delete User: DELETE /users/*user_id*
+--------------------------------------------------------------------------------------
+
+Deletes a permission set.
+
+===============  ===================================
+HTTP Method      DELETE
+URI              /users/*user_id*
+Request Format   N/A
+Response Format  N/A
+Response Codes   | 200 - Operation was successful
+    			 | 400 - Bad request
+                 | 401 - Not authorized
+                 | 404 - Not found
+===============  ===================================
+
+Deleting a user will remove all references of that user from the ACM including from 
+groups and ACLs.
+
+
+Create Group: POST /groups/*group_id*
+------------------------------------------------------------------------------------
+
+Creates a group
+
+===============  ===================================
+HTTP Method      POST
+URI              /users/*group_id*
+Request Format   Refer to the `User/Group Schema`_
+Response Format  Refer to the `User/Group Schema`_ 
+Response Codes   | 200 - Operation was successful
+                 | 400 - Bad request
+                 | 401 - Not authorized
+===============  ===================================
+
+The group id provided must be unique. If no group id is provided, the ACM will 
+generate a random user id for that user.
+
+The group id must be prefixed with the string "g-".
+
+
+Get group information: GET /groups/*group_id*
+------------------------------------------------------------------------------------
+
+Gets the json representation of a group
+
+===============  ===================================
+HTTP Method      GET
+URI              /groups/*group_id*
+Request Format   N/A
+Response Format  Refer to the `User/Group Schema`_ 
+Response Codes   | 200 - Operation was successful
+                 | 400 - Bad request
+                 | 401 - Not authorized
+                 | 404 - Not found
+===============  ===================================
+
+
+Delete Group: DELETE /groups/*group_id*
+--------------------------------------------------------------------------------------
+
+Deletes a group
+
+===============  ===================================
+HTTP Method      DELETE
+URI              /groups/*group_id*
+Request Format   N/A
+Response Format  N/A
+Response Codes   | 200 - Operation was successful
+    			       | 400 - Bad request
+                 | 401 - Not authorized
+                 | 404 - Not found
+===============  ===================================
+
+Deleting a group will remove all references of that group from the ACM including from 
+ACLs.
+
+
+Update Group: PUT /groups/*group_id*
+------------------------------------------------------------------------------------
+
+Performs a full update of a group
+
+===============  ===================================
+HTTP Method      PUT
+URI              /users/*group_id*
+Request Format   Refer to the `User/Group Schema`_
+Response Format  Refer to the `User/Group Schema`_ 
+Response Codes   | 200 - Operation was successful
+                 | 400 - Bad request
+                 | 401 - Not authorized
+===============  ===================================
+
+The group id provided must exist and be unique. The group id must be prefixed with 
+the string "g-".
+
+
+Add a member to a group: PUT /groups/*group_id*/members/*user_id*
+------------------------------------------------------------------------------------
+
+Adds member with user id *user_id* to group *group_id*
+
+===============  ===================================
+HTTP Method      PUT
+URI              /groups/*group_id*/members/*user_id*
+Request Format   N/A
+Response Format  Refer to the `User/Group Schema`_ 
+Response Codes   | 200 - Operation was successful
+                 | 400 - Bad request
+                 | 401 - Not authorized
+                 | 404 - Not found
+===============  ===================================
+
+The group id must be prefixed with the string "g-".
+
+
+Remove a member from a group: DELETE /groups/*group_id*/members/*user_id*
+------------------------------------------------------------------------------------
+
+Removes member with user id *user_id* from the group *group_id*
+
+===============  ===================================
+HTTP Method      DELETE
+URI              /groups/*group_id*/members/*user_id*
+Request Format   N/A
+Response Format  Refer to the `User/Group Schema`_ 
+Response Codes   | 200 - Operation was successful
+                 | 400 - Bad request
+                 | 401 - Not authorized
+                 | 404 - Not found
+===============  ===================================
+
+The group id must be prefixed with the string "g-".
+
+
+
+
 Operations on Objects
 ==================================
 
@@ -724,7 +946,7 @@ Response Codes   | 200 - Operation was successful
 
 For example::
 
-    PUT /objects/11c32e98-e9e4-43ca-8ac4-164ecbcb71b1/access?id=u-dc06aceb-ecde-45a4-ba96-7a7fbd866902&p=read_appspace,write_appspace,delete_appspace
+    PUT /objects/11c32e98-e9e4-43ca-8ac4-164ecbcb71b1/access?id=dc06aceb-ecde-45a4-ba96-7a7fbd866902&p=read_appspace,write_appspace,delete_appspace
     Host: internal.vcap.acm.com
     Accept: application/json
     Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
@@ -742,18 +964,18 @@ For example::
        "acl":{
           "read_appspace":[
              "g-d0f42b1e-6d5b-4ea3-a15b-59c7320ec477",
-             "u-dc06aceb-ecde-45a4-ba96-7a7fbd866902",
-             "u-b3e5a4b8-39cb-4bbf-9884-94ba7a8b6eee",
-             "u-8cbcbf18-4ec9-40ce-a2af-058377c8c2b7",
-             "u-e2803726-5f04-4754-9f6c-c22fe27f4f92"
+             "dc06aceb-ecde-45a4-ba96-7a7fbd866902",
+             "b3e5a4b8-39cb-4bbf-9884-94ba7a8b6eee",
+             "8cbcbf18-4ec9-40ce-a2af-058377c8c2b7",
+             "e2803726-5f04-4754-9f6c-c22fe27f4f92"
           ],
           "write_appspace":[
              "g-a0c16b18-8f66-4b2f-aa9a-ce590eeed13c",
-             "u-8cbcbf18-4ec9-40ce-a2af-058377c8c2b7",
-        	 "u-dc06aceb-ecde-45a4-ba96-7a7fbd866902"
+             "8cbcbf18-4ec9-40ce-a2af-058377c8c2b7",
+        	 "dc06aceb-ecde-45a4-ba96-7a7fbd866902"
           ],
           "delete_appspace":[
-             "u-dc06aceb-ecde-45a4-ba96-7a7fbd866902"
+             "dc06aceb-ecde-45a4-ba96-7a7fbd866902"
           ]
        },
        "meta":{
@@ -782,7 +1004,7 @@ Response Codes   | 200 - Operation was successful
 
 For example::
 
-    DELETE /objects/11c32e98-e9e4-43ca-8ac4-164ecbcb71b1/access?id=u-dc06aceb-ecde-45a4-ba96-7a7fbd866902&p=delete_appspace
+    DELETE /objects/11c32e98-e9e4-43ca-8ac4-164ecbcb71b1/access?id=dc06aceb-ecde-45a4-ba96-7a7fbd866902&p=delete_appspace
     Host: internal.vcap.acm.com
     Accept: application/json
     Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
@@ -800,16 +1022,16 @@ For example::
        "acl":{
           "read_appspace":[
              "g-d0f42b1e-6d5b-4ea3-a15b-59c7320ec477",
-             "u-b3e5a4b8-39cb-4bbf-9884-94ba7a8b6eee",
-             "u-8cbcbf18-4ec9-40ce-a2af-058377c8c2b7",
-             "u-e2803726-5f04-4754-9f6c-c22fe27f4f92"
+             "b3e5a4b8-39cb-4bbf-9884-94ba7a8b6eee",
+             "8cbcbf18-4ec9-40ce-a2af-058377c8c2b7",
+             "e2803726-5f04-4754-9f6c-c22fe27f4f92"
           ],
           "write_appspace":[
              "g-a0c16b18-8f66-4b2f-aa9a-ce590eeed13c",
-             "u-8cbcbf18-4ec9-40ce-a2af-058377c8c2b7"
+             "8cbcbf18-4ec9-40ce-a2af-058377c8c2b7"
           ],
           "delete_appspace":[
-             "u-dc06aceb-ecde-45a4-ba96-7a7fbd866902"
+             "dc06aceb-ecde-45a4-ba96-7a7fbd866902"
           ]
        },
        "meta":{
@@ -1137,24 +1359,24 @@ First get the whole object so we can inspect it and verify that the user is refe
        },
        "acl":{
           "read_app":[
-             "u-3749285",
+             "3749285",
              "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66"
           ],
           "update_app":[
-             "u-3749285",
+             "3749285",
              "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66"
           ],
           "read_app_logs":[
-             "u-3749285",
+             "3749285",
              "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66",
              "g-d1682c64-040f-4511-85a9-62fcff3cbbe2"
           ],
           "read_service":[
-             "u-3749285",
+             "3749285",
              "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66"
           ],
           "write_service":[
-             "u-3749285",
+             "3749285",
              "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66"
           ]
        },

@@ -31,7 +31,7 @@ describe ACM::Controller::ApiController do
       @logger = ACM::Config.logger
       basic_authorize "admin", "password"
 
-      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => "group_data" }
+      post "/groups/#{SecureRandom.uuid}", { "CONTENT_TYPE" => "application/json", :input => "group_data" }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(400)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
@@ -49,7 +49,7 @@ describe ACM::Controller::ApiController do
       @logger = ACM::Config.logger
       basic_authorize "admin", "password"
 
-      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => nil }
+      post "/groups/#{SecureRandom.uuid}", {}, { "CONTENT_TYPE" => "application/json", :input => nil }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(400)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
@@ -88,12 +88,12 @@ describe ACM::Controller::ApiController do
       basic_authorize "admin", "password"
 
       group_data = {
-        :id => @group1,
+        :id => "g-#{@group1}",
         :additional_info => "Developer group",
         :members => [@user1, @user2, @user3, @user4]
       }
 
-      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
+      post "/groups/#{group_data[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
@@ -115,16 +115,16 @@ describe ACM::Controller::ApiController do
       basic_authorize "admin", "password"
 
       group_data = {
-        :id => @group1,
+        :id => "g-#{@group1}",
         :additional_info => "Developer group",
         :members => [@user1, @user2, @user3, @user4]
       }
 
-      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
+      post "/groups/#{group_data[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(200)
 
-      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
+      post "/groups/#{group_data[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(400)
       last_response.original_headers["Location"].should be_nil
@@ -135,12 +135,12 @@ describe ACM::Controller::ApiController do
       basic_authorize "admin", "password"
 
       group_data = {
-        :id => @group1,
+        :id => "g-#{@group1}",
         :additional_info => "Developer group",
         :members => [@user1, @user2, @user3, @user4]
       }
 
-      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
+      post "/groups/#{group_data[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(200)
 
@@ -150,7 +150,7 @@ describe ACM::Controller::ApiController do
         :members => [@user1, @user2, @user3, @user4]
       }
 
-      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
+      post "/groups/#{group_data[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(400)
       last_response.original_headers["Location"].should be_nil
@@ -161,12 +161,12 @@ describe ACM::Controller::ApiController do
       basic_authorize "admin", "password"
 
       group_data = {
-        :id => @group1,
+        :id => "g-#{@group1}",
         :additional_info => "Developer group",
         :members => [nil, nil]
       }
 
-      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
+      post "/groups/#{group_data[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(200)
 
@@ -207,12 +207,12 @@ describe ACM::Controller::ApiController do
       basic_authorize "admin", "password"
 
       group_data = {
-        :id => @group1,
+        :id => "g-#{@group1}",
         :additional_info => "Developer group",
         :members => [@user1, @user2, @user3, @user4]
       }
 
-      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
+      post "/groups/#{group_data[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(200)
 
@@ -260,13 +260,13 @@ describe ACM::Controller::ApiController do
       @group_service = ACM::Services::GroupService.new()
 
       group_data = {
-        :id => @group1,
+        :id => "g-#{@group1}",
         :additional_info => "Developer group",
         :members => [@user1, @user2, @user3]
       }
 
       basic_authorize "admin", "password"
-      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
+      post "/groups/#{group_data[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(200)
 
@@ -306,26 +306,26 @@ describe ACM::Controller::ApiController do
       @group_service = ACM::Services::GroupService.new()
 
       @group1_data = {
-        :id => @group1,
+        :id => "g-#{@group1}",
         :additional_info => "Developer group",
         :members => [@user1, @user2, @user3]
       }
 
       basic_authorize "admin", "password"
-      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => @group1_data.to_json() }
+      post "/groups/#{@group1_data[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => @group1_data.to_json() }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(200)
 
       @group2 = SecureRandom.uuid
 
       group2_data = {
-        :id => @group2,
+        :id => "g-#{@group2}",
         :additional_info => "Developer group",
         :members => [@user5, @user6]
       }
 
       basic_authorize "admin", "password"
-      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => group2_data.to_json() }
+      post "/groups/#{group2_data[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => group2_data.to_json() }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(200)
 
@@ -404,13 +404,13 @@ describe ACM::Controller::ApiController do
       @group_service = ACM::Services::GroupService.new()
 
       @group1_data = {
-        :id => @group1,
+        :id => "g-#{@group1}",
         :additional_info => "Developer group",
         :members => [@user1, @user2, @user3]
       }
 
       basic_authorize "admin", "password"
-      post "/groups", {}, { "CONTENT_TYPE" => "application/json", :input => @group1_data.to_json() }
+      post "/groups/#{@group1_data[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => @group1_data.to_json() }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(200)
 
@@ -419,12 +419,12 @@ describe ACM::Controller::ApiController do
     it "should be able to replace all the properties of the group" do
       basic_authorize "admin", "password"
       updated_group_data = {
-        :id => @group1,
+        :id => "g-#{@group1}",
         :additional_info => "Updated Developer group",
         :members => [@user5]
       }
 
-      put "/groups/#{@group1}", {}, { "CONTENT_TYPE" => "application/json", :input => updated_group_data.to_json() }
+      put "/groups/#{updated_group_data[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => updated_group_data.to_json() }
       @logger.debug("put /groups last response #{last_response.inspect}")
       last_response.status.should eql(200)
 
@@ -443,11 +443,11 @@ describe ACM::Controller::ApiController do
     it "should be able to have an empty group" do
       basic_authorize "admin", "password"
       updated_group_data = {
-        :id => @group1,
+        :id => "g-#{@group1}",
         :additional_info => "Updated Developer group"
       }
 
-      put "/groups/#{@group1}", {}, { "CONTENT_TYPE" => "application/json", :input => updated_group_data.to_json() }
+      put "/groups/#{updated_group_data[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => updated_group_data.to_json() }
       @logger.debug("put /groups last response #{last_response.inspect}")
       last_response.status.should eql(200)
 

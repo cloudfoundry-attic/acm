@@ -30,9 +30,14 @@ module ACM::Services
     #     :members => array of members for the group
     # @returns the group as json
     def create_group(opts = {})
+      
+      group_id = opts[:id]
+      if !group_id.nil? && group_id.index("g-") == 0
+        group_id = group_id.sub(/(g-)/, '')
+      end
 
       group = ACM::Models::Subjects.new(
-        :immutable_id => !opts[:id].nil? ? opts[:id] : SecureRandom.uuid(),
+        :immutable_id => !group_id.nil? ? group_id : SecureRandom.uuid(),
         :type => :group.to_s,
         :additional_info => !opts[:additional_info].nil? ? opts[:additional_info] : nil
       )
@@ -89,7 +94,12 @@ module ACM::Services
         raise ACM::InvalidRequest.new("Empty group id")
       end
 
-      group = ACM::Models::Subjects.filter(:immutable_id => opts[:id], :type => :group.to_s).first()
+      group_id = opts[:id]
+      if group_id.index("g-") == 0
+        group_id = group_id.sub(/(g-)/, '')
+      end
+
+      group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
 
       if group.nil?
         @logger.error("Could not find group with id #{group_id.inspect}")
@@ -135,7 +145,7 @@ module ACM::Services
         end
       end
 
-      group = ACM::Models::Subjects.filter(:immutable_id => opts[:id], :type => :group.to_s).first()
+      group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
       group.to_json()
     end
 
@@ -145,6 +155,11 @@ module ACM::Services
     # @returns the group as json
     def find_group(group_id)
       @logger.debug("find_group parameters #{group_id.inspect}")
+
+      if !group_id.nil? && group_id.index("g-") == 0
+        group_id = group_id.sub(/(g-)/, '')
+      end
+
       group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
 
       if group.nil?
@@ -163,6 +178,10 @@ module ACM::Services
     # @params user_id - Id of the user to be added
     # @returns the modified group as json
     def add_user_to_group(group_id, user_id)
+      if !group_id.nil? && group_id.index("g-") == 0
+        group_id = group_id.sub(/(g-)/, '')
+      end
+
       @logger.debug("find_group parameters #{group_id.inspect} #{user_id}")
       group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
 
@@ -206,6 +225,10 @@ module ACM::Services
     # @params user_id - Id of the user to be added
     # @returns the modified group as json
     def remove_user_from_group(group_id, user_id)
+      if !group_id.nil? && group_id.index("g-") == 0
+        group_id = group_id.sub(/(g-)/, '')
+      end
+
       @logger.debug("remove_user_from_group parameters #{group_id.inspect} #{user_id.inspect}")
       group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
 
@@ -251,6 +274,10 @@ module ACM::Services
     # @params group_id - Id of the group to be deleted
     # @returns nothing
     def delete_group(group_id)
+      if !group_id.nil? && group_id.index("g-") == 0
+        group_id = group_id.sub(/(g-)/, '')
+      end
+
       @logger.debug("delete parameters #{group_id.inspect}")
       group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
 
