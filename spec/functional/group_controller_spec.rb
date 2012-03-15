@@ -277,7 +277,7 @@ describe ACM::Controller::ApiController do
       basic_authorize "admin", "password"
 
       delete "/groups/#{@group1}"
-      @logger.debug("get /groups last response #{last_response.inspect}")
+      @logger.debug("delete /groups last response #{last_response.inspect}")
       last_response.status.should eql(200)
       last_response.original_headers["Location"].should be_nil
 

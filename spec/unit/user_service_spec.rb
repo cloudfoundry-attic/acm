@@ -206,4 +206,93 @@ describe ACM::Services::UserService do
 
   end
 
+  describe "deleting users" do
+    before (:each) do
+      @logger = ACM::Config.logger
+
+      @permission_set_service = ACM::Services::PermissionSetService.new()
+
+      @permission_set_service.create_permission_set(:name => :app_space,
+                                                  :permissions => [:read_appspace, :write_appspace, :delete_appspace],
+                                                  :additional_info => "this is the permission set for the app space")
+      @user1 = SecureRandom.uuid
+      @user_service.create_user(:id => @user1)
+      @user2 = SecureRandom.uuid
+      @user_service.create_user(:id => @user2)
+      @user3 = SecureRandom.uuid
+      @user_service.create_user(:id => @user3)
+      @user4 = SecureRandom.uuid
+      @user_service.create_user(:id => @user4)
+      @user5 = SecureRandom.uuid
+      @user_service.create_user(:id => @user5)
+      @user6 = SecureRandom.uuid
+      @user_service.create_user(:id => @user6)
+      @user7 = SecureRandom.uuid
+      @user_service.create_user(:id => @user7)
+      @user8 = SecureRandom.uuid
+      @user_service.create_user(:id => @user8)
+
+      @group1 = SecureRandom.uuid
+      @group2 = SecureRandom.uuid
+
+      @group_service = ACM::Services::GroupService.new()
+      group_json = @group_service.create_group(:id => "g-#{@group1}",
+                                              :additional_info => "Developer group",
+                                              :members => [@user3, @user4, @user8])
+
+
+      group_json = @group_service.create_group(:id => "g-#{@group2}",
+                                              :additional_info => "Another developer group",
+                                              :members => [@user5, @user6, @user7, @user8])
+
+      @object_service = ACM::Services::ObjectService.new()
+      o_json = @object_service.create_object(:name => "www_staging_1",
+                                      :additional_info => {:description => :staging_app_space}.to_json(),
+                                      :permission_sets => [:app_space],
+                                      :acl => {
+                                        :read_appspace => ["#{@user1}", "#{@user3}", "#{@user4}", "g-#{@group2}"],
+                                        :write_appspace => ["#{@user3}", "g-#{@group1}"],
+                                        :delete_appspace => ["#{@user4}"]
+                                      })
+      @object1 = Yajl::Parser.parse(o_json, :symbolize_keys => true)
+
+      o_json = @object_service.create_object(:name => "www_staging_2",
+                                      :additional_info => {:description => :staging_app_space}.to_json(),
+                                      :permission_sets => [:app_space],
+                                      :acl => {
+                                        :write_appspace => ["g-#{@group2}"],
+                                        :delete_appspace => ["#{@user1}"]
+                                      })
+      @object2 = Yajl::Parser.parse(o_json, :symbolize_keys => true)
+    end
+
+    it "clean up all references to that user" do
+
+      @user_service.delete_user(@user8)
+
+      updated_group = Yajl::Parser.parse(@group_service.find_group("g-#{@group1}"))
+      updated_group[:members.to_s].sort.should eql([@user3, @user4].sort)
+
+      updated_group = Yajl::Parser.parse(@group_service.find_group("g-#{@group2}"))
+      updated_group[:members.to_s].sort.should eql([@user5, @user6, @user7].sort)
+
+
+      @user_service.delete_user(@user1)
+      updated_object = Yajl::Parser.parse(@object_service.read_object(@object1[:id]), :symbolize_keys => true)
+      updated_object[:acl][:read_appspace].sort.should eql(["#{@user3}", "#{@user4}", "g-#{@group2}"].sort)
+      updated_object = Yajl::Parser.parse(@object_service.read_object(@object2[:id]), :symbolize_keys => true)
+      updated_object[:acl][:delete_appspace].should be_nil
+    end
+
+    it "should raise an error if the user id cannot be found" do
+      new_user = SecureRandom.uuid
+      lambda {
+        @user_service.delete_user(new_user)
+      }.should raise_error(ACM::ObjectNotFound)
+
+    end
+
+  end
+
+
 end

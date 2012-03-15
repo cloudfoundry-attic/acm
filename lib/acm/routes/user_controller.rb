@@ -27,6 +27,13 @@ module ACM::Controller
       @user_service.get_user_info(params[:user_id])
     end
 
+    delete '/users/:user_id' do
+      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+
+      @user_service.delete_user(params[:user_id])
+    end
+
+
   end
 
 end

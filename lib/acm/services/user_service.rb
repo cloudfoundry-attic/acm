@@ -142,6 +142,37 @@ module ACM::Services
       output.to_json
     end
 
+    def delete_user(user_id)
+      @logger.debug("delete parameters #{user_id.inspect}")
+      user = ACM::Models::Subjects.filter(:immutable_id => user_id, :type => :user.to_s).first()
+
+      if user.nil?
+        @logger.error("Could not find user with id #{user_id.inspect}")
+        raise ACM::ObjectNotFound.new("#{user_id.inspect}")
+      else
+        @logger.debug("Found user #{user.inspect}")
+      end
+      # Find all groups that this user is a member of
+      group_memberships = ACM::Models::Members.
+                                    join_table(:inner, :subjects, :id => :group_id).
+                                    filter(:user_id => user[:id]).select(:members__id)
+      @logger.debug("Groups for user #{user.immutable_id} are #{group_memberships.inspect}")
+      acls = user.access_control_entries()
+      @logger.debug("Acls for user #{user.immutable_id} are #{acls.inspect}")
+      ACM::Config.db.transaction do
+        acls.each { |acl|
+          acl.destroy()
+        }
+
+        group_memberships.each { |group_membership|
+          group_membership.destroy()
+        }
+
+        user.delete()
+        nil
+      end
+    end
+
   end
 
 end

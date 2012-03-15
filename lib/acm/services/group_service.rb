@@ -269,10 +269,6 @@ module ACM::Services
       group.to_json
     end
 
-
-    # adds a user to a group
-    # @params group_id - Id of the group to be deleted
-    # @returns nothing
     def delete_group(group_id)
       if !group_id.nil? && group_id.index("g-") == 0
         group_id = group_id.sub(/(g-)/, '')
@@ -288,13 +284,18 @@ module ACM::Services
         @logger.debug("Found group #{group.inspect}")
       end
 
+      group_members = group.members
+      acls = group.access_control_entries()
+      @logger.debug("Acls for group #{group.immutable_id} are #{acls.inspect}")
+
       ACM::Config.db.transaction do
-        group_members = group.members
         group_members.each { |group_member|
-          group_member.delete
+          group_member.destroy()
         }
 
-        group.remove_all_access_control_entries
+        acls.each { |acl|
+          acl.destroy()
+        }
 
         #TODO: Delete the associated object
 

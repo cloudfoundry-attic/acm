@@ -506,11 +506,8 @@ module ACM::Services
       end
 
       ACM::Config.db.transaction do
-        object.remove_all_permission_sets
-
-        aces = object.access_control_entries
-        object.remove_all_access_control_entries
-
+        object.remove_all_permission_sets()
+        object.remove_all_access_control_entries()
         object.delete
       end
 
