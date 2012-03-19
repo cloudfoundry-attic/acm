@@ -56,6 +56,7 @@ EM.next_tick do
     ACM::Config.logger.debug "varz #{VCAP::Component.varz[:host]} #{VCAP::Component.varz[:credentials]}}"
     VCAP::Component.varz[:requests] = 0
     VCAP::Component.varz[:requests_per_sec] = 0
+    VCAP::Component.varz[:revision] = ACM::Config.revision
     ACM::Varz.setup_updates
   end
 end
@@ -69,6 +70,7 @@ end
 
 ["TERM", "INT", "QUIT"].each do |signal|
   trap(signal) do
+    ACM::Config.logger.info "Shutting down"
     thin_server.stop!
     EM.stop
   end
