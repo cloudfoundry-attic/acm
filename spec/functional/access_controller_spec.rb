@@ -23,7 +23,7 @@ describe ACM::Controller::ApiController do
   end
 
   def app
-    @app ||= ACM::Controller::RackController.new
+    @app ||= ACM::Controller::ACMController.new
   end
 
   describe "check access" do

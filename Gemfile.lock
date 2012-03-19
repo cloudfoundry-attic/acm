@@ -63,6 +63,7 @@ PLATFORMS
 DEPENDENCIES
   SystemTimer
   ci_reporter
+  nats
   pg
   rack-test
   rake

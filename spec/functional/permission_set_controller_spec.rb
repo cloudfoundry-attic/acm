@@ -18,7 +18,7 @@ describe ACM::Controller::ApiController do
   include Rack::Test::Methods
 
   def app
-    @app ||= ACM::Controller::RackController.new
+    @app ||= ACM::Controller::ACMController.new
   end
 
   describe "when creating a permission set" do

@@ -19,28 +19,27 @@ module ACM::Controller
 
   # Main application controller that receives all requests and passes them on to
   # the ApiController (Sinatra) for handling
-  class RackController
-    PUBLIC_URLS = ["/info"]
+  class ACMController
 
     def initialize
       super
       @logger = ACM::Config.logger
       api_controller = ApiController.new
 
-      @logger.debug("Created ApiController")
-
-      #Configure basic auth for all urls
+      #Configure basic auth for all acm urls
       @app = Rack::Auth::Basic.new(api_controller) do |username, password|
         [username, password] == [ACM::Config.basic_auth[:user], ACM::Config.basic_auth[:password]]
       end
       @app.realm = "ACM"
 
+      @logger.debug("Created ACMController")
+
     end
 
     # Rack requires the controller to respond to this message
     def call(env)
-
       @logger.debug("Request env #{env.inspect}")
+      VCAP::Component.varz[:requests] += 1 unless VCAP::Component.varz.nil?
       request = Rack::Request.new(env)
       log_request(request)
 

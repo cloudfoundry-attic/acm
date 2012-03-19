@@ -13,7 +13,7 @@ require File.expand_path("../../spec_helper", __FILE__)
 
 require "rack/test"
 
-describe ACM::Controller::RackController do
+describe ACM::Controller::ACMController do
   include Rack::Test::Methods
 
   before(:each) do
@@ -21,7 +21,7 @@ describe ACM::Controller::RackController do
   end
 
   def app
-    @app ||= ACM::Controller::RackController.new
+    @app ||= ACM::Controller::ACMController.new
   end
 
   describe "api authentication" do

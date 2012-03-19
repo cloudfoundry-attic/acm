@@ -2,14 +2,14 @@
 pid: /var/vcap/sys/run/acm/acm.pid
 name: ACM
 port: 9090
+mbus: nats://localhost:4212/
 logging:
   level: debug
   file: /tmp/acm.log
 db:
-  database: postgres://acm_user:t9d63703cf6451287540d6@172.23.210.28:2544/acmdb
+  database: postgres://root:changeme@localhost:5432/acm
   max_connections: 10
   pool_timeout: 2000
 basic_auth:
   user: acm_user
   password: t9d63703cf6451287540d6
-

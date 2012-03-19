@@ -10,6 +10,7 @@ gem "thin"
 gem "uuidtools"
 gem "yajl-ruby", '~> 0.8.3'
 gem "pg"
+gem "nats"
 
 group :development do
   gem "sqlite3"
