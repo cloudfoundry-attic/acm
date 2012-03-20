@@ -41,23 +41,47 @@ ACM::Config.configure(config)
 
 event_thread = Thread.new { EM.run }
 
+EM.error_handler do |e|
+  ACM::Config.logger.error "Eventmachine problem, #{e}"
+  ACM::Config.logger.error(e)
+  # Fail fast
+  STDERR.puts "Eventmachine problem, #{e}"
+  exit 1
+end
+
 require "acm_controller"
 require "vcap/component"
 require "vcap/common"
 require "utils"
 
-EM.next_tick do
-  NATS.start(:uri => config["mbus"]) do
-    VCAP::Component.register(:type => "ACM",
-                             :index => config[:index] || 0,
-                             :config => config,
-                             :logger => ACM::Config.logger)
+if config["mbus"]
+  NATS.on_error do |e|
+    if e.kind_of? NATS::ConnectError
+      ACM::Config.logger.error("EXITING! NATS connection failed: #{e}")
+      ACM::Config.logger.error(e)
 
-    ACM::Config.logger.debug "varz #{VCAP::Component.varz[:host]} #{VCAP::Component.varz[:credentials]}}"
-    VCAP::Component.varz[:requests] = 0
-    VCAP::Component.varz[:requests_per_sec] = 0
-    VCAP::Component.varz[:revision] = ACM::Config.revision
-    ACM::Varz.setup_updates
+      # Fail fast
+      STDERR.puts("EXITING! NATS connection failed: #{e}")
+      exit!
+    else
+      ACM::Config.logger.error("NATS problem, #{e}")
+      ACM::Config.logger.error(e)
+    end
+  end
+
+  EM.next_tick do
+    NATS.start(:uri => config["mbus"]) do
+      VCAP::Component.register(:type => "ACM",
+                               :index => config[:index] || 0,
+                               :config => config,
+                               :logger => ACM::Config.logger)
+
+      ACM::Config.logger.debug "varz #{VCAP::Component.varz[:host]} #{VCAP::Component.varz[:credentials]}}"
+      VCAP::Component.varz[:requests] = 0
+      VCAP::Component.varz[:requests_per_sec] = 0
+      VCAP::Component.varz[:revision] = ACM::Config.revision
+      ACM::Varz.setup_updates
+    end
   end
 end
 
