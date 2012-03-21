@@ -1,3 +1,13 @@
+# Cloud Foundry 2012.02.03 Beta
+# Copyright (c) [2009-2012] VMware, Inc. All Rights Reserved. 
+# 
+# This product is licensed to you under the Apache License, Version 2.0 (the "License").  
+# You may not use this product except in compliance with the License.  
+# 
+# This product includes a number of subcomponents with
+# separate copyright notices and license terms. Your use of these
+# subcomponents is subject to the terms and conditions of the 
+# subcomponent's license, as noted in the LICENSE file. 
 
 source :rubygems
 
@@ -20,10 +30,12 @@ group :production do
   gem "pg"
 end
 
-group :test do
+group :development, :test do
   gem "rspec"
   gem "sqlite3"
   gem "simplecov", :platforms => :ruby_19
+  gem "simplecov-rcov", :platforms => :ruby_19
+  gem "rcov", :platforms => :ruby_18
   gem "ci_reporter"
 end
 

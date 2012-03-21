@@ -18,7 +18,7 @@ require "bundler"
 Bundler.setup(:default, :test)
 
 require "rspec/core/rake_task"
-require 'ci/reporter/rake/rspec'
+require "ci/reporter/rake/rspec"
 
 coverage_dir   = File.expand_path(File.join(File.dirname(__FILE__), "..", "spec_coverage"))
 reports_dir    = File.expand_path(File.join(File.dirname(__FILE__), "..", "spec_reports"))
@@ -61,15 +61,17 @@ namespace "spec" do
     t.pattern    = "functional/**/*_spec.rb"
   end
 
-  RSpec::Core::RakeTask.new(:ci_stats => ["ci:setup:rspec"]) do |t|
+  RSpec::Core::RakeTask.new(:ci => ["ci:setup:rspec"]) do |t|
     t.pattern = '**/*_spec.rb'
   end
 
   require 'simplecov'
+  require 'simplecov-rcov'
 
   task :run_rcov => :cleanup_coverage do
     SimpleCov.root('..')
     SimpleCov.coverage_dir('cov')
+    SimpleCov.formatter = SimpleCov::Formatter::RcovFormatter
     SimpleCov.start do
       require "rspec/core"
       add_filter "/gems/"
