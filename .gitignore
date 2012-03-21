@@ -1,5 +1,6 @@
 .idea/*
-cov/
+spec_coverage/
+spec_reports/
 *.sw*
 .bundle
 spec/spec.log
