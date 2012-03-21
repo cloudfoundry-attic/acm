@@ -4,7 +4,7 @@ name: ACM
 port: 9090
 #mbus: nats://localhost:4222/
 logging:
-  level: debug
+  level: info
   file: /tmp/acm.log
 db:
   database: postgres://root:changeme@localhost:5432/acm
@@ -12,4 +12,4 @@ db:
   pool_timeout: 2000
 basic_auth:
   user: acm_user
-  password: t9d63703cf6451287540d6
+  password: acm_password
