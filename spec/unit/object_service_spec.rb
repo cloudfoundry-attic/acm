@@ -95,8 +95,6 @@ describe ACM::Services::ObjectService do
 
     end
 
-    it "should create an object with multiple types"
-
     it "should not create an object with a permission that's not supported by its permission_set'" do
       @user1 = SecureRandom.uuid
       @user_service.create_user(:id => @user1)

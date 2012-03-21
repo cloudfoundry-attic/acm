@@ -130,8 +130,6 @@ describe ACM::Controller::ApiController do
       body[:meta][:schema].should eql("urn:acm:schemas:1.0")
     end
 
-    it "should create an object with multiple types"
-
     it "should create an object with no types" do
       basic_authorize "admin", "password"
 
