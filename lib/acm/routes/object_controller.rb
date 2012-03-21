@@ -17,25 +17,25 @@ module ACM::Controller
   class ApiController < Sinatra::Base
 
     get '/objects/:object_id' do
-      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      content_type 'application/json', :charset => 'utf-8'
 
       @object_service.read_object(params[:object_id])
     end
 
     get '/objects/:object_id/users' do
-      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      content_type 'application/json', :charset => 'utf-8'
 
       @object_service.get_users_for_object(params[:object_id])
     end
 
     delete '/objects/:object_id' do
-      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      content_type 'application/json', :charset => 'utf-8'
 
       @object_service.delete_object(params[:object_id])
     end
 
     post '/objects' do
-      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      content_type 'application/json', :charset => 'utf-8'
 
       request_json = nil
       begin
@@ -74,7 +74,7 @@ module ACM::Controller
     end
 
     put '/objects/:object_id' do
-      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      content_type 'application/json', :charset => 'utf-8'
 
       if params[:object_id].nil?
         @logger.error("Empty object id")
@@ -124,7 +124,7 @@ module ACM::Controller
     #Add permission(s) for a subject to an object's acl
     put '/objects/:object_id/acl' do
       # PUT /objects/*object_id*/acl?id=*subject*&p=*permission1*,*permission2*
-      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      content_type 'application/json', :charset => 'utf-8'
 
       permissions_request = params[:p].split(',')
       @logger.debug("Permissions requested #{permissions_request.inspect}")
@@ -143,7 +143,7 @@ module ACM::Controller
     #Remove permissions for a subject from an object's acl
     delete '/objects/:object_id/acl' do 
       # DELETE /objects/*object_id*/acl?id=*subject*&p=*permission1*,*permission2*
-      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      content_type 'application/json', :charset => 'utf-8'
 
       permissions_request = params[:p].split(',')
       @logger.debug("Permissions requested to be removed are #{permissions_request.inspect}")

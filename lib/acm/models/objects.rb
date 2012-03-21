@@ -40,7 +40,6 @@ module ACM::Models
 
     def to_json
       begin
-
         @logger.debug("Object Id #{self.id}")
         #Get the names out of the permission sets
         object_types = (self.permission_sets.nil? || self.permission_sets.size == 0) ?

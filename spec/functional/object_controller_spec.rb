@@ -35,7 +35,7 @@ describe ACM::Controller::ApiController do
       post "/objects", {}, { "CONTENT_TYPE" => "application/json", :input => "object_data" }
       @logger.debug("post /objects last response #{last_response.inspect}")
       last_response.status.should eql(400)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -53,7 +53,7 @@ describe ACM::Controller::ApiController do
       post "/objects", {}, { "CONTENT_TYPE" => "application/json", :input => nil }
       @logger.debug("post /objects last response #{last_response.inspect}")
       last_response.status.should eql(400)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -112,7 +112,7 @@ describe ACM::Controller::ApiController do
       post "/objects", {}, { "CONTENT_TYPE" => "application/json", :input => object_data.to_json() }
       @logger.debug("post /objects last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -141,7 +141,7 @@ describe ACM::Controller::ApiController do
       post "/objects", {}, { "CONTENT_TYPE" => "application/json", :input => object_data.to_json() }
       @logger.debug("post /objects last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -194,7 +194,7 @@ describe ACM::Controller::ApiController do
       post "/objects", {}, { "CONTENT_TYPE" => "application/json", :input => object_data.to_json() }
       @logger.debug("post /objects last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -239,7 +239,7 @@ describe ACM::Controller::ApiController do
       post "/objects", {}, { "CONTENT_TYPE" => "application/json", :input => object_data.to_json() }
       @logger.debug("post /objects last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -283,7 +283,7 @@ describe ACM::Controller::ApiController do
       post "/objects", {}, { "CONTENT_TYPE" => "application/json", :input => object_data.to_json() }
       @logger.debug("post /objects last response #{last_response.inspect}")
       last_response.status.should eql(400)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -311,7 +311,7 @@ describe ACM::Controller::ApiController do
       post "/objects", {}, { "CONTENT_TYPE" => "application/json", :input => object_data.to_json() }
       @logger.debug("post /objects last response #{last_response.inspect}")
       last_response.status.should eql(400)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -365,7 +365,7 @@ describe ACM::Controller::ApiController do
       post "/objects", {}, { "CONTENT_TYPE" => "application/json", :input => object_data.to_json() }
       @logger.debug("post /objects last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -374,7 +374,7 @@ describe ACM::Controller::ApiController do
       get "/objects/#{body[:id]}", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("get /objects/#{body[:id]} last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       fetched_object = last_response.body
@@ -389,7 +389,7 @@ describe ACM::Controller::ApiController do
 
       get "/objects/1234", {}, { "CONTENT_TYPE" => "application/json" }
       last_response.status.should eql(404)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -404,7 +404,7 @@ describe ACM::Controller::ApiController do
 
       get "/objects/", {}, { "CONTENT_TYPE" => "application/json" }
       last_response.status.should eql(404)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -459,7 +459,7 @@ describe ACM::Controller::ApiController do
       post "/objects", {}, { "CONTENT_TYPE" => "application/json", :input => object_data.to_json() }
       @logger.debug("post /objects last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -468,12 +468,12 @@ describe ACM::Controller::ApiController do
       delete "/objects/#{body[:id]}", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("delete /objects/#{body[:id]} last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should eql("0")
 
       get "/objects/#{body[:id]}", {}, { "CONTENT_TYPE" => "application/json" }
       last_response.status.should eql(404)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -497,7 +497,7 @@ describe ACM::Controller::ApiController do
       post "/objects", {}, { "CONTENT_TYPE" => "application/json", :input => object_data.to_json() }
       @logger.debug("post /objects last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -531,7 +531,7 @@ describe ACM::Controller::ApiController do
 
       delete "/objects/1234", {}, { "CONTENT_TYPE" => "application/json" }
       last_response.status.should eql(404)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -546,7 +546,7 @@ describe ACM::Controller::ApiController do
 
       delete "/objects/", {}, { "CONTENT_TYPE" => "application/json" }
       last_response.status.should eql(404)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -631,7 +631,7 @@ describe ACM::Controller::ApiController do
       get "/objects/#{@object[:id]}/users", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("get /objects/#{@object[:id]}/users last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       user_permission_map = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -722,7 +722,7 @@ describe ACM::Controller::ApiController do
       put "/objects/#{@object[:id]}/acl?id=#{@user4}&p=delete_appspace", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("put /objects/#{@object[:id]}/acl?id=#{@user4}&p=delete_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -740,7 +740,7 @@ describe ACM::Controller::ApiController do
       delete "/objects/#{@object[:id]}/acl?id=#{@user2}&p=read_appspace,write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("delete /objects/#{@object[:id]}/acl?id=#{@user2}&p=read_appspace,write_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -759,7 +759,7 @@ describe ACM::Controller::ApiController do
       delete "/objects/#{@object[:id]}/acl?id=#{@user1}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("delete /objects/#{@object[:id]}/acl?id=#{@user1}&p=read_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -777,7 +777,7 @@ describe ACM::Controller::ApiController do
       delete "/objects/#{@object[:id]}/acl?id=#{@user1}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("delete /objects/#{@object[:id]}/acl?id=#{@user1}&p=read_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -795,7 +795,7 @@ describe ACM::Controller::ApiController do
       delete "/objects/#{@object[:id]}/acl?id=#{@user1}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("delete /objects/#{@object[:id]}/acl?id=#{@user1}&p=read_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -813,7 +813,7 @@ describe ACM::Controller::ApiController do
       delete "/objects/#{@object[:id]}/acl?id=#{@user1}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("delete /objects/#{@object[:id]}/acl?id=#{@user1}&p=read_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -833,7 +833,7 @@ describe ACM::Controller::ApiController do
       @logger.debug("delete /objects/#{@object[:id]}/acl?id=#{@user4}&p=delete_appspace,add_app_to_appspace,remove_app_from_appspace last response #{last_response.inspect}")
 
       last_response.status.should eql(400)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -849,7 +849,7 @@ describe ACM::Controller::ApiController do
       put "/objects/#{@object[:id]}/acl?id=#{@user4}&p=write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("put /objects/#{@object[:id]}/acl?id=#{@user4}&p=write_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -867,7 +867,7 @@ describe ACM::Controller::ApiController do
       put "/objects/#{@object[:id]}/acl?id=#{@user4}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("put /objects/#{@object[:id]}/acl?id=#{@user4}&p=read_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -886,7 +886,7 @@ describe ACM::Controller::ApiController do
       put "/objects/#{@object[:id]}/acl?id=#{@user7}&p=read_appspace,write_appspace", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("put /objects/#{@object[:id]}/acl?id=#{@user7}&p=read_appspace,write_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -906,7 +906,7 @@ describe ACM::Controller::ApiController do
       put "/objects/#{@object[:id]}/acl?id=#{@user1}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("put /objects/#{@object[:id]}/acl?id=#{@user1}&p=read_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -925,7 +925,7 @@ describe ACM::Controller::ApiController do
       put "/objects/#{@object[:id]}/acl?id=#{@user1}&p=clobber_appspace", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("put /objects/#{@object[:id]}/acl?id=#{@user1}&p=clobber_appspace last response #{last_response.inspect}")
       last_response.status.should eql(400)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       error = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -941,7 +941,7 @@ describe ACM::Controller::ApiController do
       put "/objects/#{@object[:id]}/acl?id=#{@user1}&p=read_appspace,clobber_appspace", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("put /objects/#{@object[:id]}/acl?id=#{@user1}&p=read_appspace,clobber_appspace last response #{last_response.inspect}")
       last_response.status.should eql(400)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       error = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -959,7 +959,7 @@ describe ACM::Controller::ApiController do
       put "/objects/#{new_object_id}/acl?id=#{@user1}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("put /objects/#{new_object_id}/acl?id=#{@user1}&p=read_appspace last response #{last_response.inspect}")
       last_response.status.should eql(404)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       error = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -969,7 +969,7 @@ describe ACM::Controller::ApiController do
       error[:description].should include("not found")
     end
 
-    it "should not create a user that does not exist and instead return ane error" do
+    it "should not create a user that does not exist and instead return an error" do
       basic_authorize "admin", "password"
 
       new_user = SecureRandom.uuid
@@ -991,7 +991,7 @@ describe ACM::Controller::ApiController do
       put "/objects/#{@object[:id]}/acl?id=g-#{@group1}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("put /objects/#{@object[:id]}/acl?id=g-#{@group1}&p=read_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -1009,7 +1009,7 @@ describe ACM::Controller::ApiController do
       put "/objects/#{@object[:id]}/acl?id=g-#{@group2}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("put /objects/#{@object[:id]}/acl?id=g-#{@group2}&p=read_appspace last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -1029,7 +1029,7 @@ describe ACM::Controller::ApiController do
       put "/objects/#{@object[:id]}/acl?id=g-#{new_group}&p=read_appspace", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("put /objects/#{@object[:id]}/acl?id=g-#{new_group}&p=read_appspace last response #{last_response.inspect}")
       last_response.status.should eql(404)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       error = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -1118,7 +1118,7 @@ describe ACM::Controller::ApiController do
       put "/objects/#{@object[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => updated_object_data.to_json() }
       @logger.debug("post /objects/#{@object[:id]} last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -1148,7 +1148,7 @@ describe ACM::Controller::ApiController do
       put "/objects/#{@object[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => updated_object_data.to_json() }
       @logger.debug("put /objects/#{@object[:id]} last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -1182,7 +1182,7 @@ describe ACM::Controller::ApiController do
       put "/objects/#{@object[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => updated_object_data.to_json() }
       @logger.debug("put /objects/#{@object[:id]} last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -1218,7 +1218,7 @@ describe ACM::Controller::ApiController do
       put "/objects/#{@object[:id]}", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("put /objects/#{@object[:id]} last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -1253,7 +1253,7 @@ describe ACM::Controller::ApiController do
       put "/objects/#{1234}", {}, { "CONTENT_TYPE" => "application/json", :input => updated_object_data.to_json() }
       @logger.debug("put /objects/1234 last response #{last_response.inspect}")
       last_response.status.should eql(404)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -1279,7 +1279,7 @@ describe ACM::Controller::ApiController do
       put "/objects/#{@object[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => updated_object_data.to_json() }
       @logger.debug("put /objects/#{@object[:id]} last response #{last_response.inspect}")
       last_response.status.should eql(400)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -1306,7 +1306,7 @@ describe ACM::Controller::ApiController do
       put "/objects/#{@object[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => updated_object_data.to_json() }
       @logger.debug("put /objects/#{@object[:id]} last response #{last_response.inspect}")
       last_response.status.should eql(400)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -1333,7 +1333,7 @@ describe ACM::Controller::ApiController do
       put "/objects", {}, { "CONTENT_TYPE" => "application/json", :input => updated_object_data.to_json() }
       @logger.debug("put /objects last response #{last_response.inspect}")
       last_response.status.should eql(404)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)

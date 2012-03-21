@@ -53,7 +53,7 @@ module ACM::Controller
 
     # Main error handler for the ACM
     error do
-      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      content_type 'application/json', :charset => 'utf-8'
 
       exception = request.env["sinatra.error"]
       @logger.debug("Reached error handler #{exception.inspect}")
@@ -77,7 +77,7 @@ module ACM::Controller
     # not_found sinatra handler for the ACM. Handles routes that cannot
     # be found and avoids the standard sinatra response
     not_found do
-      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      content_type 'application/json', :charset => 'utf-8'
 
       @logger.debug("Reached not_found handler")
       status(404)

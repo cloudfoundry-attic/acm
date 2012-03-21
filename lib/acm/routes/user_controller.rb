@@ -16,19 +16,19 @@ module ACM::Controller
   class ApiController < Sinatra::Base
 
     post '/users/:user_id' do
-      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      content_type 'application/json', :charset => 'utf-8'
 
       @user_service.create_user(:id => params[:user_id])
     end
 
     get '/users/:user_id' do
-      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      content_type 'application/json', :charset => 'utf-8'
 
       @user_service.get_user_info(params[:user_id])
     end
 
     delete '/users/:user_id' do
-      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      content_type 'application/json', :charset => 'utf-8'
 
       @user_service.delete_user(params[:user_id])
     end

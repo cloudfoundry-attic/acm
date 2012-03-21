@@ -53,7 +53,7 @@ module ACM
 
         VCAP::Logging.setup_from_config(config["logging"])
         @logger = VCAP::Logging.logger("acm")
-        @log_level = VCAP::Logging.default_log_level
+        @log_level = config["logging"]["level"].to_sym
 
         Dir.chdir(File.expand_path("..", __FILE__))
         @revision = `(git show-ref --head --hash=8 2> /dev/null || echo 00000000) | head -n1`.strip

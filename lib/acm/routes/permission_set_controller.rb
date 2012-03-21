@@ -16,13 +16,13 @@ module ACM::Controller
   class ApiController < Sinatra::Base
 
     get '/permission_sets/:name' do
-      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      content_type 'application/json', :charset => 'utf-8'
 
       @permission_set_service.read_permission_set(params[:name])
     end
 
     post '/permission_sets' do
-      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      content_type 'application/json', :charset => 'utf-8'
 
       request_json = nil
       begin
@@ -64,7 +64,7 @@ module ACM::Controller
     end
 
     put '/permission_sets/:name' do
-      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      content_type 'application/json', :charset => 'utf-8'
 
       request_json = nil
       begin
@@ -100,7 +100,7 @@ module ACM::Controller
     end
 
     delete '/permission_sets/:name' do
-      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      content_type 'application/json', :charset => 'utf-8'
 
       @permission_set_service.delete_permission_set(params[:name])
     end

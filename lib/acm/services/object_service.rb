@@ -66,12 +66,41 @@ module ACM::Services
           unless acl.nil?
             #ACLs are a list of hashes
             acl.each { |permission, user_id_set|
+
+              #Find the requested permission only if it belongs to a permission set that is related to that object
+              requested_permission = ACM::Models::Permissions.join(:permission_sets, :id => :permission_set_id)
+                                                              .join(:object_permission_set_map, :permission_set_id => :id)
+                                                              .filter(:object_permission_set_map__object_id => o.id)
+                                                              .filter(:permissions__name => permission.to_s)
+                                                              .select(:permissions__id, :permissions__name)
+                                                              .first()
+              @logger.debug("requested permission #{requested_permission.inspect}")
+
+              if requested_permission.nil?
+                @logger.error("Could not find requested permission #{permission}")
+                raise ACM::InvalidRequest.new("Could not find requested permission #{permission}")
+              end
+
               if user_id_set.kind_of?(Array) 
                 user_id_set.each { |user_id|
                   begin
-                    subject = get_subject(user_id)
-                    #TODO: icky code. should allow a set of permissions to be accepted... later
-                    add_permission(o.immutable_id, permission, subject[:id])
+                    subject = find_subject(user_id)
+
+                    #find the ace for that object and permission
+                    object_aces = o.access_control_entries.select{|ace| ace.permission_id == requested_permission.id && ace.subject_id == subject.id}
+                    ace = nil
+                    if object_aces.size() == 0
+                      ace = o.add_access_control_entry(:object_id => o.id,
+                                                       :permission_id => requested_permission.id,
+                                                       :subject_id => subject.id)
+                      @logger.debug("new ace #{ace.inspect}")
+                    else
+                      ace = object_aces[0]
+                      @logger.debug("found ace #{ace.inspect}")
+                    end
+
+                    @logger.debug("ace count object #{o.id} are #{ACM::Models::AccessControlEntries.filter(:object_id => o.id).count().inspect}") if ACM::Config.log_level == :debug
+
                   rescue => e
                     @logger.error("Failed to add permission #{permission.inspect} on object #{o.immutable_id} for user #{user_id} #{e.message} #{e.backtrace}")
                     raise ACM::InvalidRequest.new("Failed to add permission #{permission} on object #{o.immutable_id} for user #{user_id}")
@@ -157,13 +186,43 @@ module ACM::Services
           unless acl.nil?
             #ACLs are a list of hashes
             acl.each { |permission, user_id_set|
+
+              #Find the requested permission only if it belongs to a permission set that is related to that object
+              requested_permission = ACM::Models::Permissions.join(:permission_sets, :id => :permission_set_id)
+                                                              .join(:object_permission_set_map, :permission_set_id => :id)
+                                                              .filter(:object_permission_set_map__object_id => object.id)
+                                                              .filter(:permissions__name => permission.to_s)
+                                                              .select(:permissions__id, :permissions__name)
+                                                              .first()
+              @logger.debug("requested permission #{requested_permission.inspect}")
+
+              if requested_permission.nil?
+                @logger.error("Could not find requested permission #{permission}")
+                raise ACM::InvalidRequest.new("Could not find requested permission #{permission}")
+              end
+
               if user_id_set.kind_of?(Array) 
                 user_id_set.each { |user_id|
                   begin
-                    subject = get_subject(user_id)
-                    add_permission(object.immutable_id, permission, subject[:id])
+                    subject = find_subject(user_id)
+
+                    #find the ace for that object and permission
+                    object_aces = object.access_control_entries.select{|ace| ace.permission_id == requested_permission.id && ace.subject_id == subject.id}
+                    ace = nil
+                    if object_aces.size() == 0
+                      ace = object.add_access_control_entry(:object_id => object.id,
+                                                       :permission_id => requested_permission.id,
+                                                       :subject_id => subject.id)
+                      @logger.debug("new ace #{ace.inspect}")
+                    else
+                      ace = object_aces[0]
+                      @logger.debug("found ace #{ace.inspect}")
+                    end
+
+                    @logger.debug("ace count object #{object.id} are #{ACM::Models::AccessControlEntries.filter(:object_id => object.id).count().inspect}") if ACM::Config.log_level == :debug
+
                   rescue => e
-                    @logger.error("Failed to add permission #{permission.inspect} on object #{object.immutable_id} for user #{user_id}")
+                    @logger.error("Failed to add permission #{permission.inspect} on object #{object.immutable_id} for user #{user_id} #{e.message} #{e.backtrace}")
                     raise ACM::InvalidRequest.new("Failed to add permission #{permission} on object #{object.immutable_id} for user #{user_id}")
                   end
                 }
@@ -193,46 +252,38 @@ module ACM::Services
       object.to_json
     end
 
-    def get_subject(subject_id)
-      subject = nil
+    def find_subject(subject_id)
+      begin
+        if subject_id.index("g-") == 0
+          group_id = subject_id.sub(/(g-)/, '')
+          group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
 
-      if subject_id.index("g-") == 0
-        #search for the group. If the group does not exist, error out
-        group_id = subject_id.sub(/(g-)/, '')
-        group_json = nil
-        begin
-          group_json = @group_service.find_group(group_id)
-        rescue => e
-          if e.kind_of?(ACM::ObjectNotFound)
-            @logger.error("Could not find group #{group_id} #{e.message}")
-            raise e
-          else
-            @logger.error("Internal error #{e.message}")
-            raise ACM::SystemInternalError.new()
+          if group.nil?
+            @logger.error("Could not find group with id #{group_id.inspect}")
+            raise ACM::ObjectNotFound.new("#{subject_id.inspect}")
           end
-        end
 
-        subject = Yajl::Parser.parse(group_json, :symbolize_keys => true)
-      else
-        #search for the user. if the user does not exist create it
-        user_json = nil
-        begin
-          user_json = @user_service.find_user(subject_id)
-        rescue => e
-          if e.kind_of?(ACM::ObjectNotFound)
-            @logger.error("Could not find user #{subject_id}.")
-            raise e
-          else
-            @logger.error("Internal error #{e.message}")
-            raise ACM::SystemInternalError.new()
+          @logger.debug("Found group #{group.inspect}")
+          group
+        else
+          user = ACM::Models::Subjects.filter(:immutable_id => subject_id, :type => :user.to_s).first()
+
+          if user.nil?
+            @logger.error("Could not find user with id #{subject_id.inspect}")
+            raise ACM::ObjectNotFound.new("#{subject_id.inspect}")
           end
-        end
 
-        subject = Yajl::Parser.parse(user_json, :symbolize_keys => true)
+          @logger.debug("Found user #{user.inspect}")
+          user
+        end
+      rescue => e
+        if e.kind_of?(ACM::ACMError)
+          raise e
+        else
+          @logger.error("Internal error #{e.message}")
+          raise ACM::SystemInternalError.new()
+        end
       end
-
-      @logger.debug("Found subject #{subject.inspect}")
-      subject
     end
 
     def add_subjects_to_ace(obj_id, permissions, subject_id)
@@ -242,17 +293,17 @@ module ACM::Services
         raise ACM::InvalidRequest.new()
       end
 
-      subject = get_subject(subject_id)
+      subject = find_subject(subject_id)
 
       object = nil
       if permissions.respond_to?(:each)
         ACM::Config.db.transaction do
           permissions.each { |permission|
-            object = add_permission(obj_id, permission, subject[:id])
+            object = add_permission(obj_id, permission, subject.immutable_id)
           }
         end
       else
-        object = add_permission(obj_id, permissions, subject[:id])
+        object = add_permission(obj_id, permissions, subject.immutable_id)
       end
 
       object

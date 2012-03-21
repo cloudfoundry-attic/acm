@@ -17,7 +17,6 @@ module ACM::Services
   class UserService < ACMService
 
     def create_user(opts = {})
-
       user = ACM::Models::Subjects.new(
         :immutable_id => !opts[:id].nil? ? opts[:id] : SecureRandom.uuid(),
         :type => :user.to_s,
@@ -48,9 +47,6 @@ module ACM::Services
 
     def find_user(user_id)
       @logger.debug("find_user parameters #{user_id.inspect}")
-      if user_id.to_s.index("g-") == 0
-        user_id = user_id.to_s.sub(/(g-)/, '')
-      end
       user = ACM::Models::Subjects.filter(:immutable_id => user_id, :type => :user.to_s).first()
 
       if user.nil?

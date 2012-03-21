@@ -38,7 +38,7 @@ describe ACM::Controller::ApiController do
       post "/permission_sets", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
       @logger.debug("post /permission_sets last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -63,7 +63,7 @@ describe ACM::Controller::ApiController do
       post "/permission_sets", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
       @logger.debug("post /permission_sets last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -88,7 +88,7 @@ describe ACM::Controller::ApiController do
       post "/permission_sets", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
       @logger.debug("post /permission_sets last response #{last_response.inspect}")
       last_response.status.should eql(400)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -109,7 +109,7 @@ describe ACM::Controller::ApiController do
       post "/permission_sets", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
       @logger.debug("post /permission_sets last response #{last_response.inspect}")
       last_response.status.should eql(400)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -125,7 +125,7 @@ describe ACM::Controller::ApiController do
       post "/permission_sets", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("post /permission_sets last response #{last_response.inspect}")
       last_response.status.should eql(400)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -155,7 +155,7 @@ describe ACM::Controller::ApiController do
       post "/permission_sets", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
       @logger.debug("post /permission_sets last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -166,7 +166,7 @@ describe ACM::Controller::ApiController do
       get "/permission_sets/#{body[:name]}", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("get /permission_sets/#{body[:id]} last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       fetched_ps = last_response.body
@@ -181,7 +181,7 @@ describe ACM::Controller::ApiController do
 
       get "/permission_sets/12345", {}, { "CONTENT_TYPE" => "application/json" }
       last_response.status.should eql(404)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -196,7 +196,7 @@ describe ACM::Controller::ApiController do
 
       get "/permission_sets", {}, { "CONTENT_TYPE" => "application/json" }
       last_response.status.should eql(404)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -237,7 +237,7 @@ describe ACM::Controller::ApiController do
       put "/permission_sets/#{permission_set_data[:name]}", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
       @logger.debug("put /permission_sets/#{permission_set_data[:name]} last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -262,7 +262,7 @@ describe ACM::Controller::ApiController do
       put "/permission_sets/#{permission_set_data[:name]}", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
       @logger.debug("put /permission_sets/#{permission_set_data[:name]} last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -303,7 +303,7 @@ describe ACM::Controller::ApiController do
       put "/permission_sets/#{permission_set_data[:name]}", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
       @logger.debug("put /permission_sets/#{permission_set_data[:name]} last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -356,7 +356,7 @@ describe ACM::Controller::ApiController do
       put "/permission_sets/#{permission_set_data[:name]}", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
       @logger.debug("put /permission_sets/#{permission_set_data[:name]} last response #{last_response.inspect}")
       last_response.status.should eql(400)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -380,7 +380,7 @@ describe ACM::Controller::ApiController do
       put "/permission_sets/#{permission_set_data[:name]}", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
       @logger.debug("put /permission_sets/#{permission_set_data[:name]} last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -406,7 +406,7 @@ describe ACM::Controller::ApiController do
       put "/permission_sets/#{permission_set_data[:name]}", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
       @logger.debug("put /permission_sets/#{permission_set_data[:name]} last response #{last_response.inspect}")
       last_response.status.should eql(404)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -428,7 +428,7 @@ describe ACM::Controller::ApiController do
       put "/permission_sets/#{permission_set_data[:name]}", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
       @logger.debug("put /permission_sets last response #{last_response.inspect}")
       last_response.status.should eql(404)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -450,7 +450,7 @@ describe ACM::Controller::ApiController do
       put "/permission_sets/#{permission_set_data[:name]}", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
       @logger.debug("put /permission_sets last response #{last_response.inspect}")
       last_response.status.should eql(400)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -466,7 +466,7 @@ describe ACM::Controller::ApiController do
       put "/permission_sets", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("put /permission_sets last response #{last_response.inspect}")
       last_response.status.should eql(404)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -500,7 +500,7 @@ describe ACM::Controller::ApiController do
       delete "/permission_sets/app_space", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("delete /permission_sets/app_space} last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should eql("0")
 
     end
@@ -543,7 +543,7 @@ describe ACM::Controller::ApiController do
       delete "/permission_sets/#{permission_set_data[:name]}", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("delete /permission_sets/#{permission_set_data[:name]} last response #{last_response.inspect}")
       last_response.status.should eql(400)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -567,7 +567,7 @@ describe ACM::Controller::ApiController do
       put "/permission_sets/#{permission_set_data[:name]}", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
       @logger.debug("put /permission_sets/#{permission_set_data[:name]} last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -593,7 +593,7 @@ describe ACM::Controller::ApiController do
       put "/permission_sets/#{permission_set_data[:name]}", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
       @logger.debug("put /permission_sets/#{permission_set_data[:name]} last response #{last_response.inspect}")
       last_response.status.should eql(404)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -615,7 +615,7 @@ describe ACM::Controller::ApiController do
       put "/permission_sets/#{permission_set_data[:name]}", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
       @logger.debug("put /permission_sets last response #{last_response.inspect}")
       last_response.status.should eql(404)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -637,7 +637,7 @@ describe ACM::Controller::ApiController do
       put "/permission_sets/#{permission_set_data[:name]}", {}, { "CONTENT_TYPE" => "application/json", :input => permission_set_data.to_json() }
       @logger.debug("put /permission_sets last response #{last_response.inspect}")
       last_response.status.should eql(400)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -653,7 +653,7 @@ describe ACM::Controller::ApiController do
       put "/permission_sets", {}, { "CONTENT_TYPE" => "application/json" }
       @logger.debug("put /permission_sets last response #{last_response.inspect}")
       last_response.status.should eql(404)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)

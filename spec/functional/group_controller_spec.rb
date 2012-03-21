@@ -34,7 +34,7 @@ describe ACM::Controller::ApiController do
       post "/groups/#{SecureRandom.uuid}", { "CONTENT_TYPE" => "application/json", :input => "group_data" }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(400)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -52,7 +52,7 @@ describe ACM::Controller::ApiController do
       post "/groups/#{SecureRandom.uuid}", {}, { "CONTENT_TYPE" => "application/json", :input => nil }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(400)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -96,7 +96,7 @@ describe ACM::Controller::ApiController do
       post "/groups/#{group_data[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
       @logger.debug("post /groups last response #{last_response.inspect}")
       last_response.status.should eql(200)
-      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8, schema=urn:acm:schemas:1.0")
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)

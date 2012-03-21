@@ -16,19 +16,19 @@ module ACM::Controller
   class ApiController < Sinatra::Base
 
     get '/groups/:group_id' do
-      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      content_type 'application/json', :charset => 'utf-8'
 
       @group_service.find_group(params[:group_id])
     end
 
     delete '/groups/:group_id' do
-      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      content_type 'application/json', :charset => 'utf-8'
 
       @group_service.delete_group(params[:group_id])
     end
 
     post '/groups/:group_id' do
-      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      content_type 'application/json', :charset => 'utf-8'
 
       request_json = nil
       begin
@@ -69,7 +69,7 @@ module ACM::Controller
     end
 
     put '/groups/:group_id' do 
-      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      content_type 'application/json', :charset => 'utf-8'
 
       request_json = nil
       begin
@@ -106,7 +106,7 @@ module ACM::Controller
     end
 
     put '/groups/:group_id/members/:user_id' do
-      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      content_type 'application/json', :charset => 'utf-8'
 
       updated_group = @group_service.add_user_to_group(params[:group_id], params[:user_id])
 
@@ -118,7 +118,7 @@ module ACM::Controller
     end
 
     delete '/groups/:group_id/members/:user_id' do
-      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      content_type 'application/json', :charset => 'utf-8'
 
       updated_group = @group_service.remove_user_from_group(params[:group_id], params[:user_id])
 

@@ -17,7 +17,7 @@ module ACM::Controller
 
     get '/objects/:object_id/access/?' do
       #params ?id=1234&p=read_appspace,write_appspace
-      content_type 'application/json', :charset => 'utf-8', :schema => ACM::Config.default_schema_version
+      content_type 'application/json', :charset => 'utf-8'
 
       object_id = params[:object_id]
       if params[:id].nil? || params[:p].nil?
