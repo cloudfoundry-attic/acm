@@ -44,12 +44,15 @@ module ACM::Services
 
       ACM::Config.db.transaction do
         begin
-          existing_group = ACM::Models::Subjects.filter(:immutable_id => group.immutable_id).first()
-          if existing_group.nil?
+          begin
             group.save
-          else
-            @logger.error("Group id #{existing_group.immutable_id} already used")
-            raise ACM::InvalidRequest.new("Group id #{existing_group.immutable_id} already used")
+          rescue => e
+            if e.kind_of?(Sequel::DatabaseError)
+              @logger.error("Group id #{group_id} already used")
+              raise ACM::InvalidRequest.new("Group id #{group_id} already used")
+            else
+              raise e
+            end
           end
 
           unless opts[:members].nil?
@@ -58,7 +61,7 @@ module ACM::Services
               members.each {|member|
                 unless member.nil?
                   begin
-                    user = ACM::Models::Subjects.filter(:immutable_id => member).first()
+                    user = ACM::Models::Subjects.filter(:immutable_id => member).select(:id).first()
                     if user.nil?
                       @logger.error("Could not find user #{member}.")
                       raise ACM::ObjectNotFound.new("User #{member}")

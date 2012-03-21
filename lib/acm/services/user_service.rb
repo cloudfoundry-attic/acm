@@ -24,20 +24,20 @@ module ACM::Services
       )
 
       begin
-        existing_user = ACM::Models::Subjects.filter(:immutable_id => user.immutable_id).first()
-        if existing_user.nil?
-          user.save
-        else
-          @logger.error("User id #{existing_user.immutable_id} already used")
-          raise ACM::InvalidRequest.new("User id #{existing_user.immutable_id} already used")
-        end
+        user.save
       rescue => e
-        if e.kind_of?(ACM::ACMError)
-          raise e
+        if e.kind_of?(Sequel::DatabaseError)
+          existing_user = ACM::Models::Subjects.filter(:immutable_id => opts[:id]).first()
+          unless existing_user.nil?
+            @logger.error("User id #{existing_user.immutable_id} already used")
+            raise ACM::InvalidRequest.new("User id #{existing_user.immutable_id} already used")
+          else #Some other unknown error
+            @logger.info("Failed to create a user #{e}")
+            @logger.debug("Failed to create a user #{e.backtrace.inspect}")
+            raise ACM::SystemInternalError.new()
+          end
         else
-          @logger.info("Failed to create a user #{e}")
-          @logger.debug("Failed to create a user #{e.backtrace.inspect}")
-          raise ACM::SystemInternalError.new()
+          raise e
         end
       end
 
