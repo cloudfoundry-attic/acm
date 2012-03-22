@@ -72,7 +72,7 @@ module ACM::Services
                                                               .join(:object_permission_set_map, :permission_set_id => :id)
                                                               .filter(:object_permission_set_map__object_id => o.id)
                                                               .filter(:permissions__name => permission.to_s)
-                                                              .select(:permissions__id, :permissions__name)
+                                                              .select(:permissions__id)
                                                               .first()
               @logger.debug("requested permission #{requested_permission.inspect}")
 
@@ -192,7 +192,7 @@ module ACM::Services
                                                               .join(:object_permission_set_map, :permission_set_id => :id)
                                                               .filter(:object_permission_set_map__object_id => object.id)
                                                               .filter(:permissions__name => permission.to_s)
-                                                              .select(:permissions__id, :permissions__name)
+                                                              .select(:permissions__id)
                                                               .first()
               @logger.debug("requested permission #{requested_permission.inspect}")
 
@@ -326,7 +326,7 @@ module ACM::Services
                                                     .join(:object_permission_set_map, :permission_set_id => :id)
                                                     .filter(:object_permission_set_map__object_id => object.id)
                                                     .filter(:permissions__name => permission.to_s)
-                                                    .select(:permissions__id, :permissions__name)
+                                                    .select(:permissions__id)
                                                     .first()
       @logger.debug("requested permission #{requested_permission.inspect}")
 
@@ -411,7 +411,7 @@ module ACM::Services
                                                     .join(:object_permission_set_map, :permission_set_id => :id)
                                                     .filter(:object_permission_set_map__object_id => object.id)
                                                     .filter(:permissions__name => permission.to_s)
-                                                    .select(:permissions__id, :permissions__name)
+                                                    .select(:permissions__id)
                                                     .first()
       @logger.debug("requested permission #{requested_permission.inspect}")
 
@@ -438,7 +438,7 @@ module ACM::Services
 
         if ace_to_be_deleted.nil?
           @logger.error("Could not find an access control entry for that object and permission matching the subject requested")
-          raise ACM::InvalidRequest.new("Could not find an access control entry for the object #{object.name} and permission #{requested_permission.name}")
+          raise ACM::InvalidRequest.new("Could not find an access control entry for the object #{object.name} and permission #{permission}")
         else
           ace_to_be_deleted.destroy()
         end
@@ -492,7 +492,7 @@ module ACM::Services
                                                     .join(:object_permission_set_map, :permission_set_id => :id)
                                                     .filter(:object_permission_set_map__object_id => object.id)
                                                     .filter(:permissions__name => permission.to_s)
-                                                    .select(:permissions__id, :permissions__name)
+                                                    .select(:permissions__id)
                                                     .first()
       @logger.debug("requested permission #{requested_permission.inspect}")
 
@@ -519,7 +519,7 @@ module ACM::Services
 
         if ace_to_be_deleted.nil?
           @logger.error("Could not find an access control entry for that object and permission matching the subject requested")
-          raise ACM::InvalidRequest.new("Could not find an access control entry for the object #{object.name} and permission #{requested_permission.name}")
+          raise ACM::InvalidRequest.new("Could not find an access control entry for the object #{object.name} and permission #{permission}")
         else
           ace_to_be_deleted.destroy()
         end
