@@ -10,7 +10,7 @@
 # subcomponent's license, as noted in the LICENSE file. 
 
 require 'sinatra/base'
-require 'json'
+require 'yajl'
 
 module ACM::Controller
 

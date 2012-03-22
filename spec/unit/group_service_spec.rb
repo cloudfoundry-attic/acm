@@ -12,7 +12,7 @@
 require File.expand_path("../../spec_helper", __FILE__)
 
 require 'acm/services/group_service'
-require 'json'
+require 'yajl'
 
 describe ACM::Services::GroupService do
 

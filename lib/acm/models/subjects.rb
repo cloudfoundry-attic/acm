@@ -11,7 +11,7 @@
 
 require 'acm/models/acm_common_model'
 require 'sequel'
-require 'json'
+require 'yajl'
 
 module ACM::Models
   class Subjects < Sequel::Model(:subjects)
@@ -53,7 +53,7 @@ module ACM::Models
         members = self.members
         output_members = []
         members.each { |member|
-          @logger.debug("Member #{member.inspect} user #{member.user.inspect}")
+          @logger.debug("Member #{member.inspect} user #{member.user.inspect}") if ACM::Config.debug?
           output_members.insert(0, member.user.immutable_id)
         }
         if output_members.size() > 0

@@ -24,7 +24,7 @@ module ACM
       #Configuration options that can be accessed throughout the app
       CONFIG_OPTIONS = [
         :logger,
-        :log_level,
+        :debug,
         :log_file,
         :db,
         :name,
@@ -44,6 +44,10 @@ module ACM
         end
       end
 
+      def debug?
+        @debug
+      end
+
       #Called by the acm binary to consume the configuration and set up the app
       def configure(config)
         @pid_file = config["pid"]
@@ -53,7 +57,9 @@ module ACM
 
         VCAP::Logging.setup_from_config(config["logging"])
         @logger = VCAP::Logging.logger("acm")
-        @log_level = config["logging"]["level"].to_sym
+        if config["logging"] && config["logging"]["level"] == "debug"
+          @debug = true
+        end
 
         Dir.chdir(File.expand_path("..", __FILE__))
         @revision = `(git show-ref --head --hash=8 2> /dev/null || echo 00000000) | head -n1`.strip
@@ -69,7 +75,7 @@ module ACM
 
         @db = Sequel.connect(config["db"]["database"], connection_options)
 
-        if config["logging"] && config["logging"]["level"] == "debug"
+        if debug?
           @db.logger = @logger
           @db.sql_log_level = :debug
         else

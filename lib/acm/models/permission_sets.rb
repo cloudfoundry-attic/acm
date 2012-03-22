@@ -11,7 +11,7 @@
 
 require 'acm/models/acm_common_model'
 require 'sequel'
-require 'json'
+require 'yajl'
 
 module ACM::Models
   class PermissionSets < Sequel::Model(:permission_sets)

@@ -14,7 +14,7 @@ require 'acm/models/permission_sets'
 require 'acm/models/access_control_entries'
 
 require 'sequel'
-require 'json'
+require 'yajl'
 
 module ACM::Models
   class Objects < Sequel::Model(:objects)
@@ -42,9 +42,12 @@ module ACM::Models
       begin
         @logger.debug("Object Id #{self.id}")
         #Get the names out of the permission sets
-        object_types = (self.permission_sets.nil? || self.permission_sets.size == 0) ?
-                            nil :
-                            self.permission_sets.map{|permission_set| permission_set.name}
+        permission_sets = self.permission_sets.map{|permission_set| permission_set.name}
+        object_types = nil
+        if !permission_sets.nil? && permission_sets.size() > 0
+          object_types = permission_sets
+        end
+
         output_object = {
           :name => self.name,
           :permission_sets => object_types,

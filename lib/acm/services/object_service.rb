@@ -99,7 +99,7 @@ module ACM::Services
                       @logger.debug("found ace #{ace.inspect}")
                     end
 
-                    @logger.debug("ace count object #{o.id} are #{ACM::Models::AccessControlEntries.filter(:object_id => o.id).count().inspect}") if ACM::Config.log_level == :debug
+                    @logger.debug("ace count object #{o.id} are #{ACM::Models::AccessControlEntries.filter(:object_id => o.id).count().inspect}") if ACM::Config.debug?
 
                   rescue => e
                     @logger.error("Failed to add permission #{permission.inspect} on object #{o.immutable_id} for user #{user_id} #{e.message} #{e.backtrace}")
@@ -219,7 +219,7 @@ module ACM::Services
                       @logger.debug("found ace #{ace.inspect}")
                     end
 
-                    @logger.debug("ace count object #{object.id} are #{ACM::Models::AccessControlEntries.filter(:object_id => object.id).count().inspect}") if ACM::Config.log_level == :debug
+                    @logger.debug("ace count object #{object.id} are #{ACM::Models::AccessControlEntries.filter(:object_id => object.id).count().inspect}") if ACM::Config.debug?
 
                   rescue => e
                     @logger.error("Failed to add permission #{permission.inspect} on object #{object.immutable_id} for user #{user_id} #{e.message} #{e.backtrace}")

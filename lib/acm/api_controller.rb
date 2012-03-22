@@ -22,7 +22,7 @@ require 'acm/services/group_service'
 require 'acm/services/permission_set_service'
 require 'acm/services/access_control_service'
 require 'sinatra/base'
-require 'json'
+require 'yajl'
 require 'net/http'
 
 module ACM::Controller

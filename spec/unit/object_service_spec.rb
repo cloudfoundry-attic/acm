@@ -15,7 +15,7 @@ require 'acm/services/object_service'
 require 'acm/services/user_service'
 require 'acm/models/permissions'
 require 'acm/models/permission_sets'
-require 'json'
+require 'yajl'
 
 describe ACM::Services::ObjectService do
 

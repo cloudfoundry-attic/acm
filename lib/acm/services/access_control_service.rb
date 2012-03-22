@@ -37,7 +37,7 @@ module ACM::Services
       end
 
       #Find the object
-      object = ACM::Models::Objects.filter(:immutable_id => object_id).first()
+      object = ACM::Models::Objects.filter(:immutable_id => object_id).select(:id).first()
       @logger.debug("Object #{object.inspect}")
 
       if object.nil?
@@ -46,7 +46,7 @@ module ACM::Services
       end
 
       #Find the permission entities that need to be checked
-      permission_ids = ACM::Models::Permissions.filter(:name => permissions).all().map{|p| p.id}
+      permission_ids = ACM::Models::Permissions.filter(:name => permissions).select(:id).all().map{|p| p.id}
       #All the permissions must exist. That's why the size of the input must match the size of the permissions query
       if permission_ids.nil? || permission_ids.size() == 0 || permission_ids.size() < permissions.size()
         @logger.debug("Permissions did not match #{permission_ids.inspect} #{permissions.inspect} #{permission_ids.size()} #{permissions.size()}")
