@@ -20,6 +20,7 @@ gem "thin"
 gem "uuidtools"
 gem "yajl-ruby", '~> 0.8.3'
 gem "pg"
+gem "eventmachine", "~> 0.12.11.cloudfoundry.3"
 gem "nats"
 
 group :development do

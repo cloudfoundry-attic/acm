@@ -42,10 +42,13 @@ module ACM::Models
       begin
         @logger.debug("Object Id #{self.id}")
         #Get the names out of the permission sets
-        permission_sets = self.permission_sets.map{|permission_set| permission_set.name}
+        o_permission_sets = ACM::Models::PermissionSets.join(:object_permission_set_map, :permission_set_id => :id)
+                                                     .filter(:object_id => self.id)
+                                                     .select(:permission_sets__name)
+                                                     .all().map{|permission_set| permission_set.name}
         object_types = nil
-        if !permission_sets.nil? && permission_sets.size() > 0
-          object_types = permission_sets
+        if !o_permission_sets.nil? && o_permission_sets.size() > 0
+          object_types = o_permission_sets
         end
 
         output_object = {
@@ -56,7 +59,10 @@ module ACM::Models
         }
 
         output_object[:acl] = {}
-        access_control_entries.each { |access_control_entry|
+        o_acl = ACM::Models::AccessControlEntries.join(:objects, :id => :object_id)
+                                                 .filter(:object_id => self.id)
+                                                 .all()
+        o_acl.each { |access_control_entry|
           @logger.debug("Access Control entry #{access_control_entry.inspect}")
           permission = access_control_entry.permission
           permission_name = permission.name

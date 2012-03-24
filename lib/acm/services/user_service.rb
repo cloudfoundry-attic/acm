@@ -61,8 +61,8 @@ module ACM::Services
 
     def get_user_info(user_id)
       @logger.debug("find_user parameters #{user_id.inspect}")
-      if user_id.to_s.index("g-") == 0
-        user_id = user_id.to_s.sub(/(g-)/, '')
+      if user_id.to_s.start_with?("g-")
+        user_id = user_id.to_s[2..user_id.length]
       end
       user = ACM::Models::Subjects.filter(:immutable_id => user_id, :type => :user.to_s).first()
 

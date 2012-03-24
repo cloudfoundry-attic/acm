@@ -254,8 +254,8 @@ module ACM::Services
 
     def find_subject(subject_id)
       begin
-        if subject_id.index("g-") == 0
-          group_id = subject_id.sub(/(g-)/, '')
+        if subject_id.start_with?("g-")
+          group_id = subject_id[2..subject_id.length]
           group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
 
           if group.nil?
@@ -336,8 +336,8 @@ module ACM::Services
       end
 
       #find the subject
-      if user_id.to_s.index("g-") == 0
-        user_id = user_id.to_s.sub(/(g-)/, '')
+      if user_id.to_s.start_with?("g-")
+        user_id = user_id.to_s[2..user_id.length]
       end
       subject = ACM::Models::Subjects.filter(:immutable_id => user_id).first()
       @logger.debug("requested subject #{subject.inspect}")
@@ -367,8 +367,8 @@ module ACM::Services
     end
 
     def remove_subjects_from_ace(obj_id, permissions, subject_id)
-      if user_id.to_s.index("g-") == 0
-        user_id = user_id.to_s.sub(/(g-)/, '')
+      if user_id.to_s.start_with?("g-")
+        user_id = user_id.to_s[2..user_id.length]
       end
 
       user_json = @user_service.find_user(subject_id)
@@ -421,8 +421,8 @@ module ACM::Services
       end
 
       #find the subject
-      if user_id.to_s.index("g-") == 0
-        user_id = user_id.to_s.sub(/(g-)/, '')
+      if user_id.to_s.start_with?("g-")
+        user_id = user_id.to_s[2..user_id.length]
       end
       subject = ACM::Models::Subjects.filter(:immutable_id => user_id).first()
       @logger.debug("requested subject #{subject.inspect}")
@@ -502,8 +502,8 @@ module ACM::Services
       end
 
       #find the subject
-      if user_id.to_s.index("g-") == 0
-        user_id = user_id.to_s.sub(/(g-)/, '')
+      if user_id.to_s.start_with?("g-")
+        user_id = user_id.to_s[2..user_id.length]
       end
       subject = ACM::Models::Subjects.filter(:immutable_id => user_id.to_s).first()
       @logger.debug("requested subject #{subject.inspect}")

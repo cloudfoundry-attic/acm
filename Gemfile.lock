@@ -66,6 +66,7 @@ PLATFORMS
 DEPENDENCIES
   SystemTimer
   ci_reporter
+  eventmachine (~> 0.12.11.cloudfoundry.3)
   nats
   pg
   rack-test

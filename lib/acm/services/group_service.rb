@@ -32,8 +32,8 @@ module ACM::Services
     def create_group(opts = {})
       
       group_id = opts[:id]
-      if !group_id.nil? && group_id.index("g-") == 0
-        group_id = group_id.sub(/(g-)/, '')
+      if !group_id.nil? && group_id.start_with?("g-")
+        group_id = group_id[2..group_id.length]
       end
 
       group = ACM::Models::Subjects.new(
@@ -98,8 +98,8 @@ module ACM::Services
       end
 
       group_id = opts[:id]
-      if group_id.index("g-") == 0
-        group_id = group_id.sub(/(g-)/, '')
+      if group_id.start_with?("g-")
+        group_id = group_id[2..group_id.length]
       end
 
       group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
@@ -159,8 +159,8 @@ module ACM::Services
     def find_group(group_id)
       @logger.debug("find_group parameters #{group_id.inspect}")
 
-      if !group_id.nil? && group_id.index("g-") == 0
-        group_id = group_id.sub(/(g-)/, '')
+      if !group_id.nil? && group_id.start_with?("g-")
+        group_id = group_id[2..group_id.length]
       end
 
       group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
@@ -181,8 +181,8 @@ module ACM::Services
     # @params user_id - Id of the user to be added
     # @returns the modified group as json
     def add_user_to_group(group_id, user_id)
-      if !group_id.nil? && group_id.index("g-") == 0
-        group_id = group_id.sub(/(g-)/, '')
+      if !group_id.nil? && group_id.start_with?("g-")
+        group_id = group_id[2..group_id.length]
       end
 
       @logger.debug("find_group parameters #{group_id.inspect} #{user_id}")
@@ -228,8 +228,8 @@ module ACM::Services
     # @params user_id - Id of the user to be added
     # @returns the modified group as json
     def remove_user_from_group(group_id, user_id)
-      if !group_id.nil? && group_id.index("g-") == 0
-        group_id = group_id.sub(/(g-)/, '')
+      if !group_id.nil? && group_id.start_with?("g-")
+        group_id = group_id[2..group_id.length]
       end
 
       @logger.debug("remove_user_from_group parameters #{group_id.inspect} #{user_id.inspect}")
@@ -273,8 +273,8 @@ module ACM::Services
     end
 
     def delete_group(group_id)
-      if !group_id.nil? && group_id.index("g-") == 0
-        group_id = group_id.sub(/(g-)/, '')
+      if !group_id.nil? && group_id.start_with?("g-")
+        group_id = group_id[2..group_id.length]
       end
 
       @logger.debug("delete parameters #{group_id.inspect}")
