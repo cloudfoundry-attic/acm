@@ -40,5 +40,5 @@ group :development, :test do
   gem "ci_reporter"
 end
 
-gem 'vcap_common', :require => ['vcap/common', 'vcap/component']
+gem 'vcap_common', "= 1.0.10", :require => ['vcap/common', 'vcap/component']
 gem "vcap_logging"

@@ -69,7 +69,7 @@ if config["mbus"]
     end
   end
 
-  EM.next_tick do
+  EM.add_timer(5) do
     NATS.start(:uri => config["mbus"]) do
       VCAP::Component.register(:type => "ACM",
                                :index => config[:index] || 0,
