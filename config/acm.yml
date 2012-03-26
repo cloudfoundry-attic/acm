@@ -8,7 +8,7 @@ logging:
   file: /tmp/acm.log
 db:
   database: postgres://root:changeme@localhost:5432/acm
-  max_connections: 10
+  max_connections: 25
   pool_timeout: 2000
 basic_auth:
   user: acm_user

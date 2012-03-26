@@ -73,7 +73,7 @@ module ACM
         connection_options = {}
         [:max_connections, :pool_timeout].each { |key| connection_options[key] = config["db"][key.to_s] }
 
-        Sequel.single_threaded = true
+        Sequel.single_threaded = false
         @db = Sequel.connect(config["db"]["database"], connection_options)
 
         if debug?

@@ -92,7 +92,7 @@ thin_server = Thin::Server.new("0.0.0.0", config["port"], :signals => false) do
   end
 end
 
-thin_server.threaded = false
+thin_server.threaded = true
 
 ["TERM", "INT", "QUIT"].each do |signal|
   trap(signal) do
