@@ -43,9 +43,9 @@ module ACM::Models
         @logger.debug("Object Id #{self.id}")
         #Get the names out of the permission sets
         o_permission_sets = ACM::Models::PermissionSets.join(:object_permission_set_map, :permission_set_id => :id)
-                                                     .filter(:object_id => self.id)
-                                                     .select(:permission_sets__name)
-                                                     .all().map{|permission_set| permission_set.name}
+                                                       .filter(:object_id => self.id)
+                                                       .select(:permission_sets__name)
+                                                       .all().map{|permission_set| permission_set.name}
         object_types = nil
         if !o_permission_sets.nil? && o_permission_sets.size() > 0
           object_types = o_permission_sets
@@ -93,7 +93,6 @@ module ACM::Models
         )
 
         output_object.to_json()
-
       rescue => e
         @logger.error("Failure in object.to_json #{e.inspect}")
         throw e

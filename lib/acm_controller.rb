@@ -49,7 +49,7 @@ module ACM::Controller
       headers["Date"] = end_time.rfc822 # As thin doesn't inject date
 
       @logger.info("Sending response Status: #{status} Headers: #{headers} Body: #{body}")
-      @logger.info("Elapsed time #{((end_time - start_time) * 1000.0).to_i}ms")
+      @logger.info("Elapsed time #{((end_time - start_time) * 1000.0).to_i} ms")
       [ status, headers, body ]
     end
 

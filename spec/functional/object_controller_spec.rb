@@ -21,7 +21,6 @@ describe ACM::Controller::ApiController do
     @app ||= ACM::Controller::ACMController.new
   end
 
-
   before(:each) do
     @logger = ACM::Config.logger
   end

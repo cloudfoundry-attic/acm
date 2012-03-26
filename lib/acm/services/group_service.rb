@@ -42,6 +42,21 @@ module ACM::Services
         :additional_info => !opts[:additional_info].nil? ? opts[:additional_info] : nil
       )
 
+      users = []
+      unless opts[:members].nil?
+        members = opts[:members]
+        if members.kind_of?(Array)
+          users = ACM::Models::Subjects.filter(:immutable_id => members).select(:id).all()
+          if users.size() != members.size()
+            @logger.error("Could not find all the requested users")
+            raise ACM::InvalidRequest.new("Could not find all the requested users")
+          end
+        else
+          @logger.error("Failed to create group. members must be an array")
+          raise ACM::InvalidRequest.new("Failed to create group. members must be an array")
+        end
+      end
+
       ACM::Config.db.transaction do
         begin
           begin
@@ -55,26 +70,16 @@ module ACM::Services
             end
           end
 
-          unless opts[:members].nil?
-            members = opts[:members]
-            if members.kind_of?(Array)
-              members.each {|member|
-                unless member.nil?
-                  begin
-                    user = ACM::Models::Subjects.filter(:immutable_id => member).select(:id).first()
-                    if user.nil?
-                      @logger.error("Could not find user #{member}.")
-                      raise ACM::ObjectNotFound.new("User #{member}")
-                    end
-                    group.add_member(:user_id => user.id)
-                  end
-                end
-              }
-            else
-              @logger.error("Failed to create group. members must be an array")
-              raise ACM::InvalidRequest.new("Failed to create group. members must be an array")
-            end
-          end
+          group_map = []
+          users.each { |user|
+            group_map << {"group_id" => group.id, 
+                          "user_id" => user.id, 
+                          "created_at" => Time.now, 
+                          "last_updated_at" => Time.now}
+          }
+          @logger.debug("Group map #{group_map}")
+          ACM::Models::Members.dataset.multi_insert(group_map) if group_map.size() > 0
+
         rescue => e
           if e.kind_of?(ACM::ACMError)
             raise e

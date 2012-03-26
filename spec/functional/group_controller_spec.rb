@@ -168,16 +168,9 @@ describe ACM::Controller::ApiController do
 
       post "/groups/#{group_data[:id]}", {}, { "CONTENT_TYPE" => "application/json", :input => group_data.to_json() }
       @logger.debug("post /groups last response #{last_response.inspect}")
-      last_response.status.should eql(200)
+      last_response.status.should eql(400)
 
-      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
-
-      body[:id].to_s.should eql(group_data[:id].to_s)
-      body[:members].should be_nil
-      body[:additional_info].should eql(group_data[:additional_info])
-      body[:meta][:created].should_not be_nil
-      body[:meta][:updated].should_not be_nil
-      body[:meta][:schema].should eql("urn:acm:schemas:1.0")
+      last_response.original_headers["Location"].should be_nil
 
     end
 
