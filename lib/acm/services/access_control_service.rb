@@ -20,6 +20,13 @@ module ACM::Services
   class AccessControlService < ACMService
 
     def check_access(object_id, subject_id, permissions)
+      object = ACM::Models::Objects.filter(:immutable_id => object_id).select(:id).first() unless object_id.nil?
+      if object.nil?
+        raise ACM::ObjectNotFound.new("#{object_id}")
+      else
+        @logger.debug("Object #{object.inspect}")
+      end
+
       subject = ACM::Models::Subjects.filter(:immutable_id => subject_id).first() unless subject_id.nil?
 
       if subject.nil?
@@ -58,13 +65,10 @@ module ACM::Services
 
       @logger.debug("subject_ids = #{subject_ids}")
 
-      distinct_permission_ids = ACM::Models::AccessControlEntries.join(:objects, :id => :object_id)
-                                               .join(:permissions, :id => :access_control_entries__permission_id)
-                                               .join(:subjects, :id => :access_control_entries__subject_id)
+      distinct_permission_ids = ACM::Models::AccessControlEntries.join(:permissions, :id => :access_control_entries__permission_id)
                                                .filter(:permissions__name => permissions)
-                                               .filter(:objects__immutable_id => object_id)
-                                               .filter(:subjects__id => subject_ids)
-                                               .qualify()
+                                               .filter(:access_control_entries__object_id => object.id)
+                                               .filter(:subject_id => subject_ids)
                                                .distinct()
                                                .select(:permission_id)
                                                .all() unless subject_ids.size() == 0
@@ -74,4 +78,5 @@ module ACM::Services
       raise ACM::ObjectNotFound.new("") if distinct_permission_ids.nil? || permissions.size() != distinct_permission_ids.size()
       @logger.info("Access OK")
     end
+  end
 end
