@@ -50,11 +50,14 @@ module ACM::Models
       }
 
       if self.type == :group.to_s
-        members = self.members
+        members = ACM::Models::Members.join(:subjects, :id => :user_id)
+                                      .filter(:group_id => self.id)
+                                      .select(:subjects__immutable_id)
+                                      .all()
         output_members = []
         members.each { |member|
-          @logger.debug("Member #{member.inspect} user #{member.user.inspect}") if ACM::Config.debug?
-          output_members.insert(0, member.user.immutable_id)
+          @logger.debug("Member #{member.inspect}") if ACM::Config.debug?
+          output_members << member[:immutable_id]
         }
         if output_members.size() > 0
           output_group[:members] = output_members

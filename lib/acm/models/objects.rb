@@ -59,22 +59,23 @@ module ACM::Models
         }
 
         output_object[:acl] = {}
-        o_acl = ACM::Models::AccessControlEntries.join(:objects, :id => :object_id)
-                                                 .filter(:object_id => self.id)
+        o_acl = ACM::Models::AccessControlEntries.join(:permissions, :id => :permission_id)
+                                                 .join(:subjects, :id => :access_control_entries__subject_id)
+                                                 .filter(:access_control_entries__object_id => self.id)
+                                                 .select(:permissions__name, :subjects__immutable_id, :subjects__type)
                                                  .all()
+        @logger.debug("Access control entries for this object #{o_acl.inspect}")
         o_acl.each { |access_control_entry|
           @logger.debug("Access Control entry #{access_control_entry.inspect}")
-          permission = access_control_entry.permission
-          permission_name = permission.name
-          permission_id = permission.id
+          permission_name = access_control_entry[:name]
           @logger.debug("Permission name #{permission_name.inspect}")
-          subject = access_control_entry.subject
+          subject = access_control_entry[:immutable_id]
           @logger.debug("Subject #{subject.inspect}")
           subject_immutable_id = nil
-          if subject.type.to_sym == :user
-            subject_immutable_id = "#{subject.immutable_id}"
+          if access_control_entry[:type].to_sym == :user
+            subject_immutable_id = "#{subject}"
           else
-            subject_immutable_id = "g-#{subject.immutable_id}"
+            subject_immutable_id = "g-#{subject}"
           end
 
           output_object[:acl][permission_name].nil? ? 
