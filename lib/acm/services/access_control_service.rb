@@ -20,11 +20,12 @@ module ACM::Services
   class AccessControlService < ACMService
 
     def check_access(object_id, subject_id, permissions)
-      @logger.debug("Request to check_access #{object_id} #{subject_id} #{permissions}")
+      subject = ACM::Models::Subjects.filter(:immutable_id => subject_id).first() unless subject_id.nil?
 
-      if subject_id.nil?
-        @logger.debug("Subject is nil")
-        raise ACM::ObjectNotFound.new("")
+      if subject.nil?
+        raise ACM::ObjectNotFound.new("#{subject_id}")
+      else
+        @logger.debug("Subject #{subject.inspect}")
       end
 
       if permissions.nil? || permissions.size() == 0
@@ -36,73 +37,41 @@ module ACM::Services
         end
       end
 
-      #Find the object
-      object = ACM::Models::Objects.filter(:immutable_id => object_id).select(:id).first()
-      @logger.debug("Object #{object.inspect}")
-
-      if object.nil?
-        @logger.debug("Could not find the object #{object_id}")
-        raise ACM::ObjectNotFound.new("")
+      subject_ids = []
+      if subject.type == "group"
+        # Find members of that group
+        members = ACM::Models::Members.filter(:group_id => subject.id).all().map{|member| member.user_id}
+        subject_ids += members unless members.nil?
+      else
+        subject_ids = [subject.id]
       end
 
-      #Find the permission entities that need to be checked
-      permission_ids = ACM::Models::Permissions.filter(:name => permissions).select(:id).all().map{|p| p.id}
-      #All the permissions must exist. That's why the size of the input must match the size of the permissions query
-      if permission_ids.nil? || permission_ids.size() == 0 || permission_ids.size() < permissions.size()
-        @logger.debug("Permissions did not match #{permission_ids.inspect} #{permissions.inspect} #{permission_ids.size()} #{permissions.size()}")
-        raise ACM::ObjectNotFound.new("")
+      # For each subject, find the groups that the subject is a member of
+      unless subject_ids.size() == 0
+        group_ids = ACM::Models::Members.join(:subjects, :id => :user_id)
+                                        .filter(:members__user_id => subject_ids)
+                                        .select(:group_id)
+                                        .all().map{|member| member.group_id}
+        @logger.debug("Groups that the user is a member of #{group_ids}")
+        subject_ids += group_ids unless group_ids.nil?
       end
-      @logger.debug("Permission Ids #{permission_ids.inspect}")
 
-      #Find the aces for the object and each permission
-      permission_ids.each { |permission_id|
-        acl = ACM::Models::AccessControlEntries.filter(:object_id => object.id,
-                                                       :permission_id => permission_id).all()
-        if acl.nil? || acl.size() == 0
-          @logger.debug("ACL did not match")
-          raise ACM::ObjectNotFound.new("")
-        end
-        @logger.debug("ACL #{acl.inspect}")
+      @logger.debug("subject_ids = #{subject_ids}")
 
-        found = false
-        acl.each { |ace| #Go through each ace
-          @logger.debug("Ace #{ace.inspect} Searching for #{subject_id}")
+      distinct_permission_ids = ACM::Models::AccessControlEntries.join(:objects, :id => :object_id)
+                                               .join(:permissions, :id => :access_control_entries__permission_id)
+                                               .join(:subjects, :id => :access_control_entries__subject_id)
+                                               .filter(:permissions__name => permissions)
+                                               .filter(:objects__immutable_id => object_id)
+                                               .filter(:subjects__id => subject_ids)
+                                               .qualify()
+                                               .distinct()
+                                               .select(:permission_id)
+                                               .all() unless subject_ids.size() == 0
 
-          subject = ace.subject #Search the subject for each ace
-          @logger.debug("Subject being checked #{subject.inspect}")
-          if subject.type == :user.to_s
-            #If the subject has not already been found and we have a match, return a true
-            found = (found == false && subject.immutable_id.eql?(subject_id.to_s)) ? true : false
-            @logger.debug("Subject #{subject.inspect} found #{found}")
-          else                              #If the subject is a group, find the members
-            group_id = subject.immutable_id
-            found = (found == false && group_id.eql?(subject_id.to_s)) ? true : false
-            @logger.debug("Subject #{subject.inspect} found #{found}")
+      @logger.debug("Distinct Permission ids #{distinct_permission_ids.inspect}")
 
-            #If the group was not the subject being searched for, search the members
-            unless found
-              ACM::Models::Members.filter(:group_id => subject.id).all().each { |member|
-                found = (found == false && member.user.immutable_id.eql?(subject_id.to_s)) ? true : false
-                @logger.debug("Subject #{member.user.inspect} found #{found}")
-                if found
-                  break
-                end
-              }
-            end
-          end
-
-          #Don't go any further in this search if the subject has already been found
-          if found
-            break
-          end
-        }
-        unless found  #If the acl does not contain the subject, the operation fails
-          @logger.debug("No matching subjects for acl #{acl.inspect}")
-          raise ACM::ObjectNotFound.new("")
-        end
-      }
+      raise ACM::ObjectNotFound.new("") if distinct_permission_ids.nil? || permissions.size() != distinct_permission_ids.size()
       @logger.info("Access OK")
     end
-
-  end
 end
