@@ -188,28 +188,6 @@ Authentication to the API
 APIs may be authenticated using simple HTTP basic authentication using a client identifier and shared secret that
 is configured in the client and the ACM instance. 
 
-.. DS: Why not use OAuth2/OpenId Connect, that way the UAA handles
-.. authentication?  I think it will simplify the message and reduce
-.. potential confusion among clients if we stick to OAuth2.
-
-.. DO: Dave, I see your point. I don't want to preclude OAuth2, but I 
-.. don't want to require OAuth or the UAA either. Right
-.. now the ACM is completely decoupled from the UAA and I think that's a good
-.. thing, but I can also see it would be nice for the UAA to consistently 
-.. handle all authentication. 
-.. OTOH, to use the UAA the ACM would have to register with the UAA as a client
-.. and someone would have to manage the CC's identity in the UAA, token
-.. grants/revocations, etc. It seems to me just configuring a shared secret
-.. between the CC and ACM for service-to-service authentication is simpler and
-.. sufficient. OAuth2 is a really good hammer, but this is a really small nail. 
-
-.. DS: Point taken on hammer and nail.  I guess if we only have one or
-.. two fixed clients then a shared secret is easy for everyone.  If
-.. ACM became a service in user app land, then it would need to be
-.. more dynamic and also more consistent.  So we can postpone this
-.. discussion until we need dynamic client registration and/or
-.. delegated authentication.
-
 Example Permissions to Manage Objects and ACLs
 -----------------------------------------------
 
