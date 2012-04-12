@@ -8,3 +8,5 @@ To run, execute ./bin/acm
 
 To run the tests, execute bundle exec rake spec
 The test logs are spec/spec.log
+
+.
