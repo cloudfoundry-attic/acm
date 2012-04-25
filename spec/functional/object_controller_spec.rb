@@ -38,6 +38,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(400)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should be_nil
@@ -56,6 +57,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(400)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should be_nil
@@ -115,6 +117,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{body[:id]}")
@@ -144,6 +147,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{body[:id]}")
@@ -197,6 +201,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{body[:id]}")
@@ -242,6 +247,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{body[:id]}")
@@ -286,6 +292,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(400)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should be_nil
@@ -314,6 +321,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(400)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should be_nil
@@ -368,6 +376,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       original_object = last_response.body
@@ -377,6 +386,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       fetched_object = last_response.body
       last_response.original_headers["Location"].should be_nil
@@ -392,6 +402,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(404)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should be_nil
@@ -407,6 +418,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(404)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should be_nil
@@ -462,6 +474,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{body[:id]}")
@@ -471,11 +484,13 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       get "/objects/#{body[:id]}", {}, { "CONTENT_TYPE" => "application/json" }
       last_response.status.should eql(404)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should be_nil
@@ -500,6 +515,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{body[:id]}")
@@ -534,6 +550,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(404)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should be_nil
@@ -549,6 +566,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(404)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should be_nil
@@ -634,6 +652,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       user_permission_map = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
 
@@ -725,6 +744,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
@@ -743,6 +763,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
@@ -762,6 +783,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
@@ -780,6 +802,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
@@ -798,6 +821,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
@@ -816,6 +840,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
@@ -836,6 +861,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(400)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should be_nil
@@ -852,6 +878,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
@@ -870,6 +897,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
@@ -889,6 +917,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
@@ -909,6 +938,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
@@ -928,6 +958,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(400)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       error = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should be_nil
@@ -944,6 +975,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(400)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       error = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should be_nil
@@ -962,6 +994,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(404)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       error = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should be_nil
@@ -994,6 +1027,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
@@ -1012,6 +1046,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       updated_object = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{updated_object[:id]}")
@@ -1032,6 +1067,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(404)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       error = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should be_nil
@@ -1121,6 +1157,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{@object[:id]}")
@@ -1151,6 +1188,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{@object[:id]}")
@@ -1185,6 +1223,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{body[:id]}")
@@ -1221,6 +1260,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(200)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should eql("http://example.org/objects/#{body[:id]}")
@@ -1256,6 +1296,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(404)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should be_nil
@@ -1282,6 +1323,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(400)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should be_nil
@@ -1309,6 +1351,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(400)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should be_nil
@@ -1336,6 +1379,7 @@ describe ACM::Controller::ApiController do
       last_response.status.should eql(404)
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
 
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
       last_response.original_headers["Location"].should be_nil

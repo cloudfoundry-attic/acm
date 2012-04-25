@@ -39,6 +39,7 @@ describe ACM::Controller::ACMController do
       get "/"
       @logger.debug("Auth response #{last_response.inspect}")
       last_response.status.should eql(404)
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
       last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
       last_response.original_headers["Content-Length"].should_not eql("0")
       body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
@@ -49,6 +50,7 @@ describe ACM::Controller::ACMController do
     it "should not allow incorrect credentials" do
       basic_authorize "admin", "password1234"
       get "/"
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
       last_response.status.should eql(401)
       @logger.debug("Auth response #{last_response.inspect}")
     end

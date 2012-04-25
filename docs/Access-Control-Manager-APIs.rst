@@ -146,20 +146,16 @@ Let's illustrate how the cloud controller (CC) would enable collaboration spaces
 Versioning of Resource Representations
 ----------------------------------------
 
-Versioning of the format of resources such as objects or groups is based on Accept/Content-Type 
-headers in the HTTP protocol.
+Versioning of the format of resources such as objects or groups is based on the X-ACM-Schema-Version
+HTTP header in the response from the ACM.
 
-The client provided "Accept" header value "application/json" will always result in a response with 
-the latest schema.
-
-Additionally, different versions of the schema can be returned by setting alternate Accept header 
-values.
+The ACM response will always use the latest schema.  
+However, different versions of the schema can be returned by setting a request header of the same name
+to the required schema.
 
 For example, 
 
-An "Accept" header as follows::
-
-    Accept: application/json; schema=urn:acm:schemas:1.0
+    X-ACM-Schema-Version: urn:acm:schemas:1.0
 
 will return a response with the schema version urn:acm:schemas:1.0
 
