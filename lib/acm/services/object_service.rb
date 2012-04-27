@@ -653,6 +653,10 @@ module ACM::Services
       user_permission_entries.to_json
     end
 
+    def query_object(params)
+      ACM::Models::Objects.filter(:name => params[:name]).select(:immutable_id).all().map{|object| object.immutable_id}.to_json
+    end
+
   end
 
 end

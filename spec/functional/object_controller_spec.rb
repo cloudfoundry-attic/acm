@@ -427,6 +427,19 @@ describe ACM::Controller::ApiController do
       body[:description].should include("not found")
     end
 
+    it "should return the set of object ids when queried by name" do
+      basic_authorize "admin", "password"
+
+      get "/objects?name=www_staging", {}, { "CONTENT_TYPE" => "application/json" }
+      last_response.status.should eql(200)
+      last_response.original_headers["Content-Type"].should eql("application/json;charset=utf-8")
+      last_response.original_headers["Content-Length"].should_not eql("0")
+      last_response.original_headers["X-ACM-Schema-Version"].should eql("urn:acm:schemas:1.0")
+
+      body = Yajl::Parser.parse(last_response.body, :symbolize_keys => true)
+      body.should_not be_nil
+    end
+
   end
 
   describe "when deleting an object" do
