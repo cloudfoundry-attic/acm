@@ -604,6 +604,7 @@ module ACM::Services
 
       ACM::Config.db.transaction do
         object.remove_all_permission_sets()
+        ACM::Models::AccessControlEntries.select(:object_id => object.id).delete
         object.remove_all_access_control_entries()
         object.delete
       end
