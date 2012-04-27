@@ -24,6 +24,12 @@ module ACM::Controller
       @object_service.read_object(params[:object_id])
     end
 
+    get '/objects/?' do
+      content_type 'application/json', :charset => 'utf-8'
+
+      @object_service.query_object(params)
+    end
+
     get '/objects/:object_id/users' do
       content_type 'application/json', :charset => 'utf-8'
 
