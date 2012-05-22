@@ -7,10 +7,10 @@ Access Control Manager APIs
 Overview
 =========
 
-This document describes the https/json APIs for the Access Control Manager (ACM) component of Cloud Foundry. 
+This document describes the https/json APIs for the Access Control Manager (ACM) component of CloudFoundry.
 
-For an overview of how the ACM component interacts with other components in the Cloud 
-Foundry system see `Interactions Between UAA, CC, CS and VMC <UAA-CC-CS-Interactions>`__.
+For an overview of how the ACM component interacts with other components in the CloudFoundry 
+system see `Interactions Between UAA, CC, CS and VMC <UAA-CC-CS-Interactions>`__.
 
 The ACM is a service which manages access control lists and calculates access decisions for specific user and permissions 
 relative to an object. The object is identified by a GUID and the ACM has no other semantic 
@@ -25,7 +25,7 @@ allowed permissions of an app space. The ACM enables users to be
 assigned permissions in the app space and makes authorization decisions for the cloud controller 
 by looking up the Access Control List (acl) of the app space object.
 
-The design is intended to be as general as possible so that it can be used by other Cloud Foundry 
+The design is intended to be as general as possible so that it can be used by other CloudFoundry
 components as well.
 
 
@@ -68,28 +68,16 @@ ACM Entities
     Although the API supports multiple permission sets for an object, the implementation for now 
     will only support a single permission set for an object.
 
-.. DS: the example below seems realistic enough and AppSpace only has
-.. *one* permission set.  Why not restrict it that way at least to
-.. start with?
-.. JD: there probably is a need to have an object use multiple permission sets.
-.. we're restricting it to one right now because of the use-cases that we're
-.. discussing but we've kept the schema open for change. Neither the code nor
-.. the tests support multiple permission sets per object.
-
-.. DS: I wonder if after all "Object Type" might be a useful name for
-.. a wrapper for a named set of permissions, since they are always
-.. associated with an Object?
-.. JD: It depends how you look at it. Initially, we did have the type of object define
-.. the operations that can be performed on it. The feedback we've received supports
-.. having permission sets somewhat like schemas that restrict the permission names that
-.. can be used in the acl of an object.
-.. To move forward, we will implement it using permission sets.
-
 **Group**
 
     A Group is an entity that contains a set of users. A group is also
     an object (or can be associated with one) which provides access
     control decisions for modifications to the itself.
+
+**User**
+
+    A User is an entity to which permissions are assigned using an ACE in an object.
+
 
 ACM Value Objects
 =================
@@ -184,27 +172,6 @@ Authentication to the API
 APIs may be authenticated using simple HTTP basic authentication using a client identifier and shared secret that
 is configured in the client and the ACM instance. 
 
-.. DS: Why not use OAuth2/OpenId Connect, that way the UAA handles
-.. authentication?  I think it will simplify the message and reduce
-.. potential confusion among clients if we stick to OAuth2.
-
-.. DO: Dave, I see your point. I don't want to preclude OAuth2, but I 
-.. don't want to require OAuth or the UAA either. Right
-.. now the ACM is completely decoupled from the UAA and I think that's a good
-.. thing, but I can also see it would be nice for the UAA to consistently 
-.. handle all authentication. 
-.. OTOH, to use the UAA the ACM would have to register with the UAA as a client
-.. and someone would have to manage the CC's identity in the UAA, token
-.. grants/revocations, etc. It seems to me just configuring a shared secret
-.. between the CC and ACM for service-to-service authentication is simpler and
-.. sufficient. OAuth2 is a really good hammer, but this is a really small nail. 
-
-.. DS: Point taken on hammer and nail.  I guess if we only have one or
-.. two fixed clients then a shared secret is easy for everyone.  If
-.. ACM became a service in user app land, then it would need to be
-.. more dynamic and also more consistent.  So we can postpone this
-.. discussion until we need dynamic client registration and/or
-.. delegated authentication.
 
 Example Permissions to Manage Objects and ACLs
 -----------------------------------------------
@@ -297,22 +264,6 @@ Error code ranges
 
 .. note:: TODO - For now, error codes between 1000-2000 will be returned
 
-.. DS: I know the cloud controller has a numeric error identifier, but
-.. OAuth2 has string identifiers for error codes, and it's a lot more
-.. friendly.  WDYT?
-
-.. DO: I don't have a strong opinion. Advantages for error numbers are
-.. 1) it's clear they are error codes -- not for display and should not be localized. 
-.. 2) it's what existing components do.
-.. Advantages for strings:
-.. 1) much easier debugging
-.. 2) it's what OAuth2 does -- though OAuth2 has already had some difficulty
-.. preventing people from directly displaying or attempting to add
-.. localization tags to the errors. 
-.. All in all, I think I'd prefer strings, but I'll let Joel argue this one.
-.. JD: The strings look great. I'm just staying consistent with the cloudfoundry
-.. components. All of them use either exactly that format or some variant of the same.
-
 
 Operations on Permission Sets
 ==================================
@@ -323,14 +274,14 @@ Permission Set Schema
 Attributes
 
 .. note:: 
-    DO: in this rev I have opted to use 'name' as the immutable identifier for
-    permission sets. We may want to use ids to allow permission sets to be 
-    renamed, but it just did not seem to be worth the indirection for the 
-    expected use cases.
-    JD: At the moment, I do not see a compelling reason for renaming a permission set. 
-    If the operations allowed on an object need to be re-arranged, a new permission set 
-    can be created and added to the object. Some operations can then be moved to the new 
-    permission set using a permission set update.
+..  DO: in this rev I have opted to use 'name' as the immutable identifier for
+..  permission sets. We may want to use ids to allow permission sets to be
+..  renamed, but it just did not seem to be worth the indirection for the
+..  expected use cases.
+..  JD: At the moment, I do not see a compelling reason for renaming a permission set.
+..  If the operations allowed on an object need to be re-arranged, a new permission set
+..  can be created and added to the object. Some operations can then be moved to the new
+..  permission set using a permission set update.
 
 ======================= ============== ===================================
 Property                Type           Description
@@ -508,7 +459,7 @@ Response Codes   | 200 - Operation was successful
                  | 401 - Not authorized
 ===============  ===================================
 
-The user id provided must be unique. If no user id is provided, the ACM will 
+The user id provided must be unique to the ACM. If no user id is provided, the ACM will
 generate a random user id for that user.
 
 
@@ -549,123 +500,6 @@ Deleting a user will remove all references of that user from the ACM including f
 groups and ACLs.
 
 
-Create Group: POST /groups/*group_id*
-------------------------------------------------------------------------------------
-
-Creates a group
-
-===============  ===================================
-HTTP Method      POST
-URI              /users/*group_id*
-Request Format   Refer to the `User/Group Schema`_
-Response Format  Refer to the `User/Group Schema`_ 
-Response Codes   | 200 - Operation was successful
-                 | 400 - Bad request
-                 | 401 - Not authorized
-===============  ===================================
-
-The group id provided must be unique. If no group id is provided, the ACM will 
-generate a random user id for that user.
-
-The group id must be prefixed with the string "g-".
-
-
-Get group information: GET /groups/*group_id*
-------------------------------------------------------------------------------------
-
-Gets the json representation of a group
-
-===============  ===================================
-HTTP Method      GET
-URI              /groups/*group_id*
-Request Format   N/A
-Response Format  Refer to the `User/Group Schema`_ 
-Response Codes   | 200 - Operation was successful
-                 | 400 - Bad request
-                 | 401 - Not authorized
-                 | 404 - Not found
-===============  ===================================
-
-
-Delete Group: DELETE /groups/*group_id*
---------------------------------------------------------------------------------------
-
-Deletes a group
-
-===============  ===================================
-HTTP Method      DELETE
-URI              /groups/*group_id*
-Request Format   N/A
-Response Format  N/A
-Response Codes   | 200 - Operation was successful
-    			       | 400 - Bad request
-                 | 401 - Not authorized
-                 | 404 - Not found
-===============  ===================================
-
-Deleting a group will remove all references of that group from the ACM including from 
-ACLs.
-
-
-Update Group: PUT /groups/*group_id*
-------------------------------------------------------------------------------------
-
-Performs a full update of a group
-
-===============  ===================================
-HTTP Method      PUT
-URI              /users/*group_id*
-Request Format   Refer to the `User/Group Schema`_
-Response Format  Refer to the `User/Group Schema`_ 
-Response Codes   | 200 - Operation was successful
-                 | 400 - Bad request
-                 | 401 - Not authorized
-===============  ===================================
-
-The group id provided must exist and be unique. The group id must be prefixed with 
-the string "g-".
-
-
-Add a member to a group: PUT /groups/*group_id*/members/*user_id*
-------------------------------------------------------------------------------------
-
-Adds member with user id *user_id* to group *group_id*
-
-===============  ===================================
-HTTP Method      PUT
-URI              /groups/*group_id*/members/*user_id*
-Request Format   N/A
-Response Format  Refer to the `User/Group Schema`_ 
-Response Codes   | 200 - Operation was successful
-                 | 400 - Bad request
-                 | 401 - Not authorized
-                 | 404 - Not found
-===============  ===================================
-
-The group id must be prefixed with the string "g-".
-
-
-Remove a member from a group: DELETE /groups/*group_id*/members/*user_id*
-------------------------------------------------------------------------------------
-
-Removes member with user id *user_id* from the group *group_id*
-
-===============  ===================================
-HTTP Method      DELETE
-URI              /groups/*group_id*/members/*user_id*
-Request Format   N/A
-Response Format  Refer to the `User/Group Schema`_ 
-Response Codes   | 200 - Operation was successful
-                 | 400 - Bad request
-                 | 401 - Not authorized
-                 | 404 - Not found
-===============  ===================================
-
-The group id must be prefixed with the string "g-".
-
-
-
-
 Operations on Objects
 ==================================
 
@@ -689,15 +523,16 @@ meta                    object          meta information about this entity.
 Example::
 
     {
+       "name":"test_object",
        "permissionSets":["app_space"],
        "id":"54947df8-0e9e-4471-a2f9-9af509fb5889",
-       "additional_info": {"org":"vmware", "name":"www_staging"},
+       "additional_info": "{"org":"vmware", "name":"www_staging"}",
        "acl": {
-             "read_app": ["3749285", "4a9a8c60-0cb2-11e1-be50-0800200c9a66"],
-             "update_app": ["3749285", "4a9a8c60-0cb2-11e1-be50-0800200c9a66"],
-             "read_app_logs": ["3749285", "4a9a8c60-0cb2-11e1-be50-0800200c9a66", "g-d1682c64-040f-4511-85a9-62fcff3cbbe2"],
-             "read_service": ["3749285", "4a9a8c60-0cb2-11e1-be50-0800200c9a66"],
-             "write_service": ["3749285", "4a9a8c60-0cb2-11e1-be50-0800200c9a66"]
+             "read_app": ["3749285", "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66"],
+             "update_app": ["3749285", "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66"],
+             "read_app_logs": ["3749285", "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66", "g-d1682c64-040f-4511-85a9-62fcff3cbbe2"],
+             "read_service": ["3749285", "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66"],
+             "write_service": ["3749285", "g-4a9a8c60-0cb2-11e1-be50-0800200c9a66"]
        },
        "meta":{
           "updated":1273740902,
@@ -742,79 +577,6 @@ The object update replaces all the properties of an object. The "id"
 property in the request is ignored. 
 
 The service responds with an instance of the object in its updated state.
-
-.. _`partial update`:
-
-Partial Update to an object: PUT /objects/*id*
-------------------------------------------------------------------------------------
-
-Sometimes, instead of updating the entire object, it may be necessary to update only a small
-section of the schema, e.g. add a user to an ACL.
-
-A partial update allows the caller to only specify the addition/update to the object. The API 
-requires an additional header in the request to indicate that this is for a partial
-update.
-
-=================  ===================================
-HTTP Method        PUT
-URI                /objects/*id*
-Additional header  X-HTTP-Method-Override PATCH
-Request Format     Refer to the `Object Schema`_
-Response Format    Refer to the `Object Schema`_ 
-Response Codes     | 200 - Operation was successful
-                   | 400 - Bad request
-                   | 401 - Not authorized
-=================  ===================================
-
-The service responds with an instance of the object schema.
-
-Since the ACL of some objects can get large, a PATCH operation allows for a partial update.
-
-There are three types of attributes that will be affected differently depending on their type
-
-* Singular attributes:
-  Singular attributes in the PATCH request body replace the attribute on the Object.
-  
-* Complex attributes:
-  Complex Sub-Attribute values in the PATCH request body are merged into the complex attribute on the Object.
-  
-* Plural attributes:
-  Plural attributes in the PATCH request body are added to the plural attribute on the Object if 
-  the value does not yet exist or are merged into the matching plural value on the Object if the 
-  value already exists. Plural attribute values are matched by comparing the value Sub-Attribute 
-  from the PATCH request body to the value Sub-Attribute of the Object. Plural attributes that do 
-  not have a value Sub-Attribute (for example, users) cannot be matched for the purposes of 
-  partially updating an an existing value. These must be deleted then added. Similarly, plural 
-  attributes that do not have unique value Sub-Attributes must be deleted then added.
-
-For some examples see `Example Requests and Responses`_.
-
-.. note:: 
-    DO: This partial update mechanism is derived from SCIM and is good in that it would allow 
-    update of various parts of a resource, even though we haven't (so far) brought in the 
-    SCIM syntax for deleting an arbitrary attribute value. Nevertheless, I am wondering
-    if all of this is worth it for the current needs of the ACM. If we didn't support partial 
-    update of an Object and only supported add/remove of an ACE, we could remove all of this 
-    complexity.
-    
-    Create, Full Update (Put), Get, and Delete Object would all work as described. Adding and removing 
-    individual subject/permission pairs could be done like this:
-    
-    PUT /objects/*id*/acl/*subject*/*permission*
-    DELETE /objects/*id*/acl/*subject*/*permission*
-    
-    Following this model we could also easily support add permissions for a user, get all permissions 
-    for a user, delete all permissions for a user:
-
-    POST /objects/*id*/acl/*subject*    (permissions)
-    GET /objects/*id*/acl/*subject*
-    DELETE /objects/*id*/acl/*subject*
-    
-    A similar approach could be used with Group members:
-
-    POST /groups/*id*/members           (users)
-    DELETE /groups/*id*/members/*user*    
-
 
 Get Object: GET /objects/*id*
 ------------------------------------------------------------------------------------
@@ -982,6 +744,9 @@ For example::
     }
 
 
+To add a group to the object's ACL, use the group id instead of the user id in the above example.
+The group id needs to be prefixed with a "g-"
+
 Remove a set of permissions for a subject from an object: DELETE /objects/*object_id*/acl?id=*subject*&p=*permission1*,*permission2*
 -----------------------------------------------------------------------------------------------------------------------------
 
@@ -1038,6 +803,8 @@ For example::
     }
 
 
+To remove a group from the object's ACL, use the group id instead of the user id in the above example.
+The group id needs to be prefixed with a "g-"
 
 Delete Object: DELETE /objects/*id*
 ------------------------------------------------------------------------------------
@@ -1077,7 +844,7 @@ meta                    object          meta information about this entity
 Example::
 
     {
-       "id":"54947df8-0e9e-4471-a2f9-9af509fb5889",
+       "id":"g-54947df8-0e9e-4471-a2f9-9af509fb5889",
        "additional_info": {"org":"vmware", "name":"www-developers"},
        "members": [123268, 245424, 335111, 930290, 123055],
        "meta":{
@@ -1087,7 +854,8 @@ Example::
        }
     }
 
-
+All groups ids must be prefixed with a string "g-". If not already provided in the
+request, the prefix will be added to the id.
 
 Create Group: POST /groups
 ------------------------------------------------------------------------------------
@@ -1103,6 +871,10 @@ Response Codes   | 200 - Operation was successful
                  | 400 - Bad request
                  | 401 - Not authorized
 ===============  ===================================
+
+The group id provided must be unique to the ACM. If no group id is provided, the ACM will generate a random user id for that user.
+
+The group id must be prefixed with the string "g-".
 
 
 Update Group: PUT /groups/*id*
@@ -1139,6 +911,7 @@ Response Codes   | 200 - Operation was successful
                  | 404 - Not found
 ===============  ===================================
 
+The group id must be prefixed with the string "g-".
 
 Remove a user from a group: DELETE /groups/*id*/members/*user_id*
 ------------------------------------------------------------------------------------
@@ -1155,6 +928,8 @@ Response Codes   | 200 - Operation was successful
                  | 401 - Not authorized
                  | 404 - Not found
 ===============  ===================================
+
+Deleting a group will remove all references of that group from the ACM including from ACLs.
 
 
 Get Group: GET /groups/*id*
