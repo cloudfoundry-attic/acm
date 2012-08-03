@@ -265,14 +265,14 @@ module ACM::Services
 
       member = nil
       begin
-        member = ACM::Models::Members.filter(:user_id => user.id).first()
+        member = ACM::Models::Members.filter(:group_id => group.id).filter(:user_id => user.id).first()
         @logger.debug("User is a member #{member.inspect}")
       rescue => e
         @logger.error("Internal error #{e.message}")
         raise ACM::SystemInternalError.new()
       end
 
-      group.remove_member(member)
+      member.delete
 
       group = ACM::Models::Subjects.filter(:immutable_id => group_id, :type => :group.to_s).first()
       @logger.debug("Updated group #{group.inspect}")
