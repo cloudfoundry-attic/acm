@@ -15,6 +15,7 @@ require File.expand_path("../../spec_helper", __FILE__)
 
 require 'acm/services/permission_set_service'
 require 'yajl'
+require 'time'
 
 describe ACM::Services::PermissionSetService do
 
@@ -325,6 +326,11 @@ describe ACM::Services::PermissionSetService do
       ps_json = Yajl::Parser.parse(@permission_set_service.create_permission_set(:name => :app_space,
                                                               :permissions => [:read_appspace, :update_appspace, :delete_appspace],
                                                               :additional_info => "this is the permission set for the app space"))
+
+      if Time.parse(ps_json["meta"]["created"]) - Time.parse(@ps1["meta"]["created"]) > 0
+        ps_json["meta"]["created"] = @ps1["meta"]["created"]
+        ps_json["meta"]["updated"] = @ps1["meta"]["updated"]
+      end
 
       ps_json.should eql(@ps1)
 
